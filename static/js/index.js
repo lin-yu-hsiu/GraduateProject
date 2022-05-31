@@ -15,12 +15,12 @@ $(document).ready(function () {
   let picId;
   $('.option').hover(function () {
     picId = $(this).find('img').attr('id');
-    $('#' + picId).attr("src", "../icon/" + picId + "_blue.png");
+    $('#' + picId).attr("src", "../static/icon/" + picId + "_blue.png");
     $(this).siblings().css("background-color", "#B6FFFF");
     $(this).css("background-color", "rgba(255, 255, 255, 0.3)");
   }, function () {
     picId = $(this).find('img').attr('id');
-    $('#' + picId).attr("src", "../icon/" + picId + ".png");
+    $('#' + picId).attr("src", "../static/icon/" + picId + ".png");
     $(this).siblings().css("background-color", "transparent");
     $(this).css("background-color", "#000000");
   });
