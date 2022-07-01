@@ -1,3 +1,46 @@
+<template>
+  <div class="bgLogin">
+    <div class="container">
+      <div class="row">
+        <div class="col-5 profile">
+          <div class="circle">
+            <div class="rec_gray">
+              <i class="bi bi-person-circle"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-5 info">
+          <h2 class="title">XXXX館</h2>
+          <h1 class="subtitle">Member Login</h1>
+          <form action="">
+            <div class="option">
+              <img class="account" src="../assets/icon/account.png" alt="">
+              <input class="input" type="text" placeholder="Account">
+            </div>
+            <div class="option">
+              <i class="bi bi-lock-fill"></i>
+              <input class="input" type="password" placeholder="Password">
+            </div>
+          </form>
+          <button class="submit" type="submit">LOGIN</button>
+          <p class="exception">Forget Username / Password</p>
+          <div class="createAccount">
+            <p class="exception">Create your Account</p>
+            <i class="bi bi-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<script>
+
+</script>
+
+
+<style scoped>
 .bgLogin {
   background-color: #494949;
   display: flex;
@@ -61,7 +104,12 @@
 
 .title {
   font-weight: bold;
-  margin: 80px 0 90px 0;
+  margin: 80px 0 30px 0;
+}
+
+.subtitle {
+  font-weight: bold;
+  margin: 0 0 80px 0;
 }
 
 .option {
@@ -75,9 +123,8 @@
   margin-bottom: 15px;
 }
 
-.bi-envelope-fill {
-  font-size: 30px;
-  color: #353535;
+.account {
+  width: 35px;
   margin-right: 20px;
 }
 
@@ -124,5 +171,6 @@
 .createAccount {
   display: flex;
   align-items: center;
-  margin-top: 150px;
+  margin-top: 140px;
 }
+</style>
