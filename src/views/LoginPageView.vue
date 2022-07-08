@@ -14,7 +14,7 @@
           <h1 class="subtitle">Member Login</h1>
           <form action="">
             <div class="option">
-              <img class="account" src="../assets/icon/account.png" alt="">
+              <img class="account" :src="imgSrc" alt="">
               <input class="input" type="text" placeholder="Account">
             </div>
             <div class="option">
@@ -36,7 +36,13 @@
 </template>
 
 <script>
-
+export default {
+  data() {
+    return {
+      imgSrc: 'icon/account.png',
+    };
+  }
+};
 </script>
 
 

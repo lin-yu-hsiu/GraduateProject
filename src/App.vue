@@ -1,14 +1,14 @@
 <template>
-  <PageViewVue></PageViewVue>
+  <PageView></PageView>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import PageViewVue from "./layouts/PageView.vue";
+import PageView from "./layouts/PageView.vue";
 
 export default defineComponent({
   components: {
-    PageViewVue
+    PageView
   }
 });
 </script>
