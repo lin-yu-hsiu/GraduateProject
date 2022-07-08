@@ -2,7 +2,7 @@ const mainRoutes = [
   {
     path: '/',
     name: 'redirect',
-    redirect: '/home',
+    component: () => import('../views/HomePageView.vue'),
     meta: { requireAuth: true }
   },
   {
