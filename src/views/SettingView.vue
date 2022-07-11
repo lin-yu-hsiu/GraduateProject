@@ -1,64 +1,71 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100 vw-100">
-    <div class="outer">
-      <form action="">
-        <label for="">Email</label>
-        <input type="email">
-        <label for="">Password</label>
-        <input type="password">
-        <label for="">Authority</label>
-        <input type="text">
-      </form>
-      <div class="submit">
-        <button class="store">
-          <img id="store" src="../assets/icon/store.png" alt="" style="width: 30px; height: 35px;">
-          <p>store</p>
+  <div class="d-flex">
+    <MenuBar></MenuBar>
+    <div class="d-flex justify-content-center align-items-center w-100">
+      <div class="outer">
+        <form action="">
+          <label for="">Email</label>
+          <input type="email">
+          <label for="">Password</label>
+          <input type="password">
+          <label for="">Authority</label>
+          <input type="text">
+        </form>
+        <div class="submit">
+          <button class="store">
+            <img id="store" src="../assets/pic/store.png" alt="" style="width: 30px; height: 35px;">
+            <p>store</p>
+          </button>
+          <button class="reset">
+            <img id="reset" src="../assets/pic/reset.png" alt="" style="width: 35px; height: 35px;">
+            <p>reset</p>
+          </button>
+        </div>
+        <button class="logout">
+          <img id="logout" src="../assets/pic/logout.png" alt="" style="width: 35px; height: 35px;">
+          <p>logout</p>
         </button>
-        <button class="reset">
-          <img id="reset" src="../assets/icon/reset.png" alt="" style="width: 35px; height: 35px;">
-          <p>reset</p>
-        </button>
-      </div>
-      <button class="logout">
-        <img id="logout" src="../assets/icon/logout.png" alt="" style="width: 35px; height: 35px;">
-        <p>logout</p>
-      </button>
 
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import MenuBar from '@/components/MenuBar.vue';
 import $ from 'jquery'
+import store from '../assets/pic/store.png'
+import store_blue from '../assets/pic/store_blue.png'
+import reset from '../assets/pic/reset.png'
+import reset_blue from '../assets/pic/reset_blue.png'
+import logout from '../assets/pic/logout.png'
+import logout_blue from '../assets/pic/logout_blue.png'
 
 export default {
-  name: "MenuBar",
-  data() {
-    return {
-
-    }
+  components: {
+    MenuBar
   },
   mounted() {
     $(document).ready(function () {
       $('.store').hover(function () {
-        $(this).find('img').attr("src", "../icon/" + $(this).find('img').attr('id') + "_blue.png");
+        $(this).find('img').attr("src", store_blue);
         $(this).find('p').show();
       }, function () {
-        $(this).find('img').attr("src", "../icon/" + $(this).find('img').attr('id') + ".png");
+        $(this).find('img').attr("src", store);
         $(this).find('p').hide();
       });
       $('.reset').hover(function () {
-        $(this).find('img').attr("src", "../icon/" + $(this).find('img').attr('id') + "_blue.png");
+        $(this).find('img').attr("src", reset_blue);
         $(this).find('p').show();
       }, function () {
-        $(this).find('img').attr("src", "../icon/" + $(this).find('img').attr('id') + ".png");
+        $(this).find('img').attr("src", reset);
         $(this).find('p').hide();
       });
       $('.logout').hover(function () {
-        $(this).find('img').attr("src", "../icon/" + $(this).find('img').attr('id') + "_blue.png");
+        $(this).find('img').attr("src", logout_blue);
         $(this).find('p').show();
       }, function () {
-        $(this).find('img').attr("src", "../icon/" + $(this).find('img').attr('id') + ".png");
+        $(this).find('img').attr("src", logout);
         $(this).find('p').hide();
       });
     });
@@ -69,8 +76,8 @@ export default {
 <style scoped>
 .outer {
   background-color: #222222;
-  width: 800px;
-  height: 400px;
+  width: 75vw;
+  height: 60vh;
   border-radius: 20px;
   display: flex;
   justify-content: center;

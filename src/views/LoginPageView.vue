@@ -36,10 +36,11 @@
 </template>
 
 <script>
+import account from '../assets/pic/account.png'
 export default {
   data() {
     return {
-      imgSrc: 'icon/account.png',
+      imgSrc: account,
     };
   }
 };

@@ -43,7 +43,6 @@ import store_white from '../assets/pic/store_white.png'
 
 
 import testpic2 from '../assets/pic/2.jpg'
-// import $ from 'jquery'
 
 export default {
   components: {
@@ -61,17 +60,6 @@ export default {
       store_white: store_white
     };
   },
-  mounted() {
-    // $(document).ready(function () {
-    //   $('.addBtn').hover(function () {
-    //     let picId = $(this).find('img').attr('id');
-    //     $('#' + picId).attr("src", store_white);
-    //   }, function () {
-    //     let picId = $(this).find('img').attr('id');
-    //     $('#' + picId).attr("src", store_black);
-    //   });
-    // });
-  }
 };
 </script>
 
@@ -152,12 +140,12 @@ export default {
   margin: 0 auto;
   padding: 4px 8px;
   transition: all 100ms ease;
-  border-radius: 30%;
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 25%), 0 -1px 4px 0 rgba(0, 0, 0, 25%);
+  border-radius: 15px;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 10%), 0 -1px 4px 0 rgba(0, 0, 0, 10%);
 }
 
 .addBtn:hover {
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 25%) inset,
-    0 -2px 4px 0 rgba(0, 0, 0, 25%) inset;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 10%) inset,
+    0 -2px 4px 0 rgba(0, 0, 0, 10%) inset;
 }
 </style>

@@ -1,46 +1,63 @@
 <template>
   <div class="menu">
-    <button class="content">
-      <div id="addRegion" class="option" @mouseover="icon1 = addRegion_icon_blue" @mouseleave="icon1 = addRegion_icon">
-        <img id="addRegion_icon" :src="icon1" alt="" style="width: 45px; height: 45px">
-        <h2 class="function">新增區域</h2>
-      </div>
-      <div class="decoration"></div>
-    </button>
-    <button class="content">
-      <div id="addDevice" class="option" @mouseover="icon2 = addDevice_icon_blue" @mouseleave="icon2 = addDevice_icon">
-        <img id="addDevice_icon" :src="icon2" alt="" style="width: 45px; height: 45px">
-        <h2 class="function">新增裝置</h2>
-      </div>
-      <div class="decoration"></div>
-    </button>
-    <button class="content">
-      <div id="viewDevice" class="option" @mouseover="icon3 = viewDevice_icon_blue"
-        @mouseleave="icon3 = viewDevice_icon">
-        <img id="viewDevice_icon" :src="icon3" alt="" style="width: 45px; height: 45px">
-        <h2 class="function">查看裝置</h2>
-      </div>
-      <div class="decoration"></div>
-    </button>
-
-    <button class="content">
-      <div id="switchRegion" class="option" @mouseover="icon4 = switchRegion_icon_blue"
-        @mouseleave="icon4 = switchRegion_icon">
-        <img id="switchRegion_icon" :src="icon4" alt="" style="width: 45px; height: 45px">
-        <h2 class="function">切換區域</h2>
-      </div>
-      <div class="decoration"></div>
-    </button>
-
-    <div class="info">
+    <router-link :to="{ name: 'addregion' }">
       <button class="content">
-        <div id="setting" class="option" @mouseover="icon5 = setting_icon_blue" @mouseleave="icon5 = setting_icon">
-          <img id="setting_icon" :src="icon5" alt="" style="width: 45px; height: 45px">
-          <h2 class="function">設定</h2>
+        <div id="addRegion" class="option" @mouseover="icon1 = addRegion_icon_blue"
+          @mouseleave="icon1 = addRegion_icon">
+          <img id="addRegion_icon" :src="icon1" alt="" style="width: 45px; height: 45px">
+          <h2 class="function">新增區域</h2>
         </div>
         <div class="decoration"></div>
       </button>
+    </router-link>
 
+    <router-link :to="{ name: 'adddevice' }">
+      <button class="content">
+        <div id="addDevice" class="option" @mouseover="icon2 = addDevice_icon_blue"
+          @mouseleave="icon2 = addDevice_icon">
+          <img id="addDevice_icon" :src="icon2" alt="" style="width: 45px; height: 45px">
+          <h2 class="function">新增裝置</h2>
+        </div>
+        <div class="decoration"></div>
+      </button>
+    </router-link>
+
+    <router-link :to="{ name: 'viewdevice' }">
+      <button class="content">
+        <div id="viewDevice" class="option" @mouseover="icon3 = viewDevice_icon_blue"
+          @mouseleave="icon3 = viewDevice_icon">
+          <img id="viewDevice_icon" :src="icon3" alt="" style="width: 45px; height: 45px">
+          <h2 class="function">查看裝置</h2>
+        </div>
+        <div class="decoration"></div>
+      </button>
+    </router-link>
+
+    <router-link :to="{ name: 'switchregion' }">
+      <button class="content">
+        <div id="switchRegion" class="option" @mouseover="icon4 = switchRegion_icon_blue"
+          @mouseleave="icon4 = switchRegion_icon">
+          <img id="switchRegion_icon" :src="icon4" alt="" style="width: 45px; height: 45px">
+          <h2 class="function">切換區域</h2>
+        </div>
+        <div class="decoration"></div>
+      </button>
+    </router-link>
+
+
+    <div class="info">
+
+      <router-link :to="{ name: 'setting' }">
+        <button class="content">
+          <div id="setting" class="option" @mouseover="icon5 = setting_icon_blue" @mouseleave="icon5 = setting_icon">
+            <img id="setting_icon" :src="icon5" alt="" style="width: 45px; height: 45px">
+            <h2 class="function">設定</h2>
+          </div>
+          <div class="decoration"></div>
+        </button>
+      </router-link>
+
+      <!-- <router-link :to="{ name: 'AddRegionView' }"></router-link> -->
       <button class="content">
         <div id="FAQ" class="option" @mouseover="icon6 = FAQ_icon_blue" @mouseleave="icon6 = FAQ_icon">
           <img id="FAQ_icon" :src="icon6" alt="" style="width: 45px; height: 45px">
@@ -94,17 +111,12 @@ export default {
       FAQ_icon_blue: FAQ_icon_blue
     }
   },
-  methods: {
-    hover() {
-
-    }
-  },
   mounted() {
     let optionName = document.querySelectorAll('.function');
     let menu = document.querySelector('.menu');
     $(document).ready(function () {
       $(menu).hover(function () {
-        $(optionName).fadeIn(300)
+        $(optionName).fadeIn(200)
         $(this).css('width', '190px');
       }, function () {
         $(optionName).hide()
@@ -128,6 +140,10 @@ export default {
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+}
+
 .menu {
   transition: 250ms all ease;
   background: linear-gradient(to right, #434343 0%, black 100%);
@@ -178,7 +194,7 @@ export default {
 .decoration {
   transition: 100ms all ease;
   height: 55px;
-  width: 10px;
+  width: 5px;
   justify-self: end;
 }
 </style>

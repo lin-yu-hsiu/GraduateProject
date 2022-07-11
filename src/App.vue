@@ -1,10 +1,10 @@
 <template>
-  <PageView></PageView>
+  <PageView />
 </template>
 
 <script>
-import { defineComponent } from "vue";
 import PageView from "./layouts/PageView.vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   components: {

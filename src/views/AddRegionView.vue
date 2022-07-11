@@ -14,19 +14,26 @@
           點擊以匯入平面圖 ...
         </button>
       </div>
+      <button class="clickToStore">
+        <img :src="store_black" style="width: 45px; height: 55px">
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import MenuBar from '@/components/MenuBar.vue';
+import loadpic from '../assets/pic/loadpic.png'
+import store_black from '../assets/pic/store_black.png'
+
 export default {
   components: {
     MenuBar
   },
   data() {
     return {
-      loadpic: 'icon/loadpic.png'
+      store_black: store_black,
+      loadpic: loadpic
     };
   },
 };
@@ -79,5 +86,20 @@ export default {
   background-color: #D9D9D9;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 10%) inset;
   color: #2b2b2b;
+}
+
+.clickToStore {
+  background-color: #e6e6e6;
+  border: none;
+  margin: 30px auto;
+  padding: 4px 8px;
+  transition: all 100ms ease;
+  border-radius: 15px;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 25%), 0 -1px 4px 0 rgba(0, 0, 0, 25%);
+}
+
+.clickToStore:hover {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 25%) inset,
+    0 -2px 4px 0 rgba(0, 0, 0, 25%) inset;
 }
 </style>
