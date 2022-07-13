@@ -117,7 +117,7 @@ export default {
     $(document).ready(function () {
       $(menu).hover(function () {
         $(optionName).fadeIn(200)
-        $(this).css('width', '190px');
+        $(this).css('width', '185px');
       }, function () {
         $(optionName).hide()
         $(this).css('width', '100px');

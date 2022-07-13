@@ -89,17 +89,16 @@ export default {
 }
 
 .clickToStore {
-  background-color: #e6e6e6;
+  background-color: transparent;
   border: none;
   margin: 30px auto;
   padding: 4px 8px;
   transition: all 100ms ease;
   border-radius: 15px;
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 25%), 0 -1px 4px 0 rgba(0, 0, 0, 25%);
 }
 
 .clickToStore:hover {
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 25%) inset,
-    0 -2px 4px 0 rgba(0, 0, 0, 25%) inset;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 15%) inset,
+    0 -2px 4px 0 rgba(0, 0, 0, 15%) inset;
 }
 </style>

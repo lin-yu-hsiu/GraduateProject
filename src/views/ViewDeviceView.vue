@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex p-5 w-100">
-      <ViewRegion class="m-3"></ViewRegion>
-      <ViewRegion class="m-3"></ViewRegion>
-      <ViewRegion class="m-3"></ViewRegion>
+    <div class="d-flex p-5 w-100" style="position: relative;">
+      <ViewRegion></ViewRegion>
+      <ViewRegion></ViewRegion>
+      <ViewRegion></ViewRegion>
     </div>
   </div>
 </template>
