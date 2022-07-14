@@ -11,7 +11,7 @@ import testpic1 from '../assets/pic/1.jpg'
 export default {
   data() {
     return {
-      regionname: "A棟",
+      regionname: "A 棟",
       thumbnail: testpic1
     }
   },

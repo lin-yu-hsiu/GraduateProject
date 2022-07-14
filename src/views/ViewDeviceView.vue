@@ -12,6 +12,7 @@
 <script>
 import MenuBar from '@/components/MenuBar.vue';
 import ViewRegion from '@/components/ViewRegion.vue';
+// import axios from 'axios';
 export default {
   components: {
     MenuBar,

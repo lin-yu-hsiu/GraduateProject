@@ -1,6 +1,6 @@
 <template>
-  <div class="detailFrameInfo d-flex justify-content-evenly align-items-center mt-3 mx-3"
-    :class="[isRemoving ? removeClass : '', isEditing ? editClass : '']">
+  <div class="detailFrameInfo d-flex justify-content-evenly align-items-center mt-1 mx-3"
+    :class="[isRemoving ? removeClass : '', isEditing ? editClass : '', deviceStatus ? '' : error]">
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
       <button class="detailBtn p-0" v-if="!isEditing && !isRemoving" @click="isEditing = true"
         @mouseover="icon1 = edit_hover" @mouseleave="icon1 = edit">
@@ -31,20 +31,36 @@
       <div v-if="isRemoving">確定刪除此裝置 ?</div>
     </div>
     <input v-if="isEditing" class="text-center edit scroll_white" :class="[isRemoving ? removeHidden : '']"
-      style="width: 100px;" type="text" placeholder="大門口">
-    <div v-else class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px;">大門口</div>
+      style="width: 100px;" type="text" :placeholder="deviceInfo.position">
+    <div v-else class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px;">
+      {{ deviceInfo.position }}</div>
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
-      <img :src="battery90" :class="[isRemoving ? removeHidden : '']" style="width: 60px; height: 30px">
+      <img :src="require('../assets/pic/' + deviceInfo.battery + '.png')" :class="[isRemoving ? removeHidden : '']"
+        style="width: 60px;">
     </div>
     <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
-      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"></textarea>
+      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
+      v-model="deviceInfo.message"></textarea>
     <textarea v-else name="" id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10"
-      rows="2" style="width: 150px"></textarea>
-    <n-switch :class="[isRemoving ? removeHidden : '']" style="width: 100px;"></n-switch>
+      rows="2" style="width: 150px" v-model="deviceInfo.message"></textarea>
+
+
+    <n-switch size="large" v-model:value="deviceInfo.switch" :class="[isRemoving ? removeHidden : '']"
+      style="width: 100px;"></n-switch>
+
+
+    <textarea v-if="isEditing" name="" id="psEditing" class="scroll edit scroll_white"
+      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
+      v-model="deviceInfo.ps"></textarea>
+    <textarea v-else name="" id="psContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10" rows="2"
+      style="width: 150px" v-model="deviceInfo.ps"></textarea>
   </div>
 </template>
 
 <script>
+// import axios from 'axios';
+import { defineComponent } from "vue";
+
 import edit from '../assets/pic/edit_green.png'
 import edit_hover from '../assets/pic/edit_green_hover.png'
 import remove from '../assets/pic/trash.png'
@@ -61,9 +77,33 @@ import battery50 from '../assets/pic/battery50.png'
 import battery30 from '../assets/pic/battery30.png'
 import battery20 from '../assets/pic/battery20.png'
 
-export default {
+export default defineComponent({
+  setup() {
+    // axios.get('http://192.168.0.100:5000/table/Message')
+    //   .then((res) => {
+    //     console.log(res.data)
+    //   })
+    // return {};
+  },
+  props: {
+    device: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
+      // 以下為props ----------------------------------
+      deviceInfo: this.device,
+      // 以下為variables ------------------------------
+      isEditing: false,
+      editClass: 'editClass',
+      isRemoving: false,
+      removeClass: 'removeClass',
+      removeHidden: 'removehidden',
+      deviceStatus: false,
+      error: 'error',
+      // 以下為icons ----------------------------------
       icon1: edit,
       icon2: remove,
       icon3: yes,
@@ -83,23 +123,19 @@ export default {
       battery50: battery50,
       battery30: battery30,
       battery20: battery20,
-      isEditing: false,
-      editClass: 'editClass',
-      isRemoving: false,
-      removeClass: 'removeClass',
-      removeHidden: 'removehidden',
     }
   },
   methods: {
 
   }
-}
+})
 </script>
 
 <style scoped>
 .detailFrameInfo {
   font-weight: bold;
   font-size: 18px;
+  padding: 8px 0px;
 }
 
 .detailBtn {
@@ -114,6 +150,20 @@ export default {
   font-size: 16px;
   border-radius: 5px;
   resize: none;
+}
+
+#psContent {
+  outline: none;
+  border: solid .5px rgba(0, 0, 0, 15%);
+  padding: 4px 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  resize: none;
+}
+
+.error {
+  background-color: rgba(255, 0, 0, 15%);
+  border-radius: 5px;
 }
 
 .edit {
@@ -132,15 +182,14 @@ export default {
   color: #ffffff;
   border-radius: 10px;
   padding: 8px 0px;
-  box-shadow: 0 .5px 4px 0 rgba(0, 0, 0, 15%), 0 -.5px 4px 0 rgba(0, 0, 0, 15%);
+  border: solid 0.5px rgba(0, 0, 0, 10%);
 }
 
 .removeClass {
   background-color: rgba(0, 0, 0, 100%);
   color: #ffffff;
   border-radius: 10px;
-  padding: 8px 0px;
-  box-shadow: 0 .5px 4px 0 rgba(0, 0, 0, 75%), 0 -.5px 4px 0 rgba(0, 0, 0, 75%);
+  padding: 0;
 }
 
 .removehidden {

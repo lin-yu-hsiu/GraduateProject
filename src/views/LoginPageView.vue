@@ -36,14 +36,25 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { defineComponent } from "vue";
+
 import account from '../assets/pic/account.png'
-export default {
+
+export default defineComponent({
+  setup() {
+    axios.get('http://192.168.0.100:5000/table/Message')
+      .then((res) => {
+        console.log(res.data)
+      })
+    return {};
+  },
   data() {
     return {
       imgSrc: account,
     };
   }
-};
+});
 </script>
 
 

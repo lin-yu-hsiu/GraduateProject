@@ -1,9 +1,13 @@
 <template>
-  <div class="regionList m-3">
+  <div class="regionList m-3" :class="[regionStatus ? noError : Error]">
     <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ regionname }}</div>
-    <button class="forDetail" @click="open = true">
+    <button v-if="!regionStatus" class="viewDetail" @click="open = true">
       <img :src="fordetail">
-      查看細節
+      查看裝置問題
+    </button>
+    <button v-if="regionStatus" class="viewDevice" @click="open = true">
+      <img :src="devicegood">
+      裝置一切正常
     </button>
   </div>
   <DeviceRegion v-if="open" @close="open = false" style="position: absolute; top:20vh; left:25vw">
@@ -11,27 +15,26 @@
 </template>
 
 <script>
+// import axios from 'axios';
 import DeviceRegion from './DeviceRegion.vue'
 
-import detail from '../assets/pic/fordetail.png'
-import good from '../assets/pic/good.png'
+import detail from '../assets/pic/fordetail_red.png'
+import good from '../assets/pic/good_green.png'
 
 export default {
   components: {
     DeviceRegion
   },
-  props: {
-    frame_status: {
-      required: true, // 此欄位必填
-    }
-  },
   data() {
     return {
-      regionname: "A棟",
+      regionname: "A-1 區",
       message: '',
       fordetail: detail,
       devicegood: good,
-      open: false
+      Error: 'mistake',
+      noError: 'no_mistake',
+      open: false,
+      regionStatus: false,
     }
   },
   methods: {
@@ -59,9 +62,9 @@ export default {
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 5%) inset;
 }
 
-.forDetail {
-  background-color: #464646;
-  color: #ffffff;
+.viewDetail {
+  background-color: #363636;
+  color: #fd2d2d;
   font-weight: bold;
   font-size: 24px;
   width: 220px;
@@ -71,7 +74,20 @@ export default {
   border: none;
 }
 
-.forDetail:hover {
+.viewDevice {
+  background-color: #363636;
+  color: #0FA958;
+  font-weight: bold;
+  font-size: 24px;
+  width: 220px;
+  height: 60px;
+  border-radius: 10px;
+  padding: 4px 8px;
+  border: none;
+}
+
+.viewDetail:hover,
+.viewDevice:hover {
   background-color: #2c2c2c;
 }
 
@@ -80,6 +96,6 @@ export default {
 }
 
 .mistake {
-  border: ridge 3px #df4a4a;
+  border: ridge 3px #fd2d2d;
 }
 </style>
