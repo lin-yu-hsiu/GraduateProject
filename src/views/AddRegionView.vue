@@ -6,15 +6,17 @@
         <div class="title mx-3">
           區域名稱
         </div>
-        <input class="regionName" type="text" placeholder="欲新增之名稱">
+        <input id="RegionName" class="regionName" type="text" placeholder="欲新增之名稱">
       </div>
       <div class="picRegion d-flex justify-content-center align-items-center">
-        <button class="clickToLoad">
-          <img :src="loadpic" style="width: 45px; height: 45px">
-          點擊以匯入平面圖 ...
-        </button>
+        <n-upload id="RegionPic" list-type="image" class="d-flex flex-column align-items-center" action="https://">
+          <button class="clickToLoad">
+            <img :src="loadpic" style="width: 45px; height: 45px">
+            點擊以匯入平面圖 ...
+          </button>
+        </n-upload>
       </div>
-      <button class="clickToStore">
+      <button class="clickToStore" @click="validate">
         <img :src="store_black" style="width: 45px; height: 55px">
       </button>
     </div>
@@ -36,6 +38,11 @@ export default {
       loadpic: loadpic
     };
   },
+  methods: {
+    validate() {
+
+    }
+  }
 };
 </script>
 
@@ -78,6 +85,7 @@ export default {
   font-weight: bold;
   border-radius: 5px;
   padding: 8px;
+  outline: none;
   background: linear-gradient(to right, #ffffff 0%, #D9D9D9 100%);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 15%);
 }

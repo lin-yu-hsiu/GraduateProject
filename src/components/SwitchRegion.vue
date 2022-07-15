@@ -1,20 +1,29 @@
 <template>
   <div class="regionList">
-    <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ regionname }}</div>
-    <img :src="thumbnail" class="thumbNail">
+    <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo.name }}</div>
+    <img :src="require('../assets/pic/' + regionInfo.thumbNail + '.jpg')" class="thumbNail">
   </div>
 </template>
 
 <script>
-import testpic1 from '../assets/pic/1.jpg'
-// import testpic2 from '../assets/pic/2.jpg'
+import regionpic1 from '../assets/pic/regionpic1.jpg'
+import regionpic2 from '../assets/pic/regionpic2.jpg'
+
 export default {
-  data() {
-    return {
-      regionname: "A 棟",
-      thumbnail: testpic1
+  props: {
+    region: {
+      type: Object,
+      required: true
     }
   },
+  data() {
+    return {
+      regionInfo: this.region,
+      regionpic1: regionpic1,
+      regionpic2: regionpic2,
+    }
+  },
+
 }
 </script>
 
