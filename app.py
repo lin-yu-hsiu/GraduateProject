@@ -74,5 +74,18 @@ def device():
     except TypeError as e:
         return str(content)
 
+@app.route("/login",methods=["POST"])
+def login():
+    if(request.method == 'POST'):
+        account = request.form.get('Account')
+        password = request.form.get('Password')
+        data = DB.show_data('People')
+        for i in data:
+            if((data[i]['Account'] == account) and data[i]['Password'] == password):
+                return 'Success'
+        return 'Failed'
+    else:
+        '訪問頁面方法錯誤'
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
