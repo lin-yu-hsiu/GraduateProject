@@ -111,6 +111,7 @@ def modify_data(table_name,content):        #修正表格資料 (BLE 資訊中�
     except sqlite3.OperationalError as e:
         return {"success": 0, "Result": e}
 
+<<<<<<< HEAD
 def modify_battery(content):            #針對 BLE 之中的電量進行修正
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
@@ -125,3 +126,11 @@ def modify_battery(content):            #針對 BLE 之中的電量進行修正
     except sqlite3.OperationalError as e:
         return {"success": 0, "Result": e}
     
+=======
+data = {
+        'Number': 12,
+        'Content':"紫紅好棒棒",
+        'Note': "眼睛業障重"
+    }
+# print(modify_data('Message',data))
+>>>>>>> origin/Server
