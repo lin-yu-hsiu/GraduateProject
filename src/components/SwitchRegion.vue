@@ -1,7 +1,7 @@
 <template>
   <div class="regionList">
     <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo.name }}</div>
-    <img :src="require('../assets/pic/' + regionInfo.thumbNail + '.jpg')" class="thumbNail">
+    <img :src="require('../assets/pic/' + regionInfo.thumbnail + '.jpg')" class="thumbNail">
   </div>
 </template>
 

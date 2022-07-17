@@ -1,7 +1,7 @@
 <template>
   <div class="detailFrameInfo d-flex justify-content-evenly align-items-center mt-1 mx-3"
     :class="[isRemoving ? removeClass : '', isEditing ? editClass : '', deviceStatus ? '' : error]">
-    <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
+    <!-- <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
       <button class="detailBtn p-0" v-if="!isEditing && !isRemoving" @click="isEditing = true"
         @mouseover="icon1 = edit_hover" @mouseleave="icon1 = edit">
         <img :src="icon1" style="width: 40px; height: 40px">
@@ -37,28 +37,28 @@
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
       <img :src="require('../assets/pic/' + deviceInfo.battery + '.png')" :class="[isRemoving ? removeHidden : '']"
         style="width: 60px;">
-    </div>
+    </div> -->
     <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
       :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
-      v-model="deviceInfo.message"></textarea>
+      v-model="deviceInfo.Content"></textarea>
     <textarea v-else name="" id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10"
-      rows="2" style="width: 150px" v-model="deviceInfo.message"></textarea>
+      rows="2" style="width: 150px" v-model="deviceInfo.Content"></textarea>
 
 
-    <n-switch size="large" v-model:value="deviceInfo.switch" :class="[isRemoving ? removeHidden : '']"
-      style="width: 100px;"></n-switch>
+    <!-- <n-switch size="large" v-model:value="deviceInfo.switch" :class="[isRemoving ? removeHidden : '']"
+      style="width: 100px;"></n-switch> -->
 
 
     <textarea v-if="isEditing" name="" id="psEditing" class="scroll edit scroll_white"
       :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
-      v-model="deviceInfo.ps"></textarea>
+      v-model="deviceInfo.Note"></textarea>
     <textarea v-else name="" id="psContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10" rows="2"
-      style="width: 150px" v-model="deviceInfo.ps"></textarea>
+      style="width: 150px" v-model="deviceInfo.Note"></textarea>
   </div>
 </template>
 
 <script>
-// import axios from 'axios';
+
 import { defineComponent } from "vue";
 
 import edit from '../assets/pic/edit_green.png'
@@ -77,14 +77,11 @@ import battery50 from '../assets/pic/battery50.png'
 import battery30 from '../assets/pic/battery30.png'
 import battery20 from '../assets/pic/battery20.png'
 
+
+
 export default defineComponent({
-  setup() {
-    // axios.get('http://192.168.0.100:5000/table/Message')
-    //   .then((res) => {
-    //     console.log(res.data)
-    //   })
-    // return {};
-  },
+
+
   props: {
     device: {
       type: Object,

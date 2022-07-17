@@ -19,50 +19,29 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import axios from 'axios';
+import { defineComponent } from "vue";
 import DeviceInfo from './DeviceInfo.vue'
 
-const devices = [
-  {
-    position: '1',
-    battery: 'battery100',
-    message: '1',
-    switch: true,
-    ps: '1',
-  },
-  {
-    position: '2',
-    battery: 'battery90',
-    message: '2',
-    switch: false,
-    ps: '2',
-  },
-  {
-    position: '3',
-    battery: 'battery80',
-    message: '3',
-    switch: false,
-    ps: '3',
-  },
-  {
-    position: '4',
-    battery: 'battery60',
-    message: '4',
-    switch: true,
-    ps: '4',
-  }
-];
-
+// const devices = [
+//   {
+//     position: '1',
+//     battery: 'battery100',
+//     message: '1',
+//     switch: true,
+//     note: '1',
+//   },
+// ];
+const API = 'http://192.168.0.102:5000/table/Message'
 export default defineComponent({
-  components: {
-    DeviceInfo
-  },
   data() {
     return {
-      devices: devices,
+      devices: {},
       shutdown: false,
-      deviceNum: 4,
     }
+  },
+  components: {
+    DeviceInfo
   },
   methods: {
     Opendevice() {
@@ -76,8 +55,16 @@ export default defineComponent({
         this.devices[i].switch = false
       }
       this.shutdown = false
+    },
+    async fetchApi() {
+      await axios.get(API)
+        .then((response) => this.devices = response.data)
+        .catch((error) => console.log(error))
     }
   },
+  mounted() {
+    this.fetchApi()
+  }
 })
 </script>
 

@@ -1,10 +1,11 @@
 from unittest import result
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from jinja2 import Undefined
+from flask_cors import CORS
 import DB,json
 
 app = Flask(__name__)
-
+CORS(app)
 @app.route("/")             #切換 URL
 def Home():
     return "Home Page"
@@ -30,7 +31,7 @@ def insert(name):
 
 @app.route("/delete/<name>")
 def delete(name):
-    pk = 3
+    pk = 13
     result = DB.delete_data(name,pk)
     if(result['success']):
         return jsonify(result)
