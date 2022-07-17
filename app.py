@@ -27,7 +27,7 @@ def insert(name):
         "Xaxis":100,
         "Yaxis":100,
         "Battery":'0%',
-        "Status": "Turned Off",
+        "Status": 0,
         "Place": "服務台"
     }
     result = DB.insert_data(name,data)

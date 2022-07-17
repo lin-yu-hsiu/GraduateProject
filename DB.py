@@ -150,7 +150,10 @@ def show_device_info():
             temp['Xaxis'] = records[row][3]
             temp['Yaxis'] = records[row][4]
             temp['Battery'] = records[row][5]
-            temp['Status'] = records[row][6]
+            if(records[row][6] == 1):
+                temp['Status'] = True
+            else:
+                temp['Status'] = False
             temp['Place'] = records[row][7]
             temp['Content'] = records[row][9]
             temp['Note'] = records[row][10]
