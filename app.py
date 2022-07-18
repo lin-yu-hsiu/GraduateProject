@@ -21,14 +21,14 @@ def table(name):
 @app.route("/create/<name>")
 def insert(name):
     data = {
-        "UUID": "testUUID2",
-        "MessageNum": 17,
-        "MapNum":1,
-        "Xaxis":100,
-        "Yaxis":100,
-        "Battery":'0%',
+        "UUID": "Test2",
+        "Message": "鼎元我大哥",
+        "MapNum": 2,
+        "Xaxis": 100,
+        "Yaxis": 100,
+        "Battery": "50%",
         "Status": 0,
-        "Place": "服務台"
+        "Note": "none"
     }
     result = DB.insert_data(name,data)
     if(result['success']):
@@ -86,6 +86,8 @@ def login():
         return 'Failed'
     else:
         '訪問頁面方法錯誤'
+
+
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)

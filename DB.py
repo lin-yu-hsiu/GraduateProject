@@ -1,19 +1,16 @@
-from operator import contains
-import re
+"""
+注意事項:
+    1. 資料中請不要使用 ' 會影響 sql 語法
+    2. 
+"""
 import sqlite3
-from unittest import result
-
-from numpy import array
-
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','MessageNum','MapNum','Xaxis','Yaxis','Battery','Status','Place'],
-    'Message':['Number','Content','Note'],
-    'Map':['Number','Route'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note'],
+    'Map':['Number','Route','Venue','Area'],
     'PK':{
         'People':'Email',
         'BLE':'UUID',
-        'Message':'Number',
         'Map':'Number'
     }
 }
@@ -39,7 +36,6 @@ def show_data(table_name):                  #回傳表格內容
 
 #新增一筆資料 (BLE 資料中的電量和狀態預設為 "0%" 和 "Turn Off"), (Map 和 Message 的 PK 有 AUTOINCREMENT)
 def insert_data(table_name, content):
-    print(content)
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
@@ -47,11 +43,9 @@ def insert_data(table_name, content):
         if(table_name == 'People'):
             ins += 'Email,Account,Password) values ('
         elif(table_name == 'BLE'):
-            ins += 'UUID,MessageNum,MapNum,Xaxis,Yaxis,Battery,Status,Place) values ('
-        elif(table_name == 'Message'):
-            ins += 'Content,Note) values ('
+            ins += 'UUID,Message,MapNum,Xaxis,Yaxis,Battery,Status,Note) values ('
         elif(table_name == 'Map'):
-            ins += 'Route) values ('
+            ins += 'Route,Venue,Area) values ('
         for i in content:
             if(type(content[i]) == str):
                 ins += str("'{}',".format(content[i]))
@@ -102,8 +96,8 @@ def modify_data(table_name,content):        #修正表格資料 (BLE 資訊中�
             ins += 'Account = "{}",Password = "{}" where Email = "{}";'\
                 .format(content['Account'],content['Password'],dbContent['PK']['People'],content['Email'])
         elif(table_name == 'BLE'):
-            ins += 'MessageNum = {},MapNum = {},Xaxis = {},Yaxis = {} where UUID = "{}";'\
-                .format(content['MessageNum'],content['MapNum'],content['Xaxis'],content['Yaxis'],content['UUID'])
+            ins += 'Message = {},MapNum = {},Xaxis = {},Yaxis = {},Status = {} where UUID = "{}";'\
+                .format(content['Message'],content['MapNum'],content['Xaxis'],content['Yaxis'],content['Status'],content['Place'],content['UUID'])
         elif(table_name == 'Message'):
             ins += 'Content = "{}",Note = "{}" where Number = {};'\
                 .format(content['Content'],content['Note'],content['Number'])
@@ -136,28 +130,29 @@ def show_device_info():
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
-        cursor.execute('SELECT * from BLE INNER JOIN Message on BLE.MessageNum = Message.Number INNER JOIN Map on BLE.MapNum = Map.Number;')
+        cursor.execute('SELECT * from BLE INNER JOIN Map on BLE.MapNum = Map.Number;')
         conn.commit()
         records = cursor.fetchall()
         cursor.close()
         conn.close()
         result = []
+        print(records)
         for row in range(0,len(records)):
             temp = {}
             temp['UUID'] = records[row][0]
-            temp['MessageNum'] = records[row][1]
-            temp['MapNum'] = records[row][2]
-            temp['Xaxis'] = records[row][3]
-            temp['Yaxis'] = records[row][4]
-            temp['Battery'] = records[row][5]
-            if(records[row][6] == 1):
+            temp['MapNum'] = records[row][1]
+            temp['Xaxis'] = records[row][2]
+            temp['Yaxis'] = records[row][3]
+            temp['Battery'] = records[row][4]
+            if(records[row][5] == 1):
                 temp['Status'] = True
             else:
                 temp['Status'] = False
-            temp['Place'] = records[row][7]
-            temp['Content'] = records[row][9]
-            temp['Note'] = records[row][10]
-            temp['Route'] = records[row][12]
+            temp['Content'] = records[row][6]
+            temp['Note'] = records[row][7]
+            temp['Route'] = records[row][9]
+            temp['Venue'] = records[row][10]
+            temp['Area'] = records[row][11]
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:
