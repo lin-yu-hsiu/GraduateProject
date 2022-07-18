@@ -1,4 +1,5 @@
 from unittest import result
+from urllib import response
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from jinja2 import Undefined
 from flask_cors import CORS
@@ -87,6 +88,15 @@ def login():
     else:
         '訪問頁面方法錯誤'
 
+@app.route("/test",methods=["POST","GET"])
+def test():
+    if request.method == 'POST':
+        data = str(request.data,encoding="UTF-8")
+        temp = json.loads(data)
+        print("POST 資料為: " + temp)
+        return jsonify(temp)
+    else:
+        return 'This is GET way. Not POST!!'
 
     
 if __name__ == '__main__':

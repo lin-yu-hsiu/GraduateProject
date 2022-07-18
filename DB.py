@@ -1,7 +1,7 @@
 """
 注意事項:
     1. 資料中請不要使用 ' 會影響 sql 語法
-    2. 
+    2. 之後記得部分改成 POST (鈺修進度)
 """
 import sqlite3
 dbContent = {
