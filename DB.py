@@ -87,23 +87,23 @@ def delete_all(table_name):
     except sqlite3.OperationalError as e:
         return {"success": 0, "Result": e}
 
-def modify_data(table_name,content):        #修正表格資料 (BLE 資訊中的電量以及狀態將在其他路由處理)
+def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以及狀態將在其他路由處理)
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
-        ins = 'Update {} set '.format(table_name)
-        if(table_name == 'People'):
-            ins += 'Account = "{}",Password = "{}" where Email = "{}";'\
-                .format(content['Account'],content['Password'],dbContent['PK']['People'],content['Email'])
-        elif(table_name == 'BLE'):
-            ins += 'Message = {},MapNum = {},Xaxis = {},Yaxis = {},Status = {} where UUID = "{}";'\
-                .format(content['Message'],content['MapNum'],content['Xaxis'],content['Yaxis'],content['Status'],content['Place'],content['UUID'])
-        elif(table_name == 'Message'):
-            ins += 'Content = "{}",Note = "{}" where Number = {};'\
-                .format(content['Content'],content['Note'],content['Number'])
-        elif(table_name == 'Map'):
-            ins += 'Route = {} where Number = {};'\
-                .format(content['route'],content['Number'])
+        ins = "Update BLE set "
+        for i in content:
+            if(i != 'UUID' and i != 'Place'):
+                ins += '{} = '.format(i)
+                if(type(content[i]) == str):
+                    ins += "'{}'".format(content[i])
+                else:
+                    ins += '{}'.format(content[i])
+                ins += ','
+            else:
+                continue
+        ins = ins[0:len(ins)-1]
+        ins += " where UUID = '{}';".format(content['UUID'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()

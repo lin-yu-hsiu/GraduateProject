@@ -54,19 +54,6 @@ def deleteAll(name):
     else:
         return jsonify(result)
 
-@app.route("/modify/<name>")
-def modify(name):
-    data = {
-        'Number': 12,
-        'Content':"好棒棒",
-        'Note': "眼睛業障重"
-    }
-    result = DB.modify_data(name,data)
-    if(result['success']):
-        return jsonify(result)
-    else:
-        return jsonify(result)
-
 @app.route("/deviceInfo")
 def device():
     content = DB.show_device_info()
@@ -88,15 +75,15 @@ def login():
     else:
         '訪問頁面方法錯誤'
 
-@app.route("/test",methods=["POST","GET"])
+@app.route("/test",methods=["POST"])
 def test():
-    if request.method == 'POST':
-        data = str(request.data,encoding="UTF-8")
-        temp = json.loads(data)
-        print("POST 資料為: " + temp)
-        return jsonify(temp)
+    data = str(request.data,encoding="UTF-8")
+    temp = json.loads(data)
+    result = DB.modify_BLE(temp)
+    if(result['success']):
+        return jsonify(result)
     else:
-        return 'This is GET way. Not POST!!'
+        return jsonify(result)
 
     
 if __name__ == '__main__':
