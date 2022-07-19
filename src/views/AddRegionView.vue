@@ -2,6 +2,7 @@
   <div class="d-flex">
     <MenuBar></MenuBar>
     <div class="d-flex flex-column p-5 w-100">
+      <div class="building">您目前所在場館為 {{ currentBuilding }}</div>
       <div class="d-flex justify-content-center align-items-center my-5">
         <div class="title mx-3">
           區域名稱
@@ -35,7 +36,8 @@ export default {
   data() {
     return {
       store_black: store_black,
-      loadpic: loadpic
+      loadpic: loadpic,
+      currentBuilding: 'A 棟'
     };
   },
   methods: {
@@ -47,6 +49,13 @@ export default {
 </script>
 
 <style scoped>
+.building {
+  font-weight: bold;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+}
+
 .picRegion {
   width: 70vw;
   height: 60vh;

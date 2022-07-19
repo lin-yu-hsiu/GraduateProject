@@ -5,7 +5,7 @@ const routes = [
     path: '/',
     name: 'home',
     component: () => import('../views/HomePageView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true }, // 用來作為此頁是否需要權限驗證的設定
   },
   {
     path: '/login',
@@ -22,7 +22,7 @@ const routes = [
   {
     path: '/switchregion',
     name: 'switchregion',
-    component: () => import('../views/SwitchRegionView.vue'),
+    component: () => import('../views/SwitchBuildingView.vue'),
     meta: { requireAuth: true }
   },
   {

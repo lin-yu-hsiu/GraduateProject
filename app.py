@@ -79,11 +79,13 @@ def login():
 def test():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
+    print(temp)
     result = DB.modify_BLE(temp)
-    if(result['success']):
-        return jsonify(result)
-    else:
-        return jsonify(result)
+    # if(result['success']):
+    #     return jsonify(result)
+    # else:
+    #     return jsonify(result)
+    return 'Success'
 
     
 if __name__ == '__main__':

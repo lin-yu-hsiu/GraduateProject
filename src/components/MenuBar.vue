@@ -38,7 +38,7 @@
         <div id="switchRegion" class="option" @mouseover="icon4 = switchRegion_icon_blue"
           @mouseleave="icon4 = switchRegion_icon">
           <img id="switchRegion_icon" :src="icon4" alt="" style="width: 45px; height: 45px">
-          <h2 class="function">切換區域</h2>
+          <h2 class="function">切換場館</h2>
         </div>
         <div class="decoration"></div>
       </button>

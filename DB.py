@@ -93,7 +93,7 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
     try:
         ins = "Update BLE set "
         for i in content:
-            if(i != 'UUID' and i != 'Place'):
+            if(i != 'UUID'):
                 ins += '{} = '.format(i)
                 if(type(content[i]) == str):
                     ins += "'{}'".format(content[i])
@@ -104,6 +104,7 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
                 continue
         ins = ins[0:len(ins)-1]
         ins += " where UUID = '{}';".format(content['UUID'])
+        print(ins)
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -148,7 +149,7 @@ def show_device_info():
                 temp['Status'] = True
             else:
                 temp['Status'] = False
-            temp['Content'] = records[row][6]
+            temp['Message'] = records[row][6]
             temp['Note'] = records[row][7]
             temp['Route'] = records[row][9]
             temp['Venue'] = records[row][10]

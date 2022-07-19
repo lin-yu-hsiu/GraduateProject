@@ -1,7 +1,7 @@
 <template>
   <div class="detailFrameInfo d-flex justify-content-evenly align-items-center mt-1 mx-3"
     :class="[isRemoving ? removeClass : '', isEditing ? editClass : '', deviceStatus ? '' : error]">
-    <!-- <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
+    <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
       <button class="detailBtn p-0" v-if="!isEditing && !isRemoving" @click="isEditing = true"
         @mouseover="icon1 = edit_hover" @mouseleave="icon1 = edit">
         <img :src="icon1" style="width: 40px; height: 40px">
@@ -10,7 +10,8 @@
         @mouseover="icon2 = remove_hover" @mouseleave="icon2 = remove">
         <img :src="icon2" style="width: 30px; height: 35px">
       </button>
-      <button v-if="isEditing" class="detailBtn p-0 ms-1" @mouseover="icon3 = yes_hover" @mouseleave="icon3 = yes">
+      <button name="CommitEdit" v-if="isEditing" class="detailBtn p-0 ms-1" @click="editChange"
+        @mouseover="icon3 = yes_hover" @mouseleave="icon3 = yes">
         <img :src="icon3" style="width: 45px; height: 45px">
       </button>
       <button v-if="isEditing" class="detailBtn p-0" @click="isEditing = false" @mouseover="icon4 = no_hover"
@@ -20,7 +21,8 @@
     </div>
     <div v-if="isRemoving">
       <div class="d-flex justify-content-around align-items-center">
-        <button v-if="isRemoving" class="detailBtn p-0" @mouseover="icon3 = yes_hover" @mouseleave="icon3 = yes">
+        <button v-if="isRemoving" class="detailBtn p-0" @click="removeChange" @mouseover="icon3 = yes_hover"
+          @mouseleave="icon3 = yes">
           <img :src="icon3" style="width: 50px; height: 50px">
         </button>
         <button v-if="isRemoving" class="detailBtn p-0" @click="isRemoving = false" @mouseover="icon4 = no_hover"
@@ -30,35 +32,41 @@
       </div>
       <div v-if="isRemoving">確定刪除此裝置 ?</div>
     </div>
-    <input v-if="isEditing" class="text-center edit scroll_white" :class="[isRemoving ? removeHidden : '']"
-      style="width: 100px;" type="text" :placeholder="deviceInfo.position">
-    <div v-else class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px;">
-      {{ deviceInfo.position }}</div>
+
+    <div class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px; color: #000000;">
+      {{ deviceInfo.Area }}</div>
+
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
-      <img :src="require('../assets/pic/' + deviceInfo.battery + '.png')" :class="[isRemoving ? removeHidden : '']"
-        style="width: 60px;">
-    </div> -->
+      <img
+        :src="require('../assets/pic/' + 'battery' + (deviceInfo.Battery.substr(0, deviceInfo.Battery.length - 1)) + '.png')"
+        :class="[isRemoving ? removeHidden : '']" style="width: 60px;">
+    </div>
+
     <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
       :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
-      v-model="deviceInfo.Content"></textarea>
-    <textarea v-else name="" id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10"
-      rows="2" style="width: 150px" v-model="deviceInfo.Content"></textarea>
+      v-model="deviceInfo.Message"></textarea>
+    <textarea v-else name="" disabled id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']"
+      cols="10" rows="2" style="width: 150px" v-model="deviceInfo.Message"></textarea>
 
 
-    <!-- <n-switch size="large" v-model:value="deviceInfo.switch" :class="[isRemoving ? removeHidden : '']"
-      style="width: 100px;"></n-switch> -->
+    <n-switch size="large" v-if="isEditing" v-model:value="deviceInfo.Status" :class="[isRemoving ? removeHidden : '']"
+      style="width: 100px;">
+    </n-switch>
+    <n-switch size="large" v-else disabled v-model:value="deviceInfo.Status" :class="[isRemoving ? removeHidden : '']"
+      style="width: 100px;">
+    </n-switch>
 
 
     <textarea v-if="isEditing" name="" id="psEditing" class="scroll edit scroll_white"
       :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
       v-model="deviceInfo.Note"></textarea>
-    <textarea v-else name="" id="psContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10" rows="2"
-      style="width: 150px" v-model="deviceInfo.Note"></textarea>
+    <textarea v-else name="" disabled id="psContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10"
+      rows="2" style="width: 150px" v-model="deviceInfo.Note"></textarea>
   </div>
 </template>
 
 <script>
-
+import axios from 'axios';
 import { defineComponent } from "vue";
 
 import edit from '../assets/pic/edit_green.png'
@@ -70,18 +78,12 @@ import yes_hover from '../assets/pic/yes_hover.png'
 import no from '../assets/pic/no.png'
 import no_hover from '../assets/pic/no_hover.png'
 import battery100 from '../assets/pic/battery100.png'
-import battery90 from '../assets/pic/battery90.png'
-import battery80 from '../assets/pic/battery80.png'
-import battery60 from '../assets/pic/battery60.png'
 import battery50 from '../assets/pic/battery50.png'
-import battery30 from '../assets/pic/battery30.png'
-import battery20 from '../assets/pic/battery20.png'
+import battery0 from '../assets/pic/battery0.png'
 
 
-
+const testAPI = 'http://192.168.0.100:5000/test'
 export default defineComponent({
-
-
   props: {
     device: {
       type: Object,
@@ -114,16 +116,42 @@ export default defineComponent({
       no: no,
       no_hover: no_hover,
       battery100: battery100,
-      battery90: battery90,
-      battery80: battery80,
-      battery60: battery60,
       battery50: battery50,
-      battery30: battery30,
-      battery20: battery20,
+      battery0: battery0,
     }
   },
   methods: {
-
+    async editChange() {
+      const body = {
+        'UUID': this.deviceInfo.UUID,
+        'Status': this.deviceInfo.Status,
+        'Message': this.deviceInfo.Message,
+        'Note': this.deviceInfo.Note,
+      }
+      const json = JSON.stringify(body);
+      const res = await axios.post(testAPI, json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(res);
+    },
+    async removeChange() {
+      const body = {
+        'UUID': this.deviceInfo.UUID,
+        'Venue': this.deviceInfo.Venue,
+      }
+      const json = JSON.stringify(body);
+      const res = await axios.post(testAPI, json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(res);
+    }
+  },
+  mounted() {
+    console.log(this.device);
   }
 })
 </script>

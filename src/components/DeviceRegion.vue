@@ -8,8 +8,8 @@
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 150px">訊息</div>
-          <button class="openBtn" v-if="!shutdown" @click="Opendevice">一鍵開機</button>
-          <button class="closeBtn" v-if="shutdown" @click="Closedevice">一鍵關機</button>
+          <button class="openBtn" name="OpenAllDevice" v-if="!shutdown" @click="Opendevice">一鍵開機</button>
+          <button class="closeBtn" name="CloseAllDevice" v-if="shutdown" @click="Closedevice">一鍵關機</button>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
         <DeviceInfo v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
@@ -23,16 +23,8 @@ import axios from 'axios';
 import { defineComponent } from "vue";
 import DeviceInfo from './DeviceInfo.vue'
 
-// const devices = [
-//   {
-//     position: '1',
-//     battery: 'battery100',
-//     message: '1',
-//     switch: true,
-//     note: '1',
-//   },
-// ];
-const API = 'http://192.168.0.102:5000/table/Message'
+const API = 'http://192.168.0.100:5000/deviceInfo'
+const testAPI = 'http://192.168.0.100:5000/test'
 export default defineComponent({
   data() {
     return {
@@ -45,14 +37,14 @@ export default defineComponent({
   },
   methods: {
     Opendevice() {
-      for (let i = 0; i < this.deviceNum; i++) {
-        this.devices[i].switch = true
+      for (let i = 0; i < this.devices.length; i++) {
+        this.devices[i].Status = true
       }
       this.shutdown = true
     },
     Closedevice() {
-      for (let i = 0; i < this.deviceNum; i++) {
-        this.devices[i].switch = false
+      for (let i = 0; i < this.devices.length; i++) {
+        this.devices[i].Status = false
       }
       this.shutdown = false
     },
@@ -60,7 +52,21 @@ export default defineComponent({
       await axios.get(API)
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
-    }
+    },
+    async alldevicestatusChange() {
+      const body = {
+        'UUID': this.deviceInfo.UUID,
+        'Venue': this.deviceInfo.Venue,
+        'Status': this.deviceInfo.Status,
+      }
+      const json = JSON.stringify(body);
+      const res = await axios.post(testAPI, json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(res);
+    },
   },
   mounted() {
     this.fetchApi()
