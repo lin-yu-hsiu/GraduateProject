@@ -84,7 +84,7 @@ def login():
         '訪問頁面方法錯誤'
 
 @app.route("/modifyBLE",methods=["POST"])
-def test():
+def modifyBLE():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
     result = DB.modify_BLE(temp)
@@ -92,6 +92,17 @@ def test():
         return jsonify(result)
     else:
         return jsonify(result)
+
+@app.route("/switchBLE",methods=["POST"])
+def switchBLE():
+    data = str(request.data,encoding="UTF-8")
+    temp = json.loads(data)
+    result = DB.switch_BLE(temp)
+    if(result['success']):
+        return jsonify(result)
+    else:
+        return jsonify(result)
+
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)

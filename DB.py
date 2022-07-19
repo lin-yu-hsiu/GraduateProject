@@ -4,6 +4,8 @@
     2. 之後記得部分改成 POST (鈺修進度)
 """
 import sqlite3
+
+from numpy import record
 dbContent = {
     'People': ['Email','Account','Password'],
     'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note'],
@@ -117,7 +119,7 @@ def modify_battery(content):            #針對 BLE 之中的電量進行修正
     cursor = conn.cursor()
     try:
         ins = 'Update BLE set '
-        ins += 'Battery = {} where UUID = "{}";'.format(content)
+        ins += 'Battery = {} where UUID = "{}";'.format(content['Status'],content['UUID'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -142,20 +144,32 @@ def show_device_info(number):
         for row in range(0,len(records)):
             temp = {}
             temp['UUID'] = records[row][0]
-            temp['MapNum'] = records[row][1]
-            temp['Xaxis'] = records[row][2]
-            temp['Yaxis'] = records[row][3]
-            temp['Battery'] = records[row][4]
-            if(records[row][5] == 1):
-                temp['Status'] = True
-            else:
-                temp['Status'] = False
-            temp['Message'] = records[row][6]
+            temp['Message'] = records[row][1]
+            temp['MapNum'] = records[row][2]
+            temp['Xaxis'] = records[row][3]
+            temp['Yaxis'] = records[row][4]
+            temp['Battery'] = records[row][5]
+            temp['Status'] = bool(records[row][6])
             temp['Note'] = records[row][7]
             temp['Route'] = records[row][9]
             temp['Venue'] = records[row][10]
             temp['Area'] = records[row][11]
+            
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:
         return e
+
+def switch_BLE(content):
+    conn = sqlite3.connect('test.db', check_same_thread=False)
+    cursor = conn.cursor()
+    try:
+        ins = 'Update BLE set '
+        ins += 'Status = {} where MapNum = "{}";'.format(content['Status'],content['MapNum'])
+        cursor.execute(ins)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {"success": 1,'Result': '修改成功'}
+    except sqlite3.OperationalError as e:
+        return {"success": 0, "Result": e}
