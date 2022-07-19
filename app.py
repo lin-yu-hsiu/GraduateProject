@@ -22,12 +22,12 @@ def table(name):
 @app.route("/create/<name>")
 def insert(name):
     data = {
-        "UUID": "Test2",
-        "Message": "鼎元我大哥",
-        "MapNum": 2,
+        "UUID": "Test8",
+        "Message": "目前所在位置為 B-2",
+        "MapNum": 4,
         "Xaxis": 100,
         "Yaxis": 100,
-        "Battery": "50%",
+        "Battery": "100%",
         "Status": 0,
         "Note": "none"
     }
@@ -54,9 +54,17 @@ def deleteAll(name):
     else:
         return jsonify(result)
 
+@app.route("/deviceInfo/<name>")
+def device(name):
+    content = DB.show_device_info(name)
+    try:
+        return jsonify(content)
+    except TypeError as e:
+        return str(content)
+
 @app.route("/deviceInfo")
-def device():
-    content = DB.show_device_info()
+def allDevice():
+    content = DB.show_device_info(-1)
     try:
         return jsonify(content)
     except TypeError as e:
@@ -75,18 +83,15 @@ def login():
     else:
         '訪問頁面方法錯誤'
 
-@app.route("/test",methods=["POST"])
+@app.route("/modifyBLE",methods=["POST"])
 def test():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
-    print(temp)
     result = DB.modify_BLE(temp)
-    # if(result['success']):
-    #     return jsonify(result)
-    # else:
-    #     return jsonify(result)
-    return 'Success'
-
+    if(result['success']):
+        return jsonify(result)
+    else:
+        return jsonify(result)
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)

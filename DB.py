@@ -104,7 +104,6 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
                 continue
         ins = ins[0:len(ins)-1]
         ins += " where UUID = '{}';".format(content['UUID'])
-        print(ins)
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -127,17 +126,19 @@ def modify_battery(content):            #針對 BLE 之中的電量進行修正
     except sqlite3.OperationalError as e:
         return {"success": 0, "Result": e}
 
-def show_device_info():
+def show_device_info(number):
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
-        cursor.execute('SELECT * from BLE INNER JOIN Map on BLE.MapNum = Map.Number;')
+        if(number != -1):
+            cursor.execute('SELECT * from BLE INNER JOIN Map on BLE.MapNum = Map.Number where BLE.MapNum = {};'.format(number))
+        else:
+            cursor.execute('SELECT * from BLE INNER JOIN Map on BLE.MapNum = Map.Number;')
         conn.commit()
         records = cursor.fetchall()
         cursor.close()
         conn.close()
         result = []
-        print(records)
         for row in range(0,len(records)):
             temp = {}
             temp['UUID'] = records[row][0]
