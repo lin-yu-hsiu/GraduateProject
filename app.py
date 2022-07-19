@@ -28,8 +28,9 @@ def insert(name):
         "Xaxis": 100,
         "Yaxis": 100,
         "Battery": "100%",
-        "Status": 0,
-        "Note": "none"
+        "Status": 1,
+        "Note": "none",
+        "Place": '地點8'
     }
     result = DB.insert_data(name,data)
     if(result['success']):

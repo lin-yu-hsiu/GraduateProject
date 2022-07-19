@@ -8,7 +8,7 @@ import sqlite3
 from numpy import record
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place'],
     'Map':['Number','Route','Venue','Area'],
     'PK':{
         'People':'Email',
@@ -45,7 +45,7 @@ def insert_data(table_name, content):
         if(table_name == 'People'):
             ins += 'Email,Account,Password) values ('
         elif(table_name == 'BLE'):
-            ins += 'UUID,Message,MapNum,Xaxis,Yaxis,Battery,Status,Note) values ('
+            ins += 'UUID,Message,MapNum,Xaxis,Yaxis,Battery,Status,Note,Place) values ('
         elif(table_name == 'Map'):
             ins += 'Route,Venue,Area) values ('
         for i in content:
@@ -151,10 +151,10 @@ def show_device_info(number):
             temp['Battery'] = records[row][5]
             temp['Status'] = bool(records[row][6])
             temp['Note'] = records[row][7]
-            temp['Route'] = records[row][9]
-            temp['Venue'] = records[row][10]
-            temp['Area'] = records[row][11]
-            
+            temp['Place'] = records[row][8]
+            temp['Route'] = records[row][10]
+            temp['Venue'] = records[row][11]
+            temp['Area'] = records[row][12]
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:
