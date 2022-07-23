@@ -1,14 +1,18 @@
+"""
+注意事項:
+    1. 資料中請不要使用 ' 會影響 sql 語法
+    2. 之後記得部分改成 POST (鈺修進度)
+"""
 import sqlite3
 
+from numpy import record
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','MessageNum','MapNum','Xaxis','Yaxis','Battery','Status'],
-    'Message':['Number','Content','Note'],
-    'Map':['Number','Route'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place'],
+    'Map':['Number','Route','Venue','Area'],
     'PK':{
         'People':'Email',
         'BLE':'UUID',
-        'Message':'Number',
         'Map':'Number'
     }
 }
@@ -33,7 +37,7 @@ def show_data(table_name):                  #回傳表格內容
         return e
 
 #新增一筆資料 (BLE 資料中的電量和狀態預設為 "0%" 和 "Turn Off"), (Map 和 Message 的 PK 有 AUTOINCREMENT)
-def insert_data(table_name, content):       
+def insert_data(table_name, content):
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
@@ -41,17 +45,16 @@ def insert_data(table_name, content):
         if(table_name == 'People'):
             ins += 'Email,Account,Password) values ('
         elif(table_name == 'BLE'):
-            ins += 'UUID,MessageNum,MapNum,Xaxis,Yaxis) values ('
-        elif(table_name == 'Message'):
-            ins += 'Content,Note) values ('
+            ins += 'UUID,Message,MapNum,Xaxis,Yaxis,Battery,Status,Note,Place) values ('
         elif(table_name == 'Map'):
-            ins += 'Route) values ('
+            ins += 'Route,Venue,Area) values ('
         for i in content:
-            if(type(content[i] == str)):
+            if(type(content[i]) == str):
                 ins += str("'{}',".format(content[i]))
             else:
                 ins += str(str(content[i]) + ',')
         ins = ins[:-1] + ');'
+        print(ins)
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -86,23 +89,23 @@ def delete_all(table_name):
     except sqlite3.OperationalError as e:
         return {"success": 0, "Result": e}
 
-def modify_data(table_name,content):        #修正表格資料 (BLE 資訊中的電量以及狀態將在其他路由處理)
+def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以及狀態將在其他路由處理)
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
-        ins = 'Update {} set '.format(table_name)
-        if(table_name == 'People'):
-            ins += 'Account = "{}",Password = "{}" where Email = "{}";'\
-                .format(content['Account'],content['Password'],dbContent['PK']['People'],content['Email'])
-        elif(table_name == 'BLE'):
-            ins += 'MessageNum = {},MapNum = {},Xaxis = {},Yaxis = {} where UUID = "{}";'\
-                .format(content['MessageNum'],content['MapNum'],content['Xaxis'],content['Yaxis'],content['UUID'])
-        elif(table_name == 'Message'):
-            ins += 'Content = "{}",Note = "{}" where Number = {};'\
-                .format(content['Content'],content['Note'],content['Number'])
-        elif(table_name == 'Map'):
-            ins += 'Route = {} where Number = {};'\
-                .format(content['route'],content['Number'])
+        ins = "Update BLE set "
+        for i in content:
+            if(i != 'UUID'):
+                ins += '{} = '.format(i)
+                if(type(content[i]) == str):
+                    ins += "'{}'".format(content[i])
+                else:
+                    ins += '{}'.format(content[i])
+                ins += ','
+            else:
+                continue
+        ins = ins[0:len(ins)-1]
+        ins += " where UUID = '{}';".format(content['UUID'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -116,7 +119,7 @@ def modify_battery(content):            #針對 BLE 之中的電量進行修正
     cursor = conn.cursor()
     try:
         ins = 'Update BLE set '
-        ins += 'Battery = {} where UUID = "{}";'.format(content)
+        ins += 'Battery = {} where UUID = "{}";'.format(content['Status'],content['UUID'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -124,4 +127,49 @@ def modify_battery(content):            #針對 BLE 之中的電量進行修正
         return {"success": 1,'Result': '修改成功'}
     except sqlite3.OperationalError as e:
         return {"success": 0, "Result": e}
-    
+
+def show_device_info(number):
+    conn = sqlite3.connect('test.db', check_same_thread=False)
+    cursor = conn.cursor()
+    try:
+        if(number != -1):
+            cursor.execute('SELECT * from BLE INNER JOIN Map on BLE.MapNum = Map.Number where BLE.MapNum = {};'.format(number))
+        else:
+            cursor.execute('SELECT * from BLE INNER JOIN Map on BLE.MapNum = Map.Number;')
+        conn.commit()
+        records = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        result = []
+        for row in range(0,len(records)):
+            temp = {}
+            temp['UUID'] = records[row][0]
+            temp['Message'] = records[row][1]
+            temp['MapNum'] = records[row][2]
+            temp['Xaxis'] = records[row][3]
+            temp['Yaxis'] = records[row][4]
+            temp['Battery'] = records[row][5]
+            temp['Status'] = bool(records[row][6])
+            temp['Note'] = records[row][7]
+            temp['Place'] = records[row][8]
+            temp['Route'] = records[row][10]
+            temp['Venue'] = records[row][11]
+            temp['Area'] = records[row][12]
+            result.append(temp)
+        return result
+    except sqlite3.OperationalError as e:
+        return e
+
+def switch_BLE(content):
+    conn = sqlite3.connect('test.db', check_same_thread=False)
+    cursor = conn.cursor()
+    try:
+        ins = 'Update BLE set '
+        ins += 'Status = {} where MapNum = "{}";'.format(content['Status'],content['MapNum'])
+        cursor.execute(ins)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {"success": 1,'Result': '修改成功'}
+    except sqlite3.OperationalError as e:
+        return {"success": 0, "Result": e}

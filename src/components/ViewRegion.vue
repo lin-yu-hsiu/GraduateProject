@@ -1,6 +1,6 @@
 <template>
   <div class="regionList m-3" :class="[regionStatus ? noError : Error]">
-    <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ regionname }}</div>
+    <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
     <button v-if="!regionStatus" class="viewDetail" @click="open = true">
       <img :src="fordetail">
       查看裝置問題
@@ -10,7 +10,8 @@
       裝置一切正常
     </button>
   </div>
-  <DeviceRegion v-if="open" @close="open = false" style="position: absolute; top:20vh; left:25vw">
+  <DeviceRegion :passMapNum="region.MapNum" v-if="open" @close="open = false"
+    style="position: absolute; top:20vh; left:25vw">
   </DeviceRegion>
 </template>
 
@@ -21,16 +22,24 @@ import DeviceRegion from './DeviceRegion.vue'
 import detail from '../assets/pic/fordetail_red.png'
 import good from '../assets/pic/good_green.png'
 
+
+
 export default {
   components: {
     DeviceRegion
   },
+  props: {
+    region: {
+      required: true
+    }
+  },
   data() {
     return {
-      regionname: "A-1 區",
-      message: '',
       fordetail: detail,
       devicegood: good,
+
+      regions: this.region,
+
       Error: 'mistake',
       noError: 'no_mistake',
       open: false,
@@ -39,7 +48,10 @@ export default {
   },
   methods: {
 
-  }
+  },
+  mounted() {
+
+  },
 }
 </script>
 

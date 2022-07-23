@@ -1,4 +1,5 @@
 from unittest import result
+from urllib import response
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from jinja2 import Undefined
 from flask_cors import CORS
@@ -21,7 +22,15 @@ def table(name):
 @app.route("/create/<name>")
 def insert(name):
     data = {
-        
+        "UUID": "Test8",
+        "Message": "目前所在位置為 B-2",
+        "MapNum": 4,
+        "Xaxis": 100,
+        "Yaxis": 100,
+        "Battery": "100%",
+        "Status": 1,
+        "Note": "none",
+        "Place": '地點8'
     }
     result = DB.insert_data(name,data)
     if(result['success']):
@@ -31,7 +40,7 @@ def insert(name):
 
 @app.route("/delete/<name>")
 def delete(name):
-    pk = 13
+    pk = 3
     result = DB.delete_data(name,pk)
     if(result['success']):
         return jsonify(result)
@@ -46,29 +55,55 @@ def deleteAll(name):
     else:
         return jsonify(result)
 
-@app.route("/modify/<name>")
-def modify(name):
-    data = {
-        'Number': 12,
-        'Content':"好棒棒",
-        'Note': "眼睛業障重"
-    }
-    result = DB.modify_data(name,data)
-    if(result['success']):
-        return jsonify(result)
-    else:
-        return jsonify(result)
+@app.route("/deviceInfo/<name>")
+def device(name):
+    content = DB.show_device_info(name)
+    try:
+        return jsonify(content)
+    except TypeError as e:
+        return str(content)
 
-@app.route("/renew_battery",methods = ['POST'])
-def renew():
-    data = request.data
-    data = '100%'
-    result = DB.renewBattery(data)
-    if(result['success']):
-        return 'Success'
-    else:
+@app.route("/deviceInfo")
+def allDevice():
+    content = DB.show_device_info(-1)
+    try:
+        return jsonify(content)
+    except TypeError as e:
+        return str(content)
+
+@app.route("/login",methods=["POST"])
+def login():
+    if(request.method == 'POST'):
+        account = request.form.get('Account')
+        password = request.form.get('Password')
+        data = DB.show_data('People')
+        for i in data:
+            if((data[i]['Account'] == account) and data[i]['Password'] == password):
+                return 'Success'
         return 'Failed'
+    else:
+        '訪問頁面方法錯誤'
 
+@app.route("/modifyBLE",methods=["POST"])
+def modifyBLE():
+    data = str(request.data,encoding="UTF-8")
+    temp = json.loads(data)
+    result = DB.modify_BLE(temp)
+    if(result['success']):
+        return jsonify(result)
+    else:
+        return jsonify(result)
 
+@app.route("/switchBLE",methods=["POST"])
+def switchBLE():
+    data = str(request.data,encoding="UTF-8")
+    temp = json.loads(data)
+    result = DB.switch_BLE(temp)
+    if(result['success']):
+        return jsonify(result)
+    else:
+        return jsonify(result)
+
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)

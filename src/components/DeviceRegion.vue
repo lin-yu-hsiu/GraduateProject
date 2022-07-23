@@ -8,8 +8,8 @@
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 150px">訊息</div>
-          <button class="openBtn" v-if="!shutdown" @click="Opendevice">一鍵開機</button>
-          <button class="closeBtn" v-if="shutdown" @click="Closedevice">一鍵關機</button>
+          <button class="openBtn" name="OpenAllDevice" v-if="!shutdown" @click="Opendevice">一鍵開機</button>
+          <button class="closeBtn" name="CloseAllDevice" v-if="shutdown" @click="Closedevice">一鍵關機</button>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
         <DeviceInfo v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
@@ -19,25 +19,23 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 import { defineComponent } from "vue";
 import DeviceInfo from './DeviceInfo.vue'
 
-// const devices = [
-//   {
-//     position: '1',
-//     battery: 'battery100',
-//     message: '1',
-//     switch: true,
-//     note: '1',
-//   },
-// ];
-const API = 'http://192.168.0.102:5000/table/Message'
+
 export default defineComponent({
   data() {
     return {
-      devices: {},
+      devices: [],
+      alldevices: [],
       shutdown: false,
+      mapNum: this.passMapNum,
+    }
+  },
+  props: {
+    passMapNum: {
+      required: true
     }
   },
   components: {
@@ -45,25 +43,46 @@ export default defineComponent({
   },
   methods: {
     Opendevice() {
-      for (let i = 0; i < this.deviceNum; i++) {
-        this.devices[i].switch = true
+      for (let i = 0; i < this.devices.length; i++) {
+        this.alldevices.pop()
+      }
+      for (let i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].Status == false) {
+          this.alldevices.push({ 'Status': this.devices[i].Status, 'Venue': this.devices[i].Venue })
+        }
       }
       this.shutdown = true
+      console.log(JSON.stringify(this.alldevices))
+      this.alldevicestatusChange()
     },
     Closedevice() {
-      for (let i = 0; i < this.deviceNum; i++) {
-        this.devices[i].switch = false
+      for (let i = 0; i < this.devices.length; i++) {
+        this.alldevices.pop()
+      }
+      console.log(this.devices.length)
+      for (let i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].Status == true) {
+          this.alldevices.push({ 'Status': this.devices[i].Status, 'Venue': this.devices[i].Venue })
+        }
+        console.log(JSON.stringify(this.alldevices))
       }
       this.shutdown = false
+      this.alldevicestatusChange()
     },
-    async fetchApi() {
-      await axios.get(API)
+    async handleAPI(mapNum) {
+      const API = 'http://192.168.0.102:5000/deviceInfo/'
+      await axios({
+        method: 'get',
+        baseURL: API,
+        url: mapNum.toString(),
+        'Content-Type': 'application/json',
+      })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
-    }
+    },
   },
   mounted() {
-    this.fetchApi()
+    this.handleAPI(this.mapNum)
   }
 })
 </script>

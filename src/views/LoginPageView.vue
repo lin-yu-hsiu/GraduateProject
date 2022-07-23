@@ -12,21 +12,28 @@
         <div class="col-5 info">
           <h2 class="title">XXXX館</h2>
           <h1 class="subtitle">Member Login</h1>
-          <form action="">
+          <form @submit.prevent="memberLogin" class="d-flex flex-column align-items-center">
             <div class="option">
               <img class="account" :src="imgSrc" alt="">
-              <input class="input" type="text" placeholder="Account">
+              <input name="Account" class="input" type="text" placeholder="Account" v-model="loginForm.account">
             </div>
             <div class="option">
               <i class="bi bi-lock-fill"></i>
-              <input class="input" type="password" placeholder="Password">
+              <input name="Password" class="input" type="password" placeholder="Password" v-model="loginForm.password">
             </div>
+
+            <button class="submit" type="submit">LOGIN</button>
+
+            <!-- <p class="exception">If you forget Username / Password, call us</p>
+            <div class="createAccount">
+              <p class="exception">Create your Account</p>
+              <i class="bi bi-arrow-right"></i>
+            </div> -->
           </form>
-          <button class="submit" type="submit">LOGIN</button>
-          <p class="exception">Forget Username / Password</p>
-          <div class="createAccount">
-            <p class="exception">Create your Account</p>
-            <i class="bi bi-arrow-right"></i>
+          <div v-if="loginStatus == 'Failed'" class="d-flex justify-content-center align-items-center"
+            style="font-weight: 800">
+            <img :src="errorSrc" style="width: 40px; height: 40px">
+            帳號或密碼不存在
           </div>
         </div>
       </div>
@@ -36,23 +43,62 @@
 </template>
 
 <script>
+// import Cookies from 'js-cookie'
 import axios from 'axios';
 import { defineComponent } from "vue";
 
 import account from '../assets/pic/account.png'
+import error from '../assets/pic/loginerror.png'
 
+
+const API = 'http://192.168.0.102:5000/login'
 export default defineComponent({
   setup() {
-    axios.get('http://192.168.0.100:5000/table/Message')
-      .then((res) => {
-        console.log(res.data)
-      })
-    return {};
+
   },
   data() {
     return {
       imgSrc: account,
+      errorSrc: error,
+      loginForm: {
+        account: '',
+        password: '',
+        token: ''
+      },
+      loginStatus: false,
     };
+  },
+  methods: {
+    async memberLogin() {
+      let useraccount = this.loginForm.account
+      let userpassword = this.loginForm.password
+
+      await axios({
+        method: 'post',
+        url: API,
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'multipart/form-data'
+          // 'Authorization': `Bearer ${token}` // Bearer 跟 token 中間有一個空格
+        },
+        data: {
+          'Account': useraccount,
+          'Password': userpassword
+        }
+      }).then(response => {
+        this.loginStatus = response.data
+        console.log(this.loginStatus)
+        if (this.loginStatus == 'Success') {
+          this.$router.push({ name: 'home' })
+        }
+        else {
+          return response.data;
+        }
+
+      }).catch(err => {
+        console.log(err);
+      })
+    }
   }
 });
 </script>
