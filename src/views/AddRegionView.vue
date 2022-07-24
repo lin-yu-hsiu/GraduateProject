@@ -2,14 +2,21 @@
   <div class="d-flex">
     <MenuBar></MenuBar>
     <div class="d-flex flex-column p-5 w-100">
-      <div class="building">您目前所在場館為 {{ currentBuilding }}</div>
-      <div class="d-flex justify-content-center align-items-center my-5">
+      <div class="d-flex justify-content-center align-items-center">
+        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
+        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
+          {{
+              $store.state.currentvenue
+          }}
+        </div>
+      </div>
+      <div v-if="$store.state.currvenue" class="d-flex justify-content-center align-items-center my-5">
         <div class="title mx-3">
           區域名稱
         </div>
         <input id="RegionName" class="regionName" type="text" placeholder="欲新增之名稱">
       </div>
-      <div class="picRegion d-flex justify-content-center align-items-center">
+      <div v-if="$store.state.currvenue" class="picRegion d-flex justify-content-center align-items-center">
         <n-upload id="RegionPic" list-type="image" class="d-flex flex-column align-items-center" action="https://">
           <button class="clickToLoad">
             <img :src="loadpic" style="width: 45px; height: 45px">
@@ -17,7 +24,7 @@
           </button>
         </n-upload>
       </div>
-      <button class="clickToStore" @click="validate">
+      <button v-if="$store.state.currvenue" class="clickToStore" @click="validate">
         <img :src="store_black" style="width: 45px; height: 55px">
       </button>
     </div>
@@ -49,13 +56,6 @@ export default {
 </script>
 
 <style scoped>
-.building {
-  font-weight: bold;
-  font-size: 24px;
-  display: flex;
-  justify-content: center;
-}
-
 .picRegion {
   width: 70vw;
   height: 60vh;

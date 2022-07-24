@@ -8,8 +8,8 @@
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 150px">訊息</div>
-          <button class="openBtn" name="OpenAllDevice" v-if="!shutdown" @click="Opendevice">一鍵開機</button>
-          <button class="closeBtn" name="CloseAllDevice" v-if="shutdown" @click="Closedevice">一鍵關機</button>
+          <button class="openBtn" name="OpenAllDevice" v-if="this.shutdown" @click="alldevicestatusChange">一鍵開機</button>
+          <button class="closeBtn" name="CloseAllDevice" v-else @click="alldevicestatusChange">一鍵關機</button>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
         <DeviceInfo v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
@@ -19,57 +19,69 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 import { defineComponent } from "vue";
 import DeviceInfo from './DeviceInfo.vue'
 
-const API = 'http://192.168.0.100:5000/deviceInfo'
-const testAPI = 'http://192.168.0.100:5000/test'
+
 export default defineComponent({
   data() {
     return {
-      devices: {},
-      shutdown: false,
+      devices: [],
+      alldevices: [],
+      shutdown: '',
+      mapNum: this.passMapNum,
+    }
+  },
+  props: {
+    passMapNum: {
+      required: true
     }
   },
   components: {
     DeviceInfo
   },
   methods: {
-    Opendevice() {
-      for (let i = 0; i < this.devices.length; i++) {
-        this.devices[i].Status = true
-      }
-      this.shutdown = true
-    },
-    Closedevice() {
-      for (let i = 0; i < this.devices.length; i++) {
-        this.devices[i].Status = false
-      }
-      this.shutdown = false
-    },
-    async fetchApi() {
-      await axios.get(API)
+    async handleAPI(mapNum) {
+      const API = 'http://192.168.0.103:5000/deviceInfo/'
+      await axios({
+        method: 'get',
+        baseURL: API,
+        url: mapNum.toString(),
+        'Content-Type': 'application/json',
+      })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
+      for (let i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].Status == false) {
+          this.shutdown = true
+        }
+        else this.shutdown = false
+      }
     },
     async alldevicestatusChange() {
+
+      console.log(this.devices)
+      const switchBLEAPI = 'http://192.168.0.103:5000/switchBLE'
+      // let res = ''
       const body = {
-        'UUID': this.deviceInfo.UUID,
-        'Venue': this.deviceInfo.Venue,
-        'Status': this.deviceInfo.Status,
+        // 傳其中一個device的MapNum跟Status就好
+        'MapNum': this.devices[0].MapNum,
+        'Status': this.shutdown
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(testAPI, json, {
+      console.log(json)
+      const res = await axios.post(switchBLEAPI, json, {
         headers: {
           'Content-Type': 'application/json'
         }
-      });
-      console.log(res);
+      })
+      console.log(res)
+      this.handleAPI(this.mapNum)
     },
   },
   mounted() {
-    this.fetchApi()
+    this.handleAPI(this.mapNum)
   }
 })
 </script>

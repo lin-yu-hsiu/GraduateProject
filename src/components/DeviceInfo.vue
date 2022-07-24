@@ -34,11 +34,11 @@
     </div>
 
     <div class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px; color: #000000;">
-      {{ deviceInfo.Area }}</div>
+      {{ deviceInfo.Place }}</div>
 
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
-      <img
-        :src="require('../assets/pic/' + 'battery' + (deviceInfo.Battery.substr(0, deviceInfo.Battery.length - 1)) + '.png')"
+      <img v-if="deviceInfo.Battery"
+        :src="require('../assets/pic/' + 'battery' + (deviceInfo.Battery.substr(0, deviceInfo.Battery.length - 1)).toString() + '.png')"
         :class="[isRemoving ? removeHidden : '']" style="width: 60px;">
     </div>
 
@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 import { defineComponent } from "vue";
 
 import edit from '../assets/pic/edit_green.png'
@@ -81,13 +81,11 @@ import battery100 from '../assets/pic/battery100.png'
 import battery50 from '../assets/pic/battery50.png'
 import battery0 from '../assets/pic/battery0.png'
 
-
-const testAPI = 'http://192.168.0.100:5000/test'
+const testAPI = 'http://192.168.0.103:5000/modifyBLE'
 export default defineComponent({
   props: {
     device: {
       type: Object,
-      required: true
     }
   },
   data() {
@@ -135,11 +133,11 @@ export default defineComponent({
         }
       });
       console.log(res);
+      this.isEditing = false
     },
     async removeChange() {
       const body = {
         'UUID': this.deviceInfo.UUID,
-        'Venue': this.deviceInfo.Venue,
       }
       const json = JSON.stringify(body);
       const res = await axios.post(testAPI, json, {
@@ -148,10 +146,10 @@ export default defineComponent({
         }
       });
       console.log(res);
-    }
+      this.isRemoving = false
+    },
   },
   mounted() {
-    console.log(this.device);
   }
 })
 </script>

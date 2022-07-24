@@ -1,18 +1,18 @@
 <template>
   <div class="regionList">
-    <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo.name }}</div>
-    <img :src="require('../assets/pic/' + regionInfo.thumbnail + '.jpg')" class="thumbNail">
+    <div style=" font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo }}</div>
+    <!-- <img :src="require('../assets/pic/' + regionInfo.Route + '.jpg')" class="thumbNail"> -->
   </div>
 </template>
 
 <script>
+import { defineComponent } from "vue";
 import regionpic1 from '../assets/pic/regionpic1.jpg'
 import regionpic2 from '../assets/pic/regionpic2.jpg'
 
-export default {
+export default defineComponent({
   props: {
     region: {
-      type: Object,
       required: true
     }
   },
@@ -23,8 +23,13 @@ export default {
       regionpic2: regionpic2,
     }
   },
+  methods: {
 
-}
+  },
+  mounted() {
+
+  },
+});
 </script>
 
 <style scoped>
