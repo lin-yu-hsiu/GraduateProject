@@ -1,18 +1,26 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column align-items-center p-5 w-100" :class="(locating && no_cursor) ? notlocateCursor : ''"
-      style="position: relative">
-      <n-select size="large" class="region" :consistent-menu-width="false" v-model:show="show" filterable
-        placeholder="請選擇欲新增裝置之區域" :options="options">
+    <div class="d-flex flex-column align-items-center p-5 w-100"
+      :class="(locating && no_cursor) ? notlocateCursor : ''">
+      <div class="d-flex justify-content-center align-items-center">
+        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
+        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
+          {{
+              $store.state.currentvenue
+          }}
+        </div>
+      </div>
+      <n-select v-if="$store.state.currvenue" size="large" class="region" :consistent-menu-width="false"
+        v-model:show="show" filterable placeholder="請選擇欲新增裝置之區域" :options="options">
         <template v-if="show" #arrow>
           <md-search />
         </template>
       </n-select>
-      <button class="locateBtn mb-3" @click="add_status = true; locating = true;">
+      <button v-if="$store.state.currvenue" class="locateBtn mb-3" @click="add_status = true; locating = true;">
         <img :src="locatePic">
       </button>
-      <div class="frame">
+      <div v-if="$store.state.currvenue" class="frame">
         <img :src="pic" :class="locating ? canlocateCursor : ''" @click="add_device = true; no_cursor = false">
       </div>
       <AddDeviceInfo style="cursor: default;" v-if="add_status && add_device"
@@ -22,32 +30,19 @@
 </template>
 
 <script>
+import axios from 'axios'
 import MdSearch from '@vicons/ionicons4/MdSearch'
 import { defineComponent, ref } from 'vue'
 import MenuBar from '@/components/MenuBar.vue';
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
 
 import locatePic from '../assets/pic/location.png'
-import regionpic2 from '../assets/pic/regionpic2.jpg'
 
 export default defineComponent({
   setup() {
     return {
       show: ref(false),
-      options: [
-        {
-          label: 'A-1區',
-          value: 'A-1'
-        },
-        {
-          label: 'A-2區',
-          value: 'A-2'
-        },
-        {
-          label: 'A-3區',
-          value: 'A-3'
-        },
-      ]
+      options: [],
     }
   },
   components: {
@@ -58,7 +53,7 @@ export default defineComponent({
   data() {
     return {
       locatePic: locatePic,
-      pic: regionpic2,
+      pic: '',
       add_status: false,
       add_device: false,
       locating: false,
@@ -70,10 +65,26 @@ export default defineComponent({
     };
   },
   methods: {
-    showData() {
-      console.log(this.show)
-
-    }
+    async fetchApi() {
+      let regions = []
+      await axios({
+        method: 'get',
+        baseURL: this.$store.state.api + '/deviceInfo',
+        'Content-Type': 'application/json',
+      })
+        .then((response) => regions = response.data)
+        .catch((err) => { console.error(err) })
+      let regionSet = new Set()
+      for (let i = 0; i < regions.length; i++) {
+        if (regions[i].Venue == this.$store.state.currentvenue) {
+          regionSet.add(regions[i].Area)
+        }
+      }
+      regionSet.forEach((item) => this.options.push({ 'label': item, 'value': item }));
+    },
+  },
+  mounted() {
+    this.fetchApi()
   }
 });
 </script>
@@ -102,7 +113,7 @@ export default defineComponent({
 
 .frame {
   width: 80vw;
-  height: 700px;
+  height: 100%;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 25%) inset;
   position: relative;
 

@@ -22,7 +22,7 @@ def table(name):
 @app.route("/create/<name>")
 def insert(name):
     data = {
-        "UUID": "Test8",
+        "UUID": "Test9",
         "Message": "目前所在位置為 B-2",
         "MapNum": 4,
         "Xaxis": 100,
@@ -33,15 +33,6 @@ def insert(name):
         "Place": '地點8'
     }
     result = DB.insert_data(name,data)
-    if(result['success']):
-        return jsonify(result)
-    else:
-        return jsonify(result)
-
-@app.route("/delete/<name>")
-def delete(name):
-    pk = 3
-    result = DB.delete_data(name,pk)
     if(result['success']):
         return jsonify(result)
     else:
@@ -99,6 +90,17 @@ def switchBLE():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
     result = DB.switch_BLE(temp)
+    if(result['success']):
+        return jsonify(result)
+    else:
+        return jsonify(result)
+
+@app.route("/deleteBLE",methods=["POST"])
+def deleteBLE():
+    data = str(request.data,encoding="UTF-8")
+    temp = json.loads(data)
+    print(temp)
+    result = DB.delete_data("BLE",temp['UUID'])
     if(result['success']):
         return jsonify(result)
     else:

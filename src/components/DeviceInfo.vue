@@ -81,7 +81,7 @@ import battery100 from '../assets/pic/battery100.png'
 import battery50 from '../assets/pic/battery50.png'
 import battery0 from '../assets/pic/battery0.png'
 
-const testAPI = ''
+
 export default defineComponent({
   props: {
     device: {
@@ -127,32 +127,29 @@ export default defineComponent({
         'Note': this.deviceInfo.Note,
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(testAPI, json, {
+      const res = await axios.post(this.$store.state.api + '/modifyBLE', json, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
       console.log(res);
+      this.isEditing = false
     },
     async removeChange() {
       const body = {
         'UUID': this.deviceInfo.UUID,
-        'Venue': this.deviceInfo.Venue,
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(testAPI, json, {
+      const res = await axios.post(this.$store.state.api + '/deleteBLE', json, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
       console.log(res);
+      this.isRemoving = false
     },
-    te() {
-      console.log(this.deviceInfo)
-    }
   },
   mounted() {
-    this.te()
   }
 })
 </script>

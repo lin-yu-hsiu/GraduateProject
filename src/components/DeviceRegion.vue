@@ -8,8 +8,8 @@
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 150px">訊息</div>
-          <button class="openBtn" name="OpenAllDevice" v-if="!shutdown" @click="Opendevice">一鍵開機</button>
-          <button class="closeBtn" name="CloseAllDevice" v-if="shutdown" @click="Closedevice">一鍵關機</button>
+          <button class="openBtn" name="OpenAllDevice" v-if="this.shutdown" @click="alldevicestatusChange">一鍵開機</button>
+          <button class="closeBtn" name="CloseAllDevice" v-else @click="alldevicestatusChange">一鍵關機</button>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
         <DeviceInfo v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
@@ -29,7 +29,7 @@ export default defineComponent({
     return {
       devices: [],
       alldevices: [],
-      shutdown: false,
+      shutdown: '',
       mapNum: this.passMapNum,
     }
   },
@@ -42,43 +42,51 @@ export default defineComponent({
     DeviceInfo
   },
   methods: {
-    Opendevice() {
-      for (let i = 0; i < this.devices.length; i++) {
-        this.alldevices.pop()
-      }
-      for (let i = 0; i < this.devices.length; i++) {
-        if (this.devices[i].Status == false) {
-          this.alldevices.push({ 'Status': this.devices[i].Status, 'Venue': this.devices[i].Venue })
-        }
-      }
-      this.shutdown = true
-      console.log(JSON.stringify(this.alldevices))
-      this.alldevicestatusChange()
-    },
-    Closedevice() {
-      for (let i = 0; i < this.devices.length; i++) {
-        this.alldevices.pop()
-      }
-      console.log(this.devices.length)
-      for (let i = 0; i < this.devices.length; i++) {
-        if (this.devices[i].Status == true) {
-          this.alldevices.push({ 'Status': this.devices[i].Status, 'Venue': this.devices[i].Venue })
-        }
-        console.log(JSON.stringify(this.alldevices))
-      }
-      this.shutdown = false
-      this.alldevicestatusChange()
-    },
     async handleAPI(mapNum) {
-      const API = 'http://192.168.0.102:5000/deviceInfo/'
+      const API = 'http://192.168.0.103:5000/deviceInfo/'
       await axios({
         method: 'get',
         baseURL: API,
         url: mapNum.toString(),
-        'Content-Type': 'application/json',
+        headers: { 'Content-Type': 'application/json' },
       })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
+      // 偵測是否有裝置
+      for (let i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].Status == false) {
+          this.shutdown = true
+        }
+        else this.shutdown = false
+      }
+    },
+    async alldevicestatusChange() {
+      //json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+      const body = {
+        // 傳其中一個device的MapNum跟Status就好
+        'MapNum': this.devices[0].MapNum,
+        'Status': this.shutdown
+      }
+
+      const json = JSON.stringify(body);
+      console.log(json)
+      // let res = []
+      // await axios({
+      //   method: 'POST',
+      //   baseURL: this.$store.state.api,
+      //   url: '/switchBLE',
+      //   headers: { 'Content-Type': 'application/json' },
+      // })
+      let res = []
+      await axios.post(this.$store.state.api + '/switchBLE', json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => res = response.data)
+        .catch((err) => console.log(err))
+      console.log(res)
+      this.handleAPI(this.mapNum)
     },
   },
   mounted() {

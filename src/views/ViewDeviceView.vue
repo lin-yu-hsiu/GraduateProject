@@ -1,8 +1,18 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex p-5 w-100" style="position: relative;">
-      <ViewRegion v-for="item in regionamount" :key="item.id" :region="item"></ViewRegion>
+    <div class="d-flex flex-column p-5 w-100">
+      <div class="d-flex justify-content-center align-items-center">
+        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
+        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
+          {{
+              $store.state.currentvenue
+          }}
+        </div>
+      </div>
+      <div v-if="$store.state.currvenue" class="d-flex">
+        <ViewRegion v-for="item in regionamount" :key="item.id" :region="item"></ViewRegion>
+      </div>
     </div>
   </div>
 </template>
@@ -26,13 +36,17 @@ export default {
     };
   },
   methods: {
-
     async fetchApi() {
       let regions = []
-      const API = 'http://192.168.0.102:5000/deviceInfo'
-      await axios.get(API)
+      await axios({
+        method: 'get',
+        baseURL: this.$store.state.api,
+        url: '/deviceInfo',
+        'Content-Type': 'application/json',
+      })
         .then((response) => regions = response.data)
-        .catch((error) => console.log(error))
+        .catch((err) => { console.error(err) })
+
 
       regions.sort()
 

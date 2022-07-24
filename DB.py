@@ -67,7 +67,11 @@ def delete_data(table_name, pk):        #刪除一筆資料
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
-        ins = 'Delete from {} where {} = {};'.format(table_name,dbContent['PK'][table_name],pk)
+        ins = 'Delete from {} where {} = '.format(table_name,dbContent['PK'][table_name])
+        if(type(pk) == str):
+            ins += "'{}';".format(pk)
+        else:
+            ins += '{};'.format(pk)
         cursor.execute(ins)
         conn.commit()
         cursor.close()

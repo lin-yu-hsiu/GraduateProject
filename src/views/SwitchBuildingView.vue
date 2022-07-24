@@ -29,23 +29,9 @@ export default defineComponent({
     };
   },
   methods: {
-    async listAllRegion() {
-      const API = 'http://192.168.0.100:5000/deviceInfo'
-      const Venue = ''
-      const body = {
-
-      }
-      const json = JSON.stringify(body);
-      const res = await axios.get(API + "/" + Venue, json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log(res);
-    },
     async fetchAllRegion() {
 
-      const API = 'http://192.168.0.102:5000/deviceInfo'
+      const API = 'http://192.168.0.103:5000/deviceInfo'
       const res = await axios.get(API, {
         headers: {
           'Content-Type': 'application/json'
