@@ -1,14 +1,15 @@
 <template>
   <div class="regionList">
-    <div style=" font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo }}</div>
+    <div style=" font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo }}
+    </div>
     <!-- <img :src="require('../assets/pic/' + regionInfo.Route + '.jpg')" class="thumbNail"> -->
   </div>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import regionpic1 from '../assets/pic/regionpic1.jpg'
-import regionpic2 from '../assets/pic/regionpic2.jpg'
+import regionpic1 from '../assets/region/regionpic1.jpg'
+import regionpic2 from '../assets/region/regionpic2.jpg'
 
 export default defineComponent({
   props: {

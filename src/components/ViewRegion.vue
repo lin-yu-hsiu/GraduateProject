@@ -11,7 +11,7 @@
     </button>
   </div>
   <DeviceRegion :passMapNum="region.MapNum" v-if="open" @close="open = false"
-    style="position: absolute; top:20vh; left:25vw">
+    style="position: absolute; top:20vh; left:25vw" @emptyRegion="emptyRegion">
   </DeviceRegion>
 </template>
 
@@ -47,10 +47,12 @@ export default {
     }
   },
   methods: {
-
+    emptyRegion() {
+      // console.log(this.region)
+      this.$emit('clear')
+    },
   },
   mounted() {
-
   },
 }
 </script>

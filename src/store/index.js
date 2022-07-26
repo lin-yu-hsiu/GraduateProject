@@ -4,8 +4,7 @@ export default createStore({
   state: {
     currvenue: false,
     currentvenue: '(需先切換場館)',
-    currentarea: null,
-    api: 'http://192.168.0.103:5000/'
+    api: 'http://192.168.0.100:5000'
   },
   getters: {
   },

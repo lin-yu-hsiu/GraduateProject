@@ -22,16 +22,18 @@ def table(name):
 @app.route("/create/<name>")
 def insert(name):
     data = {
-        "UUID": "Test9",
-        "Message": "目前所在位置為 B-2",
-        "MapNum": 4,
+        "UUID": "Test1",
+        "Message": "目前所在位置為 A-1",
+        "MapNum": 1,
         "Xaxis": 100,
         "Yaxis": 100,
         "Battery": "100%",
         "Status": 1,
         "Note": "none",
-        "Place": '地點8'
+        "Place": '地點1'
     }
+        
+    
     result = DB.insert_data(name,data)
     if(result['success']):
         return jsonify(result)

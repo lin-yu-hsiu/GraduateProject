@@ -12,7 +12,9 @@
           <button class="closeBtn" name="CloseAllDevice" v-else @click="alldevicestatusChange">一鍵關機</button>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
-        <DeviceInfo v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
+
+        <DeviceInfo v-for="item in devices" :key="item.id" :device="item" @remove="removeDevice"></DeviceInfo>
+
       </div>
     </n-scrollbar>
   </n-card>
@@ -38,12 +40,17 @@ export default defineComponent({
       required: true
     }
   },
+  watch: {
+    passMapNum(newVal) {
+      this.mapNum = newVal
+    }
+  },
   components: {
     DeviceInfo
   },
   methods: {
     async handleAPI(mapNum) {
-      const API = 'http://192.168.0.103:5000/deviceInfo/'
+      const API = this.$store.state.api + '/deviceInfo/'
       await axios({
         method: 'get',
         baseURL: API,
@@ -61,22 +68,13 @@ export default defineComponent({
       }
     },
     async alldevicestatusChange() {
-      //json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
       const body = {
         // 傳其中一個device的MapNum跟Status就好
         'MapNum': this.devices[0].MapNum,
         'Status': this.shutdown
       }
-
       const json = JSON.stringify(body);
       console.log(json)
-      // let res = []
-      // await axios({
-      //   method: 'POST',
-      //   baseURL: this.$store.state.api,
-      //   url: '/switchBLE',
-      //   headers: { 'Content-Type': 'application/json' },
-      // })
       let res = []
       await axios.post(this.$store.state.api + '/switchBLE', json, {
         headers: {
@@ -88,6 +86,14 @@ export default defineComponent({
       console.log(res)
       this.handleAPI(this.mapNum)
     },
+    removeDevice() {
+      this.handleAPI(this.mapNum)
+      // console.log(this.devices)
+      if (this.devices.length == 1) {
+        console.log('empty')
+        this.$emit('emptyRegion')
+      }
+    }
   },
   mounted() {
     this.handleAPI(this.mapNum)

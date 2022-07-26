@@ -50,8 +50,10 @@ import { defineComponent } from "vue";
 import account from '../assets/pic/account.png'
 import error from '../assets/pic/loginerror.png'
 
+//顯示目前誰在系統裡面 
 
-const API = 'http://192.168.0.102:5000/login'
+//硬體跟app
+
 export default defineComponent({
   setup() {
 
@@ -75,7 +77,7 @@ export default defineComponent({
 
       await axios({
         method: 'post',
-        url: API,
+        url: this.$store.state.api + '/login',
         headers: {
           accept: 'application/json',
           'Content-Type': 'multipart/form-data'

@@ -10,8 +10,12 @@
           }}
         </div>
       </div>
-      <div v-if="$store.state.currvenue" class="d-flex">
-        <ViewRegion v-for="item in regionamount" :key="item.id" :region="item"></ViewRegion>
+      <div v-if="!emptyFlag" style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 20%); margin: auto;">
+        目前已無任何裝置, 正在刪除
+        {{ this.recordvenue }} 中...
+      </div>
+      <div v-if="$store.state.currvenue && emptyFlag" class="d-flex">
+        <ViewRegion v-for="item in regionamount" :key="item.id" :region="item" @clear="noRegion"></ViewRegion>
       </div>
     </div>
   </div>
@@ -33,6 +37,8 @@ export default {
       regionamount: [],
       regioninfo: [],
       temp: [],
+      emptyFlag: true,
+      recordvenue: '',
     };
   },
   methods: {
@@ -68,7 +74,12 @@ export default {
         }
       }
     },
-
+    noRegion() {
+      this.emptyFlag = false
+      this.recordvenue = this.$store.state.currentvenue
+      this.$store.state.currentvenue = '(需先切換場館)'
+      this.$store.state.currvenue = false
+    }
   },
   mounted() {
     this.fetchApi()

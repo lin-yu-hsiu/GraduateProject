@@ -88,6 +88,11 @@ export default defineComponent({
       type: Object,
     }
   },
+  watch: {
+    device(newVal) {
+      this.deviceInfo = newVal
+    }
+  },
   data() {
     return {
       // 以下為props ----------------------------------
@@ -147,6 +152,7 @@ export default defineComponent({
       });
       console.log(res);
       this.isRemoving = false
+      this.$emit('remove')
     },
   },
   mounted() {

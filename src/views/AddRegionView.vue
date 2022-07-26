@@ -58,7 +58,7 @@ export default {
 <style scoped>
 .picRegion {
   width: 70vw;
-  height: 60vh;
+  height: 100%;
   max-width: 1500px;
   background-color: #D9D9D9;
   box-shadow: 0 0 30px 0 rgba(0, 0, 0, 25%) inset;

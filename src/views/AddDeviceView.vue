@@ -17,14 +17,15 @@
           <md-search />
         </template>
       </n-select>
-      <button v-if="$store.state.currvenue" class="locateBtn mb-3" @click="add_status = true; locating = true;">
+      <button v-if="$store.state.currvenue" class="locateBtn mb-3" @click="frame_status = true; locating = true;">
         <img :src="locatePic">
       </button>
-      <div v-if="$store.state.currvenue" class="frame">
-        <img :src="pic" :class="locating ? canlocateCursor : ''" @click="add_device = true; no_cursor = false">
+      <div v-if="$store.state.currvenue" class="frame" :class="(locating && no_cursor) ? canlocateCursor : normalCursor"
+        @click="add_device = true; no_cursor = false;" @mousedown="getCursorValue">
+        <img :src="pic">
       </div>
-      <AddDeviceInfo style="cursor: default;" v-if="add_status && add_device"
-        @close="add_status = false; add_device = false; locating = false"></AddDeviceInfo>
+      <AddDeviceInfo style="cursor: default;" v-if="frame_status && add_device"
+        @close="frame_status = false; add_device = false; locating = false; no_cursor = true"></AddDeviceInfo>
     </div>
   </div>
 </template>
@@ -37,12 +38,17 @@ import MenuBar from '@/components/MenuBar.vue';
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
 
 import locatePic from '../assets/pic/location.png'
+import pic from '../assets/region/regionpic1.jpg'
 
 export default defineComponent({
   setup() {
     return {
       show: ref(false),
       options: [],
+      mouse: {
+        'x': 0,
+        'y': 0,
+      }
     }
   },
   components: {
@@ -53,15 +59,14 @@ export default defineComponent({
   data() {
     return {
       locatePic: locatePic,
-      pic: '',
-      add_status: false,
+      pic: pic,
+      frame_status: false,
       add_device: false,
       locating: false,
       canlocateCursor: 'locateCursor',
       notlocateCursor: 'notlocateCursor',
       normalCursor: 'normalCursor',
       no_cursor: true,
-      currentRegion: ''
     };
   },
   methods: {
@@ -82,6 +87,11 @@ export default defineComponent({
       }
       regionSet.forEach((item) => this.options.push({ 'label': item, 'value': item }));
     },
+    getCursorValue(event) {
+      this.mouse.x = event.clientX
+      this.mouse.y = event.clientY
+      console.log(this.mouse)
+    }
   },
   mounted() {
     this.fetchApi()
@@ -108,30 +118,29 @@ export default defineComponent({
 }
 
 .locateBtn:focus {
-  background-color: rgba(0, 0, 0, 75%);
+  background-color: rgba(0, 0, 0, 10%);
 }
 
 .frame {
   width: 80vw;
   height: 100%;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 25%) inset;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 25%);
   position: relative;
-
 }
 
 
 .frame img {
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
+  height: 100%;
+  width: 100%;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   margin: 0 auto;
-  padding: 20px 0;
+  border-radius: 5px;
+  /* padding: 20px 0;*/
+  position: absolute;
 }
 
 .locateCursor {
