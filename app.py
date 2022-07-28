@@ -22,15 +22,15 @@ def table(name):
 @app.route("/create/<name>")
 def insert(name):
     data = {
-        "UUID": "Test1",
+        "UUID": "Test3",
         "Message": "目前所在位置為 A-1",
         "MapNum": 1,
         "Xaxis": 100,
         "Yaxis": 100,
-        "Battery": "100%",
-        "Status": 1,
+        "Battery": "0%",
+        "Status":  0,
         "Note": "none",
-        "Place": '地點1'
+        "Place": '地點5'
     }
         
     

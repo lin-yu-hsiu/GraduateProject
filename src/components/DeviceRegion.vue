@@ -1,9 +1,9 @@
 <template>
   <n-card hoverable closable style="background-color: #ffffff; border-radius: 30px;
-  height: 600px; width: 900px;">
+  height: 600px; width: 900px; margin: 0 auto;">
     <n-scrollbar style="max-height: 500px; background-color: #ffffff;">
       <div style="position: relative;">
-        <div class="detailFrameTitle d-flex justify-content-evenly align-items-center mx-3 py-3">
+        <div v-if="!emptyflag" class="detailFrameTitle d-flex justify-content-evenly align-items-center mx-3 py-3">
           <div style="width: 100px; background-color: #ffffff; height: 35px;"></div>
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>
@@ -12,9 +12,13 @@
           <button class="closeBtn" name="CloseAllDevice" v-else @click="alldevicestatusChange">一鍵關機</button>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
-
-        <DeviceInfo v-for="item in devices" :key="item.id" :device="item" @remove="removeDevice"></DeviceInfo>
-
+        <div v-else class="text-center m-auto"
+          style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 20%); margin: auto;">
+          目前此區域無任何裝置
+        </div>
+        <div v-if="!emptyflag">
+          <DeviceInfo @ifEmpty="checkempty" v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
+        </div>
       </div>
     </n-scrollbar>
   </n-card>
@@ -33,10 +37,12 @@ export default defineComponent({
       alldevices: [],
       shutdown: '',
       mapNum: this.passMapNum,
+      emptyflag: '',
     }
   },
   props: {
     passMapNum: {
+      type: Number,
       required: true
     }
   },
@@ -66,6 +72,11 @@ export default defineComponent({
         }
         else this.shutdown = false
       }
+
+      if (this.devices.length == 0) {
+        this.emptyflag = true   // 一開始此區域即無裝置
+        this.$emit('emptyregion', this.emptyflag)
+      }
     },
     async alldevicestatusChange() {
       const body = {
@@ -86,12 +97,11 @@ export default defineComponent({
       console.log(res)
       this.handleAPI(this.mapNum)
     },
-    removeDevice() {
+    checkempty() {
       this.handleAPI(this.mapNum)
-      // console.log(this.devices)
-      if (this.devices.length == 1) {
-        console.log('empty')
-        this.$emit('emptyRegion')
+      if (this.devices.length == 0) {
+        this.emptyflag = true   // 刪除裝置後此區域無裝置
+        this.$emit('emptyregion', this.emptyflag)
       }
     }
   },

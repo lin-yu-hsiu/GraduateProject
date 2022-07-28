@@ -1,19 +1,19 @@
 <template>
   <div class="menu">
-    <div class="logout">
+    <div class="logout w-100">
       <router-link :to="{ name: 'login' }">
         <button class="content">
-          <div id="login" class="option" style="padding: 5px 0 5px 25px;" @mouseover="icon5 = logout_icon_blue"
+          <div id="login" class="option" style="padding: 5px 0 5px 30px;" @mouseover="icon5 = logout_icon_blue"
             @mouseleave="icon5 = logout_icon">
             <img id="login_icon" :src="icon5" alt="" style="width: 45px; height: 45px; margin: 0;">
-            <h2 class="function">登出</h2>
+            <h2 class="function" style="width: 100px">登出</h2>
           </div>
           <div class="decoration"></div>
         </button>
       </router-link>
     </div>
 
-    <div style="position: absolute; top: 30vh;">
+    <div class="w-100" style="margin: 0 0 20vh 0">
       <router-link :to="{ name: 'addregion' }">
         <button class="content">
           <div id="addRegion" class="option" @mouseover="icon1 = addRegion_icon_blue"
@@ -59,9 +59,7 @@
       </router-link>
     </div>
 
-
-
-    <div class="info">
+    <div class="info w-100">
       <router-link :to="{ name: 'FAQ' }">
         <button class="content">
           <div id="FAQ" class="option" @mouseover="icon6 = FAQ_icon_blue" @mouseleave="icon6 = FAQ_icon">
@@ -124,7 +122,7 @@ export default {
     $(document).ready(function () {
       $(menu).hover(function () {
         $(optionName).fadeIn(200)
-        $(this).css('width', '200px');
+        $(this).css('width', '190px');
       }, function () {
         $(optionName).fadeOut(200)
         $(this).css('width', '100px');
@@ -153,23 +151,14 @@ a {
 
 .menu {
   transition: 250ms all ease;
-  /* background: linear-gradient(to right, #434343 0%, black 100%); */
   background: linear-gradient(to left, transparent 0%, #505050 1%, black 100%);
   height: 100vh;
   width: 100px;
-  position: relative;
-}
-
-.info {
-  position: absolute;
-  bottom: 25px;
-  width: 100%
-}
-
-.logout {
-  position: absolute;
-  top: 25px;
-  width: 100%
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 0;
 }
 
 .option {
@@ -195,7 +184,7 @@ a {
 
 .function {
   color: #FFFFFF;
-  width: 95px;
+  width: 105px;
   font-size: 20px;
   text-align: center;
   margin: 0;

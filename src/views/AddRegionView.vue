@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column p-5 w-100">
+    <div class="d-flex flex-column p-5 w-100 mx-auto">
       <div class="d-flex justify-content-center align-items-center">
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">

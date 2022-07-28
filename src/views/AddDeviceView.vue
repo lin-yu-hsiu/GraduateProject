@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column align-items-center p-5 w-100"
+    <div class="d-flex flex-column align-items-center w-100 p-5" style="width: 100%"
       :class="(locating && no_cursor) ? notlocateCursor : ''">
       <div class="d-flex justify-content-center align-items-center">
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>

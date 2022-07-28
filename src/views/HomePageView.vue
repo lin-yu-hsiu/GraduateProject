@@ -1,6 +1,9 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
+    <div class="p-5 h-100 w-100 mx-auto">
+
+    </div>
   </div>
 </template>
 

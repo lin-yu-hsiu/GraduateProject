@@ -1,28 +1,45 @@
 <template>
-  <div class="regionList m-3" :class="[regionStatus ? noError : Error]">
-    <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
-    <button v-if="!regionStatus" class="viewDetail" @click="open = true">
+  <!-- :class="[regionStatus ? noError : Error]" -->
+  <div class="regionList m-3"
+    :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
+    <div class="d-flex justify-content-around align-items-center w-100">
+      <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
+      <button class="detailBtn p-0" @mouseover="icon = remove_hover" @mouseleave="icon = remove">
+        <img :src="icon" style="width: 30px; height: 35px">
+      </button>
+    </div>
+    <button v-if="regionStatus == 'error'" class="viewDetail" @click="open = true">
       <img :src="fordetail">
       查看裝置問題
     </button>
-    <button v-if="regionStatus" class="viewDevice" @click="open = true">
+    <button v-if="regionStatus == 'good'" class="viewDevice" @click="open = true">
       <img :src="devicegood">
       裝置一切正常
     </button>
+    <button v-if="regionStatus == 'normal'" class="viewNone">
+      <img :src="none" style="width: 50px; height: 50px">
+      此區域無裝置
+    </button>
   </div>
-  <DeviceRegion :passMapNum="region.MapNum" v-if="open" @close="open = false"
-    style="position: absolute; top:20vh; left:25vw" @emptyRegion="emptyRegion">
+  <DeviceRegion @emptyregion="responseEmpty" :passMapNum="region.Number" v-if="open" @close="open = false" style="position: absolute; 
+        top: 0;             
+        bottom: 0;           
+        left: 0;        
+        right: 0;
+        margin: auto;  ">
   </DeviceRegion>
+  <!-- @emptyregion="responseEmpty" -->
 </template>
 
 <script>
-// import axios from 'axios';
+import axios from 'axios'
 import DeviceRegion from './DeviceRegion.vue'
 
 import detail from '../assets/pic/fordetail_red.png'
 import good from '../assets/pic/good_green.png'
-
-
+import none from '../assets/pic/eyes_none.png'
+import remove from '../assets/pic/trash.png'
+import remove_hover from '../assets/pic/trash_hover.png'
 
 export default {
   components: {
@@ -33,34 +50,71 @@ export default {
       required: true
     }
   },
+  watch: {
+    region(newVal) {
+      this.regions = newVal
+    },
+    regionStatus(newVal) {
+      this.regionStatus = newVal
+    }
+  },
   data() {
     return {
+      icon: remove,
+      remove: remove,
+      remove_hover: remove_hover,
       fordetail: detail,
       devicegood: good,
+      none: none,
 
       regions: this.region,
 
-      Error: 'mistake',
-      noError: 'no_mistake',
       open: false,
-      regionStatus: false,
+      regionStatus: 'good',
     }
   },
   methods: {
-    emptyRegion() {
-      // console.log(this.region)
-      this.$emit('clear')
+    async viewRegion(mapNum) {
+      const API = this.$store.state.api + '/deviceInfo/'
+      await axios({
+        method: 'get',
+        baseURL: API,
+        url: mapNum.toString(),
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => this.devices = response.data)
+        .catch((error) => console.log(error))
+
+      if (this.devices.length == 0) {
+        this.regionStatus = 'normal'
+      }
+
+      //尋訪/table/Map中之指定場館中所有區域 ( 包括已經無裝置的區域 )
+      // for (const key in tempmaps) {
+      //   // console.log(key, maps[key]);
+      //   if (tempmaps[key].Venue == this.$store.state.currentvenue) {
+      //     this.maps.push(tempmaps[key])
+      //   }
+      // }
     },
+    responseEmpty(value) {
+      // console.log(value)
+      if (value == true) {
+        this.regionStatus = 'normal'
+      }
+      this.$emit('emptyRegion', this.regionStatus)
+    }
   },
   mounted() {
+    this.viewRegion(this.regions.Number)
   },
 }
 </script>
 
 <style scoped>
 .regionList {
-  width: 400px;
-  height: 250px;
+  width: 320px;
+  height: 200px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
@@ -69,11 +123,15 @@ export default {
   justify-content: space-around;
   border-radius: 0 0 20px 20px;
   padding: 20px;
-
 }
 
 .regionList:hover {
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 5%) inset;
+}
+
+.detailBtn {
+  background-color: transparent;
+  border: none;
 }
 
 .viewDetail {
@@ -100,8 +158,21 @@ export default {
   border: none;
 }
 
+.viewNone {
+  background-color: #363636;
+  color: #D9D9D9;
+  font-weight: bold;
+  font-size: 24px;
+  width: 220px;
+  height: 60px;
+  border-radius: 10px;
+  padding: 4px 8px;
+  border: none;
+}
+
 .viewDetail:hover,
-.viewDevice:hover {
+.viewDevice:hover,
+.viewNone:hover {
   background-color: #2c2c2c;
 }
 
@@ -111,5 +182,9 @@ export default {
 
 .mistake {
   border: ridge 3px #fd2d2d;
+}
+
+.normal {
+  border: ridge 3px #bebebe;
 }
 </style>

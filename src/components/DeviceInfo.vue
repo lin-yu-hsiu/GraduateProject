@@ -98,6 +98,7 @@ export default defineComponent({
       // 以下為props ----------------------------------
       deviceInfo: this.device,
       // 以下為variables ------------------------------
+      emptyflag: false,
       isEditing: false,
       editClass: 'editClass',
       isRemoving: false,
@@ -152,11 +153,9 @@ export default defineComponent({
       });
       console.log(res);
       this.isRemoving = false
-      this.$emit('remove')
+      this.$emit('ifEmpty')
     },
   },
-  mounted() {
-  }
 })
 </script>
 
