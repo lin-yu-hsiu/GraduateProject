@@ -28,8 +28,6 @@
     7. 以 json  來 POST, 傳入 MapNum
 """
 import sqlite3
-
-from numpy import record
 dbContent = {
     'People': ['Email','Account','Password'],
     'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place'],

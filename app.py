@@ -156,6 +156,12 @@ def deleteArea():
             return jsonify(result)
     else:
         return jsonify(result)
+
+@app.route("/showVenue")
+def showVenue():
+    result = DB.show_venue()
+    return str(result)
+
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
