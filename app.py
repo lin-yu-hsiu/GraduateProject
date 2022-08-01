@@ -22,10 +22,9 @@ def insert(name):
         "UUID": "Test9",
         "Message": "目前所在位置為 B-2",
         "MapNum": 4,
-        "Xaxis": 100,
+        "Xaxis": 100,  
         "Yaxis": 100,
         "Battery": "100%",
-        "Status": 1,
         "Note": "none",
         "Place": '地點8'
     }
@@ -49,7 +48,7 @@ def device(name):
     try:
         return jsonify(content)
     except TypeError as e:
-        return str(content)
+        return str(e)
 
 @app.route("/deviceInfo")
 def allDevice():
@@ -160,8 +159,52 @@ def deleteArea():
 @app.route("/showVenue")
 def showVenue():
     result = DB.show_venue()
-    return str(result)
+    temp = { "場館": result }
+    return jsonify(temp)
 
+@app.route("/newDevice",methods=["POST","GET"])
+def newDevice():
+    data = {}
+    if (request.method == 'POST'):
+        data = str(request.data,encoding="UTF-8")
+        temp = json.loads(data)
+        data = { "UUID": temp['UUID'] }
+        result = DB.insert_data("BLE", data)
+        if(result['success']):
+            return jsonify(result)
+        else:
+            return jsonify(result)
+    elif (request.method == 'GET'):
+        free = []
+        busy = []
+        data = DB.show_data('BLE')
+        for i in data:
+            if (data[i]['MapNum'] == None):
+                free.append(data[i]['UUID'])
+            else:
+                busy.append(data[i]['UUID'])
+        data = { "free": free, "busy": busy }
+        return jsonify(data)
+
+@app.route("/insertBLE",methods=["POST"])
+def insertBLE():
+    data = str(request.data,encoding="UTF-8")
+    temp = json.loads(data)
+    data = DB.show_data('Map')
+    MapNum = -1
+    for i in data:
+        if (data[i]['Venue'] == temp['Venue'] and data[i]['Area'] == temp['Area']):
+            MapNum = data[i]['Number']
+            break
+    del temp['Venue']
+    del temp['Area']
+    temp['MapNum'] = MapNum
+    result = DB.modify_BLE(temp)
+    if(result['success']):
+        return jsonify(result)
+    else:
+        return jsonify(result)
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
+

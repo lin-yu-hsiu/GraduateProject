@@ -16,16 +16,21 @@
     ★ /deleteAll/<表格名稱> => 刪除該表格所有資料 => GET
     ★ /insertArea => 新增區域 => POST(備註6)
     ★ /deleteArea => 刪除區域 => POST(備註7)
+    ★ /newDevice => 裝置和前端配對 UUID => 裝置: POST/ 前端: GET (備註8)
+    ★ /showVenue => 顯示所有場館 => GET
+    ★ /insertBLE => 設定裝置所配對到的資料 => POST (備註9)
 
 備註:
-    1. 以 json 來 POST, 傳入場館名稱
-    2. 以 json 來 POST, 傳入場館名稱
-    2. 以 value 來 POST, 分別傳入帳號密碼
-    3. 以 json 來 POST, 傳入 UUID, Message, Status, Note
-    4. 以 json 來 POST, 傳入 Status
-    5. 以 json 來 POST, 傳入 UUID
-    6. 以 json 來 POST, 傳入 Route, Venue, Area
-    7. 以 json  來 POST, 傳入 MapNum
+    1. 前端以 json 來 POST, 傳入場館名稱
+    2. 前端以 json 來 POST, 傳入場館名稱
+    2. 前端以 value 來 POST, 分別傳入帳號密碼
+    3. 前端以 json 來 POST, 傳入 UUID, Message, Status, Note
+    4. 前端以 json 來 POST, 傳入 Status
+    5. 前端以 json 來 POST, 傳入 UUID
+    6. 前端以 json 來 POST, 傳入 Route, Venue, Area
+    7. 前端以 json 來 POST, 傳入 MapNum
+    8. 裝置透過字串方式傳送欲配對裝置之 UUID 到後端，並讓前端配對
+    9. 前端以 json 來 POST, 傳入 UUID, Message, Venue, Area, Xaxis, Yaxis, Place
 """
 import sqlite3
 dbContent = {
@@ -67,19 +72,20 @@ def insert_data(table_name, content):
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
-        ins = 'Insert into {} ('.format(table_name)
-        if(table_name == 'People'):
-            ins += 'Email,Account,Password) values ('
-        elif(table_name == 'BLE'):
-            ins += 'UUID,Message,MapNum,Xaxis,Yaxis,Battery,Status,Note,Place) values ('
-        else:
-            ins += 'Route,Venue,Area) values ('
-        for i in content:
-            if(type(content[i]) == str):
-                ins += str("'{}',".format(content[i]))
+        if (table_name != "BLE"):
+            ins = 'Insert into {} ('.format(table_name)
+            if(table_name == 'People'):
+                ins += 'Email,Account,Password) values ('
             else:
-                ins += str(str(content[i]) + ',')
-        ins = ins[:-1] + ');'
+                ins += 'Route,Venue,Area) values ('
+            for i in content:
+                if(type(content[i]) == str):
+                    ins += str("'{}',".format(content[i]))
+                else:
+                    ins += str(str(content[i]) + ',')
+            ins = ins[:-1] + ');'
+        else:
+            ins = "Insert into BLE ('UUID') Values ('{}');".format(content['UUID'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()
@@ -127,16 +133,14 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
     try:
         ins = "Update BLE set "
         for i in content:
-            if(i != 'UUID'):
-                ins += '{} = '.format(i)
-                if(type(content[i]) == str):
-                    ins += "'{}'".format(content[i])
-                else:
-                    ins += '{}'.format(content[i])
-                ins += ','
-            else:
+            if(i == 'UUID'):
                 continue
-        ins = ins[0:len(ins)-1]
+            else:
+                if(type(content[i]) == str):
+                    ins += "{} = '{}',".format(i,content[i])
+                else:
+                    ins += "{} = {},".format(i,content[i])
+        ins = ins[:-1]
         ins += " where UUID = '{}';".format(content['UUID'])
         cursor.execute(ins)
         conn.commit()
