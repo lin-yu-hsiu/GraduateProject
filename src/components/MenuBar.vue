@@ -14,39 +14,6 @@
     </div>
 
     <div class="w-100" style="margin: 0 0 20vh 0">
-      <router-link :to="{ name: 'addregion' }">
-        <button class="content">
-          <div id="addRegion" class="option" @mouseover="icon1 = addRegion_icon_blue"
-            @mouseleave="icon1 = addRegion_icon">
-            <img id="addRegion_icon" :src="icon1" alt="" style="width: 45px; height: 45px">
-            <h2 class="function">新增區域</h2>
-          </div>
-          <div class="decoration"></div>
-        </button>
-      </router-link>
-
-      <router-link :to="{ name: 'adddevice' }">
-        <button class="content">
-          <div id="addDevice" class="option" @mouseover="icon2 = addDevice_icon_blue"
-            @mouseleave="icon2 = addDevice_icon">
-            <img id="addDevice_icon" :src="icon2" alt="" style="width: 45px; height: 45px">
-            <h2 class="function">新增裝置</h2>
-          </div>
-          <div class="decoration"></div>
-        </button>
-      </router-link>
-
-      <router-link :to="{ name: 'viewdevice' }">
-        <button class="content">
-          <div id="viewDevice" class="option" @mouseover="icon3 = viewDevice_icon_blue"
-            @mouseleave="icon3 = viewDevice_icon">
-            <img id="viewDevice_icon" :src="icon3" alt="" style="width: 45px; height: 45px">
-            <h2 class="function">查看裝置</h2>
-          </div>
-          <div class="decoration"></div>
-        </button>
-      </router-link>
-
       <router-link :to="{ name: 'switchregion' }">
         <button class="content">
           <div id="switchRegion" class="option" @mouseover="icon4 = switchRegion_icon_blue"
@@ -57,6 +24,43 @@
           <div class="decoration"></div>
         </button>
       </router-link>
+
+      <router-link :to="{ name: 'addregion' }" v-show="this.$store.state.currvenue"
+        @click="$store.commit('addRegion');">
+        <button class="content">
+          <div id="addRegion" class="option" @mouseover="icon1 = addRegion_icon_blue"
+            @mouseleave="icon1 = addRegion_icon">
+            <img id="addRegion_icon" :src="icon1" alt="" style="width: 45px; height: 45px">
+            <h2 class="function">新增區域</h2>
+          </div>
+          <div class="decoration"></div>
+        </button>
+      </router-link>
+
+      <router-link :to="{ name: 'adddevice' }" v-show="this.$store.state.currvenue"
+        @click="$store.commit('addDevice');">
+        <button class="content">
+          <div id="addDevice" class="option" @mouseover="icon2 = addDevice_icon_blue"
+            @mouseleave="icon2 = addDevice_icon">
+            <img id="addDevice_icon" :src="icon2" alt="" style="width: 45px; height: 45px">
+            <h2 class="function">新增裝置</h2>
+          </div>
+          <div class="decoration"></div>
+        </button>
+      </router-link>
+
+      <router-link :to="{ name: 'viewdevice' }" v-show="this.$store.state.currvenue">
+        <button class="content">
+          <div id="viewDevice" class="option" @mouseover="icon3 = viewDevice_icon_blue"
+            @mouseleave="icon3 = viewDevice_icon">
+            <img id="viewDevice_icon" :src="icon3" alt="" style="width: 45px; height: 45px">
+            <h2 class="function">查看裝置</h2>
+          </div>
+          <div class="decoration"></div>
+        </button>
+      </router-link>
+
+
     </div>
 
     <div class="info w-100">
@@ -113,33 +117,35 @@ export default {
       viewDevice_icon_blue: viewDevice_icon_blue,
       switchRegion_icon_blue: switchRegion_icon_blue,
       logout_icon_blue: logout_icon_blue,
-      FAQ_icon_blue: FAQ_icon_blue
+      FAQ_icon_blue: FAQ_icon_blue,
+
+
+    }
+  },
+  methods: {
+    display() {
+      $(document).ready(function () {
+        $('.menu').hover(function () {
+          $('.function').fadeIn(200)
+          $(this).css('width', '190px');
+        }, function () {
+          $('.function').fadeOut(200)
+          $(this).css('width', '100px');
+        });
+        $('.option').hover(function () {
+
+          $(this).siblings().css("background-color", "#B6FFFF");
+          $(this).css("background-color", "rgba(255, 255, 255, 0.3)");
+        }, function () {
+
+          $(this).siblings().css("background-color", "transparent");
+          $(this).css("background", "transparent");
+        });
+      })
     }
   },
   mounted() {
-    let optionName = document.querySelectorAll('.function');
-    let menu = document.querySelector('.menu');
-    $(document).ready(function () {
-      $(menu).hover(function () {
-        $(optionName).fadeIn(200)
-        $(this).css('width', '190px');
-      }, function () {
-        $(optionName).fadeOut(200)
-        $(this).css('width', '100px');
-      });
-      $('.option').hover(function () {
-        $(this).siblings().css("background-color", "#B6FFFF");
-        $(this).css("background-color", "rgba(255, 255, 255, 0.3)");
-      }, function () {
-        $(this).siblings().css("background-color", "transparent");
-        $(this).css("background", "transparent");
-      });
-      $('.decoration').hover(function () {
-        $(this).css("background-color", "#B6FFFF");
-      }, function () {
-        $(this).css("background", "transparent");
-      });
-    });
+    this.display()
   }
 }
 </script>
@@ -188,8 +194,8 @@ a {
   font-size: 20px;
   text-align: center;
   margin: 0;
-  display: none;
   font-weight: bold;
+  display: none;
 }
 
 .decoration {

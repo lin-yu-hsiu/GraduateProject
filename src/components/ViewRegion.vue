@@ -4,7 +4,8 @@
     :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
     <div class="d-flex justify-content-around align-items-center w-100">
       <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
-      <button class="detailBtn p-0" @mouseover="icon = remove_hover" @mouseleave="icon = remove">
+      <button class="detailBtn p-0" @click="sendToRemoveRegion()" @mouseover="icon = remove_hover"
+        @mouseleave="icon = remove">
         <img :src="icon" style="width: 30px; height: 35px">
       </button>
     </div>
@@ -21,14 +22,13 @@
       此區域無裝置
     </button>
   </div>
-  <DeviceRegion @emptyregion="responseEmpty" :passMapNum="region.Number" v-if="open" @close="open = false" style="position: absolute; 
+  <DeviceRegion @ifEmpty="ifEmpty_ViewRegion" :passMapNum="region.Number" v-if="open" @close="open = false" style="position: absolute; 
         top: 0;             
         bottom: 0;           
         left: 0;        
         right: 0;
         margin: auto;  ">
   </DeviceRegion>
-  <!-- @emptyregion="responseEmpty" -->
 </template>
 
 <script>
@@ -85,24 +85,38 @@ export default {
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
 
+      // 如果此區域已無裝置
       if (this.devices.length == 0) {
         this.regionStatus = 'normal'
       }
 
-      //尋訪/table/Map中之指定場館中所有區域 ( 包括已經無裝置的區域 )
-      // for (const key in tempmaps) {
-      //   // console.log(key, maps[key]);
-      //   if (tempmaps[key].Venue == this.$store.state.currentvenue) {
-      //     this.maps.push(tempmaps[key])
-      //   }
-      // }
+      // 尋訪指定區域中是否有裝置狀態異常 (ex:電池沒電)
+      for (let i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].Battery == '0%') {
+          this.regionStatus = 'error'
+        }
+      }
+
     },
-    responseEmpty(value) {
-      // console.log(value)
+    ifEmpty_ViewRegion(value) {
       if (value == true) {
         this.regionStatus = 'normal'
       }
-      this.$emit('emptyRegion', this.regionStatus)
+      this.$emit('ifEmpty')
+    },
+    async sendToRemoveRegion() {
+      let body = {
+        'MapNum': this.regions.Number,
+      }
+      const json = JSON.stringify(body)
+      await axios({
+        method: 'post',
+        url: this.$store.state.api + '/deleteArea',
+        headers: { 'Content-Type': 'application/json' },
+        data: json
+      }).then((response) => response = response.data)
+        .catch((err) => { console.error(err) })
+      this.$emit('_reDisplay')
     }
   },
   mounted() {

@@ -17,7 +17,8 @@
           目前此區域無任何裝置
         </div>
         <div v-if="!emptyflag">
-          <DeviceInfo @ifEmpty="checkempty" v-for="item in devices" :key="item.id" :device="item"></DeviceInfo>
+          <DeviceInfo @ifEmpty="ifEmpty_DeviceRegion" v-for="item in devices" :key="item.id" :device="item">
+          </DeviceInfo>
         </div>
       </div>
     </n-scrollbar>
@@ -97,11 +98,12 @@ export default defineComponent({
       console.log(res)
       this.handleAPI(this.mapNum)
     },
-    checkempty() {
+    ifEmpty_DeviceRegion() {
       this.handleAPI(this.mapNum)
-      if (this.devices.length == 0) {
+      console.log(this.devices.length)
+      if (this.devices.length == 1) {
         this.emptyflag = true   // 刪除裝置後此區域無裝置
-        this.$emit('emptyregion', this.emptyflag)
+        this.$emit('ifEmpty', this.emptyflag)
       }
     }
   },

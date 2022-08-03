@@ -2,22 +2,30 @@
   <div class="d-flex">
     <MenuBar></MenuBar>
     <div class="p-5 h-100 w-100 mx-auto">
+      <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
+        /
+        {{
+            $store.state.currentvenue
+        }}
+      </div>
       <div v-if="!this.$store.state.currvenue"
         style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 70%); text-align: center;">
-        請點擊以下欲切換之場館
+        請雙擊以下欲切換之場館
       </div>
       <div v-else style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 70%); text-align: center;">切換成功 !
+        您目前所在場館為 {{ $store.state.currentvenue }}
       </div>
-      <div class="d-flex">
-        <SwitchBuilding class="m-3" v-for="item in listvenues" :key="item.id" :region="item"
-          @click="$store.commit('switchRegion', item);">
+      <div class="d-flex justify-content-center" style="flex-wrap: wrap">
+        <SwitchBuilding class="m-3" v-for="item in venues" :key="item.id" :region="item" @removeDisplay="reDisplay"
+          @dblclick="$store.commit('switchRegion', item);">
         </SwitchBuilding>
         <div class="AddVenue m-3">
           <div style="font-weight: bold; font-size: 22px; color: rgba(0, 0, 0, 100%); text-align: center;">欲新增之場館名稱
           </div>
           <div class="d-flex justify-content-around">
-            <input type="text" name="" id="AddVenueInput">
-            <button class="detailBtn p-0" @mouseover="icon = add_hover" @mouseleave="icon = add">
+            <input type="text" name="" id="AddVenueInput" v-model="venuedata.name">
+            <button class="detailBtn p-0" @click="sendToAddVenue" @mouseover="icon = add_hover"
+              @mouseleave="icon = add">
               <img :src="icon" style="width: 50px; height: 50px">
             </button>
           </div>
@@ -35,7 +43,8 @@ import SwitchBuilding from '@/components/SwitchBuilding.vue';
 import add from '../assets/pic/add.png'
 import add_hover from '../assets/pic/add_hover.png'
 
-const venues = []
+
+
 export default defineComponent({
   components: {
     MenuBar,
@@ -43,37 +52,68 @@ export default defineComponent({
   },
   data() {
     return {
-      regions: venues,
-      listvenues: [],
+      venues: [],
+      venuedata: {
+        name: ''
+      },
+      removingflag: false,
+
       icon: add,
       add: add,
       add_hover: add_hover,
     };
   },
   methods: {
-    async fetchAllRegion() {
-      const API = this.$store.state.api + '/deviceInfo'
-      const res = await axios.get(API, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      this.regions = res.data;
-      for (let i = 0; i < this.regions.length; i++) {
-        venues.push({ 'Venue': this.regions[i].Venue, 'Area': this.regions[i].Area })
-      }
+    async fetchAllVenues() {
+      let tempmaps = []
+      await axios({
+        method: 'get',
+        baseURL: this.$store.state.api + '/showVenue',
+        'Content-Type': 'application/json',
+      })
+        .then((response) => tempmaps = response.data)
+        .catch((err) => { console.error(err) })
       const venueSet = new Set();
-      for (let i = 0; i < this.regions.length; i++) {
-        venueSet.add(venues[i].Venue)
+      for (let i = 0; i < tempmaps['場館'].length; i++) {
+        venueSet.add(tempmaps['場館'][i])
       }
-      this.listvenues = venueSet.values()
-      let SetToArray = [...this.listvenues];
+
+      let SetToArray = [...venueSet];    // Set 轉成 Array
       SetToArray.sort()
-      this.listvenues = SetToArray
+      this.venues = SetToArray
+    },
+    reDisplay(toRemoveVenue, flag) {
+      this.removingflag = flag
+      var toRemove = toRemoveVenue;
+      var arr = this.venues;
+      arr = arr.filter(function (item) {
+        return item !== toRemove
+      });
+      this.venues = arr
+      window.location.reload()
+    },
+    async sendToAddVenue() {
+      if (this.venuedata.name != '') {
+        let body = {
+          'Venue': this.venuedata.name,
+        }
+        const json = JSON.stringify(body);
+        await axios({
+          method: 'post',
+          url: this.$store.state.api + '/createVenue',
+          headers: { 'Content-Type': 'application/json' },
+          data: json
+        }).then((response) => response = response.data)
+          .catch((err) => { console.error(err) })
+
+        this.venuedata.name = ''  //清空輸入格
+        this.fetchAllVenues()
+        window.location.reload()
+      }
     },
   },
   mounted() {
-    this.fetchAllRegion()
+    this.fetchAllVenues()
   }
 });
 </script>

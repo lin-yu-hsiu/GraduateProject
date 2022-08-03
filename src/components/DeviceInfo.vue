@@ -133,12 +133,15 @@ export default defineComponent({
         'Note': this.deviceInfo.Note,
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(this.$store.state.api + '/modifyBLE', json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log(res);
+      await axios({
+        method: 'post',
+        baseURL: this.$store.state.api + '/modifyBLE',
+        headers: { 'Content-Type': 'application/json' },
+        data: json
+      })
+        .then((response) => response = response.data)
+        .catch((error) => console.log(error))
+
       this.isEditing = false
     },
     async removeChange() {
@@ -146,14 +149,18 @@ export default defineComponent({
         'UUID': this.deviceInfo.UUID,
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(this.$store.state.api + '/deleteBLE', json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log(res);
+      await axios({
+        method: 'post',
+        baseURL: this.$store.state.api + '/deleteBLE',
+        headers: { 'Content-Type': 'application/json' },
+        data: json
+      })
+        .then((response) => response = response.data)
+        .catch((error) => console.log(error))
+
       this.isRemoving = false
-      this.$emit('ifEmpty')
+
+      this.$emit('ifEmpty') //如果此區域已無裝置回傳到父元件以更新畫面
     },
   },
 })
