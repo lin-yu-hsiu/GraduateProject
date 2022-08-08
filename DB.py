@@ -19,18 +19,20 @@
     ★ /newDevice => 裝置和前端配對 UUID => 裝置: POST/ 前端: GET (備註8)
     ★ /showVenue => 顯示所有場館 => GET
     ★ /insertBLE => 設定裝置所配對到的資料 => POST (備註9)
+    ★ /uploadPic => 上傳圖片 => POST (備註10)
 
 備註:
     1. 前端以 json 來 POST, 傳入場館名稱
     2. 前端以 json 來 POST, 傳入場館名稱
-    2. 前端以 value 來 POST, 分別傳入帳號密碼
+    2. 前端以 form 的 value 來 POST, 分別傳入帳號密碼
     3. 前端以 json 來 POST, 傳入 UUID, Message, Status, Note
     4. 前端以 json 來 POST, 傳入 Status
     5. 前端以 json 來 POST, 傳入 UUID
-    6. 前端以 json 來 POST, 傳入 Route, Venue, Area
+    6. 前端以 json 來 POST, 傳入 fileName, Venue, Area
     7. 前端以 json 來 POST, 傳入 MapNum
     8. 裝置透過字串方式傳送欲配對裝置之 UUID 到後端，並讓前端配對
     9. 前端以 json 來 POST, 傳入 UUID, Message, Venue, Area, Xaxis, Yaxis, Place
+    10. 前端以 form 的方法來傳圖片
 """
 import sqlite3
 dbContent = {
