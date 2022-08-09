@@ -23,30 +23,34 @@
         </div>
         <input v-model="regionName" id="RegionName" class="regionName" type="text" placeholder="欲新增之區域名稱">
       </div>
-      <div v-if="$store.state.currvenue" class="picRegion d-flex flex-column justify-content-center align-items-center">
-        <img :src="previewImage" style="max-width: 98%; max-height: 70%; border-radius: 5px; margin-bottom: 20px;">
-        <input type="file" accept="image/*" style="display: none;" @change="onFileChanged" ref="fileInput">
-        <button class="clickToLoad" @click="$refs.fileInput.click()">
-          <img :src="loadpic" style="width: 45px; height: 45px">
-          {{ pic }}
+      <form @submit.prevent="onUpload" class="w-100 h-100 d-flex flex-column">
+        <div v-if="$store.state.currvenue"
+          class="picRegion d-flex flex-column justify-content-center align-items-center">
+          <img :src="previewImage" style="max-width: 98%; max-height: 70%; border-radius: 5px; margin-bottom: 20px;">
+          <button class="clickToLoad" @click="this.$refs.regionimage.click()">
+            <img :src="loadpic" style="width: 45px; height: 45px">
+            {{ pic }}
+          </button>
+          <input name="RegionImage" type="file" accept="image/*" style="display: none;" ref="regionimage"
+            @change="onChange">
+          <!-- <input type="file" name="RegionImage" accept="image/*" @change="onChange"> -->
+        </div>
+        <button v-if="$store.state.currvenue" type="submit" class="clickToStore">
+          <img :src="store_black" style="width: 45px; height: 55px">
         </button>
-        <n-modal v-model:show="showModal">
-          <n-card style="width: 300px; text-align: center; font-weight: bold;" title="新增失敗" size="huge" role="dialog"
-            aria-modal="true">
+        <n-modal v-show="showModal == true">
+          <n-card style="width: 300px; text-align: center; font-weight: bold;" title="新增失敗" size="huge" role="dialog">
             資料尚未填齊
           </n-card>
         </n-modal>
-      </div>
-      <button v-if="$store.state.currvenue" class="clickToStore" @click="onUpload">
-        <img :src="store_black" style="width: 45px; height: 55px">
-      </button>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 // import { useStore } from "vuex";
 import MenuBar from '@/components/MenuBar.vue';
 import loadpic from '../assets/pic/loadpic.png'
@@ -54,11 +58,6 @@ import store_black from '../assets/pic/store_black.png'
 
 
 export default defineComponent({
-  setup() {
-    return {
-      showModal: ref(false)
-    };
-  },
   components: {
     MenuBar,
   },
@@ -69,39 +68,62 @@ export default defineComponent({
       selectedFile: null,
       regionName: '',
       pic: '點擊以匯入平面圖 ...',
-      previewImage: undefined
+      previewImage: undefined,
+      showModal: false,
     };
   },
   methods: {
-    onFileChanged(event) {
+    onChange(event) {
       this.selectedFile = event.target.files[0]
       this.pic = this.selectedFile.name
       this.previewImage = URL.createObjectURL(this.selectedFile);
     },
-    async onUpload() {
-      if (this.selectedFile == null || this.regionName == null) {
+    async onUploadImage() {
+      if (this.regionName === '' || this.selectedFile === null) {
         this.showModal = true
-        return;
       }
+      else {
+        let formData = new FormData()
+        let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+        formData.append('file', this.selectedFile, imgName)
+
+        console.log(formData.get('file'))
+        let res = []
+        await axios({
+          method: 'post',
+          url: this.$store.state.api + '/uploadPic',
+          headers: { "Content-Type": "multipart/form-data" },
+          data: formData,
+        }).then((response) => res = response.data)
+          .catch((err) => { console.error(err) })
+        console.log(res)
+      }
+    },
+    async onUploadData() {
       let body = {
-        'Route': this.selectedFile.name,
         'Venue': this.$store.state.currentvenue,
         'Area': this.regionName,
+        'fileName': this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
       }
-      const json = JSON.stringify(body)
       let res = []
       await axios({
         method: 'post',
         url: this.$store.state.api + '/insertArea',
-        headers: { 'Content-Type': 'application/json' },
-        data: json,
-        onUploadProgress: uploadEvent => {
-          console.log('Upload Progress: ' + Math.round(uploadEvent.loaded / uploadEvent.total * 100) + '%')
-        }
+        headers: { "Content-Type": 'application/json' },
+        data: JSON.stringify(body)
       }).then((response) => res = response.data)
         .catch((err) => { console.error(err) })
       console.log(res)
-    }
+    },
+    onUpload() {
+      this.onUploadImage()
+      if (this.selectedFile != null) {
+        this.onUploadData()
+        this.regionName = ''
+        this.pic = '點擊以匯入平面圖 ...'
+        this.previewImage = undefined
+      }
+    },
   },
 
 });

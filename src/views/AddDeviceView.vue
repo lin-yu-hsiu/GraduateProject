@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column align-items-center p-5" style="width: 100%"
+    <div class="d-flex flex-column align-items-center p-5" style="width: 100%; position: relative;"
       :class="(locating && no_cursor) ? notlocateCursor : ''">
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         /
@@ -18,23 +18,36 @@
           }}
         </div>
       </div>
-      <n-select v-if="$store.state.currvenue && freeBLEFlag" size="large" class="region" :consistent-menu-width="false"
-        v-model:show="show" v-model:value="areavalue" filterable placeholder="請選擇欲新增裝置之區域" :options="options">
+      <n-select v-if="$store.state.currvenue && freeBLEFlag" @change="onChangeMethod($event)" size="large"
+        class="region" :consistent-menu-width="false" v-model:show="show" v-model:value="areavalue" filterable
+        placeholder="請選擇欲新增裝置之區域" :options="options">
         <template v-if="show" #arrow>
           <md-search />
         </template>
       </n-select>
       <button v-if="$store.state.currvenue && freeBLEFlag" class="locateBtn mb-3"
-        @click="frame_status = true; locating = true;">
+        @click="frame_status = true; locating = true;" :style="clickBtnFlag()">
         <img :src="locatePic">
       </button>
-      <div v-if="$store.state.currvenue && freeBLEFlag" class="frame"
-        :class="(locating && no_cursor) ? canlocateCursor : normalCursor" @click="add_device = true; no_cursor = false;"
+      <div v-if="$store.state.currvenue && freeBLEFlag" class="frame" @click="add_device = true; no_cursor = false;"
         @mousedown="getCursorValue">
-        <img :src="pic">
+        <img :src="areapic" :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域">
       </div>
-      <AddDeviceInfo :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
-        @close="frame_status = false; add_device = false; locating = false; no_cursor = true"></AddDeviceInfo>
+      <!-- <vue-drawing-canvas v-if="$store.state.currvenue && freeBLEFlag" ref="VueCanvasDrawing" v-model:image="image"
+        :width="600" :height="400" :stroke-type="strokeType" :color="color" :background-image="backgroundImage"
+        saveAs="png" :styles="{
+        
+        }" :lock="disabled" @mousemove="getCoordinate($event)" :additional-images="additionalImages" /> -->
+
+
+      <div>
+        <!-- class="moveable" -->
+        <AddDeviceInfo class="moveable" :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
+          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.BLEUUID = null; areavalue = null">
+        </AddDeviceInfo>
+      </div>
+
+      <Moveable v-bind="moveable" @drag="handleDrag" />
     </div>
     <div class="listFreeBLE" v-if="this.$store.state.currvenue">
       <div style="font-weight: bold; font-size: 18px; text-align: center; word-wrap: none; margin-bottom: 50px;">
@@ -57,6 +70,8 @@ import axios from 'axios'
 import MdSearch from '@vicons/ionicons4/MdSearch'
 import { defineComponent, ref } from 'vue'
 import MenuBar from '@/components/MenuBar.vue';
+// import VueDrawingCanvas from "vue-drawing-canvas";
+import Moveable from "vue3-moveable";
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
 
 import locatePic from '../assets/pic/location.png'
@@ -67,7 +82,7 @@ export default defineComponent({
   setup() {
     return {
       show: ref(false),
-      areavalue: ref(null),
+
       options: [],
       propdata: [],
     }
@@ -75,12 +90,13 @@ export default defineComponent({
   components: {
     MdSearch,
     MenuBar,
-    AddDeviceInfo
+    AddDeviceInfo,
+    // VueDrawingCanvas,
+    Moveable
   },
   data() {
     return {
       locatePic: locatePic,
-      pic: pic,
       frame_status: false,
       add_device: false,
       locating: false,
@@ -96,10 +112,52 @@ export default defineComponent({
       },
       freeBLE: [],
       freeBLEFlag: false,
-      chooseFlag: null,
+      BLEUUID: null,
+      areavalue: null,
+      areapic: '',
+      //---------------------------
+      x: 0,
+      y: 0,
+      image: "",
+      disabled: false,
+      color: "#000000",
+      strokeType: "dash",
+      backgroundImage: pic,
+      additionalImages: [],
+      //---------------------------
+      moveable: {
+        target: [".moveable"],
+        draggable: true,
+        throttleDrag: 1,
+        origin: false,
+      },
     };
   },
+  // watch: {
+  //   areavalue() {
+  //     this.onChangeMethod()
+  //   }
+  // },
   methods: {
+    async onChangeMethod(event) {
+      this.areavalue = event
+      let areas
+      await axios({
+        method: 'get',
+        baseURL: this.$store.state.api + '/table/Map',
+        'Content-Type': 'application/json',
+      })
+        .then((response) => areas = response.data)
+        .catch((err) => { console.error(err) })
+
+      for (let i = 0; i < Object.values(areas).length; i++) {
+        if (areas[i].Area === this.areavalue && areas[i].Venue === this.$store.state.currentvenue) {
+          this.areapic = areas[i].Route
+          break
+        }
+      }
+      console.log(this.areapic)
+    },
     async fetchApi() {
       let regions
       await axios({
@@ -140,13 +198,12 @@ export default defineComponent({
       }
     },
     chooseBLE(index) {
-      this.chooseFlag = index
+      this.BLEUUID = index
     },
-    listItemStyle: function (index) {
+    clickBtnFlag: function () {
       var style = {};
-      if (index === this.chooseFlag) {
-        style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        style.color = 'rgba(255, 255, 255, 1)';
+      if (this.locating) {
+        style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
       }
       return style;
     },
@@ -154,22 +211,88 @@ export default defineComponent({
       this.mouse.x = event.clientX
       this.mouse.y = event.clientY
 
-      // TODO: 應該要記錄目前要新增裝置之點
+      // TODO: 應該要標記icon給目前要新增裝置之點
       this.propdata.push({
-        'UUID': this.chooseFlag, 'Xaxis': this.mouse.x, 'Yaxis': this.mouse.y, 'Area': this.areavalue, 'Venue': this.$store.state.currentvenue
+        'UUID': this.BLEUUID, 'Xaxis': this.mouse.x, 'Yaxis': this.mouse.y, 'Area': this.areavalue, 'Venue': this.$store.state.currentvenue
       })
       console.log(this.propdata)
     },
-
+    //-----------------------------------
+    listItemStyle: function (index) {
+      var style = {};
+      if (index === this.BLEUUID) {
+        style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        style.color = 'rgba(255, 255, 255, 1)';
+      }
+      return style;
+    },
+    handleDrag({ target, transform }) {
+      console.log("onDrag", transform, target);
+      target.style.transform = transform;
+    },
+    //-----------------------------
+    async setImage(event) {
+      let URL = window.URL;
+      this.backgroundImage = URL.createObjectURL(event.target.files[0]);
+      await this.$refs.VueCanvasDrawing.redraw();
+    },
+    async setWatermarkImage(event) {
+      let URL = window.URL;
+      this.watermark = {
+        type: "Image",
+        source: URL.createObjectURL(event.target.files[0]),
+        x: 0,
+        y: 0,
+        imageStyle: {
+          width: 600,
+          height: 400,
+        },
+      };
+      await this.$refs.VueCanvasDrawing.redraw();
+    },
+    getCoordinate(event) {
+      let coordinates = this.$refs.VueCanvasDrawing.getCoordinates(event);
+      this.x = coordinates.x;
+      this.y = coordinates.y;
+    },
+    getStrokes() {
+      window.localStorage.setItem(
+        "vue-drawing-canvas",
+        JSON.stringify(this.$refs.VueCanvasDrawing.getAllStrokes())
+      );
+      alert(
+        "Strokes saved, reload your browser to see the canvas with previously saved image"
+      );
+    },
+    removeSavedStrokes() {
+      window.localStorage.removeItem("vue-drawing-canvas");
+      alert("Strokes cleared from local storage");
+    },
   },
+
   mounted() {
     this.fetchApi()
     this.fetchUUID()
+    if ("vue-drawing-canvas" in window.localStorage) {
+      this.initialImage = JSON.parse(
+        window.localStorage.getItem("vue-drawing-canvas")
+      );
+    }
   }
 });
 </script>
 
 <style scoped>
+.moveable {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  border: none;
+  outline: none;
+}
+
 .region {
   width: 50vw;
   text-align: center;
@@ -212,35 +335,33 @@ export default defineComponent({
   align-self: flex-start;
 }
 
-.locateBtn:focus {
-  background-color: rgba(0, 0, 0, 20%);
-}
-
 .frame {
   width: 100%;
   height: 100%;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 25%);
-  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
 }
 
 
 .frame img {
   height: 100%;
   width: 100%;
-  position: absolute;
+  /* position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  margin: 0 auto;
-  border-radius: 5px;
-  position: absolute;
-  padding: 20px 15px;
-  object-fit: contain;
+  margin: 0 auto; */
+
+  /* object-fit: fill; */
+
 }
 
 .locateCursor {
-  cursor: url('../assets/pic/locate_green.png'), pointer;
+  cursor: url('../assets/pic/locate_green2.png'), pointer;
 }
 
 .notlocateCursor {

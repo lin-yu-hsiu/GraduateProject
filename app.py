@@ -1,6 +1,9 @@
+from msilib.schema import Error
+import re
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from flask_cors import CORS
 import DB,json
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -125,7 +128,10 @@ def deleteVenue():
 def insertArea():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
-    result = DB.insert_data(temp['Venue'],temp)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    temp['Route'] = basedir + "\\" + temp['fileName']
+    del temp['fileName']
+    result = DB.insert_data(temp['Venue'],temp) 
     if(result['success']):
         result = DB.insert_data("Map",temp)
         if(result['success']):
@@ -204,7 +210,25 @@ def insertBLE():
         return jsonify(result)
     else:
         return jsonify(result)
-    
+
+@app.route("/uploadPic",methods=["POST"])
+def uploadPic():
+    try:
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        exist = os.path.exists('Pic')       
+        if(exist == False):
+            os.mkdir(os.path.join(basedir,'Pic'))      
+        img = request.files.get('file')
+        format = img.filename[img.filename.index('.'):]
+        if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
+            dir = basedir + '\\Pic\\' + img.filename.replace(format,'.jpg')
+            img.save(dir)
+            result = {'success': 1, 'result': 'Upload Successfully'}
+        else:
+            result = {'success': 0, 'result': 'Type Wrong'}
+    except:
+        result = {'success': 0, 'result': 'Upload Failed'}
+    return jsonify(result)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
-

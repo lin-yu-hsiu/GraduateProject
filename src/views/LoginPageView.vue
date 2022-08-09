@@ -52,7 +52,6 @@ import error from '../assets/pic/loginerror.png'
 
 //顯示目前誰在系統裡面 
 
-//硬體跟app
 
 export default defineComponent({
   setup() {

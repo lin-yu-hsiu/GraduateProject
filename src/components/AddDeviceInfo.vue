@@ -2,6 +2,20 @@
   <n-card hoverable closable class="checkDevice">
     <h3 class="text-center mb-5" style="font-weight: bold;">欲新增裝置之必填資料
     </h3>
+    <div class="d-flex justify-content-between mx-auto mb-1" style="width: 300px">
+      <div class="subTitle">裝置編號</div>
+      <div class="edit" v-if="info.UUID" style="color: #000000;
+  background-color: rgba(0, 0, 0, 30%);">{{ info.UUID }}</div>
+      <div class="edit" style="color: #000000;
+  background-color: rgba(0, 0, 0, 30%);" v-else>尚未選取裝置</div>
+    </div>
+    <div class="d-flex justify-content-between mx-auto mb-1" style="width: 300px">
+      <div class="subTitle">裝置區域</div>
+      <div class="edit" style="color: #000000;
+  background-color: rgba(0, 0, 0, 30%);" v-if="info.Area">{{ info.Area }}</div>
+      <div class="edit" style="color: #000000;
+  background-color: rgba(0, 0, 0, 30%);" v-else>尚未選取區域</div>
+    </div>
     <div class="d-flex justify-content-between mx-auto" style="width: 300px">
       <div class="subTitle">裝置地點</div>
       <input v-model="placevalue" class="edit" type="text">
@@ -86,12 +100,9 @@ export default defineComponent({
 <style scoped>
 .checkDevice {
   width: 500px;
-  height: 600px;
-  position: absolute;
-  top: 15vh;
-  left: auto;
+  /* height: 600px; */
   background-color: #ffffff;
-  border-radius: 30px;
+  border-radius: 15px;
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 25%),
     0 -4px 20px 0 rgba(0, 0, 0, 25%);
   display: flex;
@@ -126,12 +137,14 @@ export default defineComponent({
   border: solid .5px rgba(0, 0, 0, 15%);
   padding: 4px 8px;
   font-size: 16px;
+  font-weight: 500;
+  text-align: center;
   border-radius: 5px;
   resize: none;
   color: #000000;
   background-color: rgba(217, 217, 217, 50%);
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 15%);
-  width: 100px;
+  width: 150px;
 }
 
 .addBtn {
