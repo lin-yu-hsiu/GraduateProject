@@ -1,8 +1,10 @@
 <template>
   <div class="d-flex">
+
     <MenuBar></MenuBar>
     <div class="d-flex flex-column align-items-center p-5" style="width: 100%; position: relative;"
       :class="(locating && no_cursor) ? notlocateCursor : ''">
+
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         /
         {{
@@ -36,13 +38,13 @@
           <br />
           1. 選取區域
           <br />
-          2. 選取右表中任一裝置
+          2.選取右表中任一裝置
           <br />
-          3. 點擊左上方之新增按鈕
+          3.點擊左上方之新增按鈕
           <br />
-          4. 選取平面圖中欲將裝置設置之位置
+          4.選取平面圖中欲將裝置設置之位置
           <br />
-          5. 送出資料
+          5.送出資料
         </div>
         <img v-if="areapic != ''" :src="'../../images/' + areapic + '.jpg'"
           :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域"
@@ -50,17 +52,13 @@
         <div v-for="item in currentdevice" :key="item">
           <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
         </div>
+
       </div>
-
-      <!-- <div style="z-index: 1"> -->
-      <!-- class="moveable" -->
-
-      <!-- </div> -->
-      <AddDeviceInfo class="moveable" :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
-        @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.BLEUUID = null; areavalue = null">
-      </AddDeviceInfo>
-      <Moveable v-bind="moveable" @drag="handleDrag" />
-
+      <div id="draggable">
+        <AddDeviceInfo :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
+          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.BLEUUID = null; areavalue = null">
+        </AddDeviceInfo>
+      </div>
     </div>
     <div class="listFreeBLE" v-if="this.$store.state.currvenue">
       <div style="font-weight: bold; font-size: 20px; text-align: center; word-wrap: none; margin-bottom: 50px;">
@@ -79,11 +77,13 @@
 </template>
 
 <script>
+import $ from 'jquery'
+import 'jquery-ui-dist/jquery-ui.js'
+import 'jquery-ui-dist/jquery-ui.css'
 import axios from 'axios'
 import MdSearch from '@vicons/ionicons4/MdSearch'
 import { defineComponent, ref, reactive } from 'vue'
 import MenuBar from '@/components/MenuBar.vue';
-import Moveable from "vue3-moveable";
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
 
 import locatePic from '../assets/pic/location.png'
@@ -114,7 +114,6 @@ export default defineComponent({
     MdSearch,
     MenuBar,
     AddDeviceInfo,
-    Moveable
   },
   data() {
     return {
@@ -143,13 +142,7 @@ export default defineComponent({
       areavalue: null,
       areapic: '',
       currentdevice: [],
-      // movable ---------------------------
-      moveable: {
-        target: [".moveable"],
-        draggable: true,
-        throttleDrag: 1,
-        origin: false,
-      },
+
     };
   },
   methods: {
@@ -157,7 +150,8 @@ export default defineComponent({
       this.currentdevice = []
       this.areavalue = event
       if (this.areavalue != null) {
-        this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
+        // this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
+        this.areapic = '1'
         this.fetchPicInfo()
       }
     },
@@ -251,12 +245,7 @@ export default defineComponent({
       }
       return style;
     },
-
     // -----------------------------------
-    handleDrag({ target, transform }) {
-      console.log("onDrag", transform, target);
-      target.style.transform = transform;
-    },
     async fetchPicInfo() {
       let devices
       await axios({
@@ -273,29 +262,25 @@ export default defineComponent({
           this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis })
         }
       }
-      console.log(this.currentdevice)
+      // console.log(this.currentdevice)
     },
   },
-
   mounted() {
     this.fetchApi()
     this.fetchUUID()
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')
     }
+    $('#draggable').draggable();
   }
 });
 </script>
 
 <style scoped>
-.moveable {
+#draggable {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
-  border: none;
-  outline: none;
+  top: 20vh;
+  left: 25vw;
 }
 
 .region {

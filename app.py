@@ -216,22 +216,19 @@ def insertBLE():
 def uploadPic():
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))
-        basedir = basedir + '\public'
-        print(basedir)
-        exist = os.path.exists('\images')       
-        print(exist)  
+        exist = os.path.exists('Pic')
         if(exist == False):
-            os.mkdir(os.path.join(basedir,'images'))     
+            os.mkdir(os.path.join(basedir,'Pic'))
         img = request.files.get('file')
         format = img.filename[img.filename.index('.'):]
-        if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):           
-            dir = basedir + '\\images\\' + img.filename.replace(format,'.jpg') 
-            print(dir)          
+        if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
+            dir = basedir + '\\Pic\\' + img.filename.replace(format,'.jpg')
             img.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
             result = {'success': 0, 'result': 'Type Wrong'}
-    except:
+    except Exception as e:
+        print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 

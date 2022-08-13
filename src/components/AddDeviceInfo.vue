@@ -24,14 +24,8 @@
       <div class="subTitle my-4" style="align-self: flex-start">訊息內容</div>
       <textarea v-model="messagecontent" class="message scroll p-3"></textarea>
     </div>
-    <!-- <div class="d-flex justify-content-center align-items-center mt-5" style="font-weight: bold; font-size: 18px;">
-      <Icon v-if="!connectSuccess" icon="eos-icons:loading" color="rgba(0, 0, 0, 70%)" height="40" />
-      <img v-else :src="ok" class="me-3" style="width:30px; height:30px">
-      確認此裝置已連上網
-    </div> -->
     <button @click="sendToAddDevice();" class="addBtn mt-5">
       <img v-if="disableBtn" :src="store_black" style="width: 45px; height: 55px">
-      <!-- <img v-if="!disableBtn && connectSuccess" :src="store_green" style="width: 45px; height: 55px"> -->
       <img v-if="!disableBtn && !connectSuccess" :src="store_red" style="width: 45px; height: 55px">
     </button>
   </n-card>
@@ -122,6 +116,7 @@ export default defineComponent({
   mounted() { }
 })
 </script>
+
 
 <style scoped>
 .checkDevice {

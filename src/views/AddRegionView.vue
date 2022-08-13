@@ -98,19 +98,22 @@ export default defineComponent({
       }
       else {
         this.selectedFile = event.target.files[0]
+        console.log(this.selectedFile)
         this.pic = this.selectedFile.name
         this.previewImage = URL.createObjectURL(this.selectedFile);
         let formData = new FormData()
         let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
         formData.append('file', this.selectedFile, imgName)
 
+        let res = []
         await axios({
           method: 'post',
           url: this.$store.state.api + '/uploadPic',
           headers: { "Content-Type": "image/png" },
           data: formData,
-        }).then((response) => response = response.data)
+        }).then((response) => res = response.data)
           .catch((err) => { console.error(err) })
+        console.log(res)
       }
     },
     async UploadData() {
