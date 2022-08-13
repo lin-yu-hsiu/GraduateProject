@@ -1,5 +1,3 @@
-# vue-test
-
 ## Project setup
 ```
 npm install
@@ -10,16 +8,8 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Server fake data
 ```
-npm run build
+INSERT INTO ('') VALUES ('');
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-
 
