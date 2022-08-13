@@ -2,9 +2,11 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
+    step: '',
     currvenue: false,
     currentvenue: '(需先切換場館)',
-    currentarea: null,
+    api: 'http://192.168.0.100:5000',
+    currentUser: '',
   },
   getters: {
   },
@@ -12,7 +14,13 @@ export default createStore({
     switchRegion(state, curr) {
       state.currentvenue = curr;
       state.currvenue = true
-      console.log(curr)
+      state.step = 'switch'
+    },
+    addRegion(state) {
+      state.step = 'addregion'
+    },
+    addDevice(state) {
+      state.step = 'addDevice'
     },
   },
   actions: {

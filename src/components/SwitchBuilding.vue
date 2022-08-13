@@ -1,14 +1,17 @@
 <template>
   <div class="regionList">
-    <div style=" font-weight: bold; align-self: start; font-size: 26px;">{{ regionInfo }}</div>
-    <!-- <img :src="require('../assets/pic/' + regionInfo.Route + '.jpg')" class="thumbNail"> -->
+    <div style="font-weight: bold; font-size: 26px;">{{ regionInfo }}</div>
+    <button class="detailBtn p-0" @click="removeVenue" @mouseover="icon = remove_hover" @mouseleave="icon = remove">
+      <img :src="icon" style="width: 36px; height: 42px">
+    </button>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import { defineComponent } from "vue";
-import regionpic1 from '../assets/pic/regionpic1.jpg'
-import regionpic2 from '../assets/pic/regionpic2.jpg'
+import remove from '../assets/pic/trash.png'
+import remove_hover from '../assets/pic/trash_hover.png'
 
 export default defineComponent({
   props: {
@@ -18,12 +21,34 @@ export default defineComponent({
   },
   data() {
     return {
+      icon: remove,
+      remove: remove,
+      remove_hover: remove_hover,
+
+
+      //
       regionInfo: this.region,
-      regionpic1: regionpic1,
-      regionpic2: regionpic2,
+      removeflag: false,
     }
   },
   methods: {
+    async removeVenue() {
+      const body = {
+        'Venue': this.regionInfo,
+      }
+      const json = JSON.stringify(body);
+      await axios({
+        method: 'post',
+        baseURL: this.$store.state.api + '/deleteVenue',
+        headers: { 'Content-Type': 'application/json' },
+        data: json
+      })
+        .then((response) => response = response.data)
+        .catch((error) => console.log(error))
+
+      this.removeflag = true
+      this.$emit('removeDisplay', this.regionInfo, this.removeflag) //刪除此場館並回傳到父元件以更新畫面
+    },
 
   },
   mounted() {
@@ -34,15 +59,14 @@ export default defineComponent({
 
 <style scoped>
 .regionList {
-  width: 400px;
-  height: 250px;
+  width: 300px;
+  height: 180px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  border-radius: 0 0 20px 20px;
+  justify-content: space-between;
+  border-radius: 20px;
   padding: 20px;
 }
 
@@ -55,5 +79,10 @@ export default defineComponent({
   width: 300px;
   height: 150px;
   border-radius: 20px;
+}
+
+.detailBtn {
+  background-color: transparent;
+  border: none;
 }
 </style>

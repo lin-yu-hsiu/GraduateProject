@@ -12,6 +12,12 @@
         <div class="col-5 info">
           <h2 class="title">XXXX館</h2>
           <h1 class="subtitle">Member Login</h1>
+          <div class="hasUser" v-if="this.$store.state.currentUser != ''">
+            目前有人使用，請稍後 ...
+          </div>
+          <div class="noUser" v-else>
+            目前無人使用，歡迎您
+          </div>
           <form @submit.prevent="memberLogin" class="d-flex flex-column align-items-center">
             <div class="option">
               <img class="account" :src="imgSrc" alt="">
@@ -50,8 +56,6 @@ import { defineComponent } from "vue";
 import account from '../assets/pic/account.png'
 import error from '../assets/pic/loginerror.png'
 
-
-const API = 'http://192.168.0.102:5000/login'
 export default defineComponent({
   setup() {
 
@@ -73,9 +77,11 @@ export default defineComponent({
       let useraccount = this.loginForm.account
       let userpassword = this.loginForm.password
 
+      this.$store.state.currentUser = useraccount  //記錄誰現在正在系統內部
+
       await axios({
         method: 'post',
-        url: API,
+        url: this.$store.state.api + '/login',
         headers: {
           accept: 'application/json',
           'Content-Type': 'multipart/form-data'
@@ -118,6 +124,34 @@ export default defineComponent({
   height: 700px;
   display: flex;
   border-radius: 20px;
+}
+
+.noUser {
+  background-color: rgba(0, 0, 0, 0.1);
+  width: 250px;
+  height: 40px;
+  border-radius: 5px;
+  text-align: center;
+  color: #00c853;
+  margin: 25px 0px;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 2;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.5);
+}
+
+.hasUser {
+  background-color: rgba(0, 0, 0, 0.1);
+  width: 250px;
+  height: 40px;
+  border-radius: 5px;
+  text-align: center;
+  color: #d50000;
+  margin: 25px 0px;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 2;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.5);
 }
 
 .row {
@@ -173,7 +207,7 @@ export default defineComponent({
 
 .subtitle {
   font-weight: bold;
-  margin: 0 0 80px 0;
+  margin: 0 auto;
 }
 
 .option {

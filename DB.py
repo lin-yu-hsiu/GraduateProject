@@ -77,15 +77,10 @@ def insert_data(table_name, content):
         if (table_name != "BLE"):
             ins = 'Insert into {} ('.format(table_name)
             if(table_name == 'People'):
-                ins += 'Email,Account,Password) values ('
+                ins += 'Email,Account,Password) values ("{}","{}","{}"'.format(content['Email'],content['Account'],content['Password'])
             else:
-                ins += 'Route,Venue,Area) values ('
-            for i in content:
-                if(type(content[i]) == str):
-                    ins += str("'{}',".format(content[i]))
-                else:
-                    ins += str(str(content[i]) + ',')
-            ins = ins[:-1] + ');'
+                ins += 'Route,Venue,Area) values ("{}","{}","{}"'.format(content['Route'],content['Venue'],content['Area'])
+            ins += ');'
         else:
             ins = "Insert into BLE ('UUID') Values ('{}');".format(content['UUID'])
         cursor.execute(ins)
@@ -94,6 +89,8 @@ def insert_data(table_name, content):
         conn.close()
         return {"success": 1,'Result': '新增成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def delete_data(table_name, pk):        #刪除一筆資料
@@ -114,6 +111,8 @@ def delete_data(table_name, pk):        #刪除一筆資料
         conn.close()
         return {"success": 1,'Result': '刪除成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def delete_all(table_name):
@@ -127,6 +126,8 @@ def delete_all(table_name):
         conn.close()
         return {"success": 1,'Result': '刪除成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以及狀態將在其他路由處理)
@@ -150,6 +151,8 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
         conn.close()
         return {"success": 1,'Result': '修改成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def modify_battery(content):            #針對 BLE 之中的電量進行修正
@@ -164,6 +167,8 @@ def modify_battery(content):            #針對 BLE 之中的電量進行修正
         conn.close()
         return {"success": 1,'Result': '修改成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def show_device_info(number):
@@ -196,6 +201,8 @@ def show_device_info(number):
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return e
 
 def switch_BLE(content):
@@ -210,6 +217,8 @@ def switch_BLE(content):
         conn.close()
         return {"success": 1,'Result': '修改成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def show_venue():
@@ -230,6 +239,8 @@ def show_venue():
         conn.close()
         return result
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return e
 
 def create_venue(name):
@@ -243,6 +254,8 @@ def create_venue(name):
         conn.close()
         return {"success": 1,'Result': '新增成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}
 
 def delete_venue(name):
@@ -256,4 +269,6 @@ def delete_venue(name):
         conn.close()
         return {"success": 1,'Result': '刪除成功'}
     except sqlite3.OperationalError as e:
+        cursor.close()
+        conn.close()
         return {"success": 0, "Result": str(e)}

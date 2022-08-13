@@ -67,7 +67,7 @@
 
 <script>
 import axios from 'axios'
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 
 import edit from '../assets/pic/edit_green.png'
 import edit_hover from '../assets/pic/edit_green_hover.png'
@@ -81,11 +81,25 @@ import battery100 from '../assets/pic/battery100.png'
 import battery50 from '../assets/pic/battery50.png'
 import battery0 from '../assets/pic/battery0.png'
 
-const testAPI = 'http://192.168.0.103:5000/modifyBLE'
+
 export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update,
+    }
+  },
   props: {
     device: {
       type: Object,
+    }
+  },
+  watch: {
+    device(newVal) {
+      this.deviceInfo = newVal
     }
   },
   data() {
@@ -93,6 +107,7 @@ export default defineComponent({
       // 以下為props ----------------------------------
       deviceInfo: this.device,
       // 以下為variables ------------------------------
+      emptyflag: false,
       isEditing: false,
       editClass: 'editClass',
       isRemoving: false,
@@ -127,12 +142,15 @@ export default defineComponent({
         'Note': this.deviceInfo.Note,
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(testAPI, json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log(res);
+      await axios({
+        method: 'post',
+        baseURL: this.$store.state.api + '/modifyBLE',
+        headers: { 'Content-Type': 'application/json' },
+        data: json
+      })
+        .then((response) => response = response.data)
+        .catch((error) => console.log(error))
+
       this.isEditing = false
     },
     async removeChange() {
@@ -140,17 +158,19 @@ export default defineComponent({
         'UUID': this.deviceInfo.UUID,
       }
       const json = JSON.stringify(body);
-      const res = await axios.post(testAPI, json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log(res);
+      await axios({
+        method: 'post',
+        baseURL: this.$store.state.api + '/deleteBLE',
+        headers: { 'Content-Type': 'application/json' },
+        data: json
+      })
+        .then((response) => response = response.data)
+        .catch((error) => console.log(error))
+
       this.isRemoving = false
+      this.$emit('ifEmpty') //如果此區域已無裝置回傳到父元件以更新畫面
     },
   },
-  mounted() {
-  }
 })
 </script>
 

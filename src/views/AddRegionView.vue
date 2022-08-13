@@ -1,7 +1,14 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column p-5 w-100">
+    <div class="d-flex flex-column p-5 w-100 mx-auto" style="max-height: 100vh">
+      <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%);">
+        /
+        {{
+            this.$store.state.currentvenue
+        }}
+        / 新增區域
+      </div>
       <div class="d-flex justify-content-center align-items-center">
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
@@ -10,21 +17,21 @@
           }}
         </div>
       </div>
-      <div v-if="$store.state.currvenue" class="d-flex justify-content-center align-items-center my-5">
+      <div v-if="this.$store.state.currvenue" class="d-flex justify-content-center align-items-center my-5">
         <div class="title mx-3">
           區域名稱
         </div>
-        <input id="RegionName" class="regionName" type="text" placeholder="欲新增之名稱">
+        <input v-model="regionName" id="RegionName" class="regionName" type="text" placeholder="欲新增之區域名稱">
       </div>
-      <div v-if="$store.state.currvenue" class="picRegion d-flex justify-content-center align-items-center">
-        <n-upload id="RegionPic" list-type="image" class="d-flex flex-column align-items-center" action="https://">
-          <button class="clickToLoad">
-            <img :src="loadpic" style="width: 45px; height: 45px">
-            點擊以匯入平面圖 ...
-          </button>
-        </n-upload>
+      <div v-if="$store.state.currvenue" class="picRegion d-flex flex-column justify-content-center align-items-center">
+        <img :src="previewImage" style="max-width: 98%; max-height: 70%; border-radius: 5px; margin-bottom: 20px;">
+        <button class="clickToLoad" @click="this.$refs.regionimage.click()">
+          <img :src="loadpic" style="width: 45px; height: 45px">
+          {{ pic }}
+        </button>
+        <input type="file" accept="image/*" style="display: none;" ref="regionimage" @change="UploadImage">
       </div>
-      <button v-if="$store.state.currvenue" class="clickToStore" @click="validate">
+      <button v-if="$store.state.currvenue" class="clickToStore" @click="UploadData()">
         <img :src="store_black" style="width: 45px; height: 55px">
       </button>
     </div>
@@ -32,37 +39,146 @@
 </template>
 
 <script>
+import axios from 'axios'
+import { defineComponent, inject } from "vue";
+import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
 import loadpic from '../assets/pic/loadpic.png'
 import store_black from '../assets/pic/store_black.png'
 
-export default {
+
+export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const message = useMessage()
+    const update = () => {
+      message.success('新增成功'),
+        { duration: 1000 }
+      reload()
+    }
+    const mistake = () => {
+      reload()
+      message.error('新增失敗'),
+        { duration: 1000 }
+    }
+    const already = () => {
+      reload()
+      message.error('新增失敗\n已新增過相同名稱之區域'),
+        { duration: 1000 }
+    }
+    const noname = () => {
+      message.error('請先填寫區域名稱'),
+        { duration: 1000 }
+    }
+    return {
+      update,
+      mistake,
+      already,
+      noname
+    }
+  },
   components: {
-    MenuBar
+    MenuBar,
   },
   data() {
     return {
       store_black: store_black,
       loadpic: loadpic,
-      currentBuilding: 'A 棟'
+      selectedFile: null,
+      regionName: '',
+      pic: '點擊以匯入平面圖 ...',
+      previewImage: undefined,
+      sendFlag: false
     };
   },
   methods: {
-    validate() {
+    async UploadImage(event) {
+      if (this.regionName == '') {
+        this.noname()
+      }
+      else {
+        this.selectedFile = event.target.files[0]
+        this.pic = this.selectedFile.name
+        this.previewImage = URL.createObjectURL(this.selectedFile);
+        let formData = new FormData()
+        let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+        formData.append('file', this.selectedFile, imgName)
 
+        await axios({
+          method: 'post',
+          url: this.$store.state.api + '/uploadPic',
+          headers: { "Content-Type": "image/png" },
+          data: formData,
+        }).then((response) => response = response.data)
+          .catch((err) => { console.error(err) })
+      }
+    },
+    async UploadData() {
+      if (this.selectedFile == null) {
+        this.mistake()
+      }
+      let res1 = []
+      await axios({
+        method: 'get',
+        url: this.$store.state.api + '/table/' + this.$store.state.currentvenue,
+        headers: { "Content-Type": 'application/json' },
+      }).then((response) => res1 = response.data)
+        .catch((err) => { console.error(err) })
+
+      if (this.regionName == '') {
+        this.mistake()
+        this.sendFlag = true
+      }
+      if (this.regionName != '') {
+        for (let i = 0; i < Object.values(res1).length; i++) {
+          if (this.regionName == res1[i].Area) {
+            this.already()
+            this.sendFlag = true
+          }
+        }
+      }
+      if (this.sendFlag === false && this.selectedFile != null) {
+        let body = {
+          'Venue': this.$store.state.currentvenue,
+          'Area': this.regionName,
+          'fileName': this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+        }
+        let res = []
+        await axios({
+          method: 'post',
+          url: this.$store.state.api + '/insertArea',
+          headers: { "Content-Type": 'application/json' },
+          data: JSON.stringify(body)
+        }).then((response) => res = response.data)
+          .catch((err) => { console.error(err) })
+        // console.log(res)
+        if (res.success == 1) {
+          this.update()
+        } else {
+          this.mistake()
+        }
+      }
+    },
+  },
+  mounted() {
+
+    if (this.$store.state.currvenue == false) {
+      this.$router.push('/')
     }
   }
-};
+});
 </script>
 
 <style scoped>
 .picRegion {
   width: 70vw;
-  height: 60vh;
+  height: 60%;
   max-width: 1500px;
   background-color: #D9D9D9;
   box-shadow: 0 0 30px 0 rgba(0, 0, 0, 25%) inset;
   margin: 0 auto;
+  position: relative;
+  border-radius: 5px;
 }
 
 .title {
@@ -90,13 +206,15 @@ export default {
 
 .clickToLoad {
   border: none;
-  font-size: 18px;
   font-weight: bold;
   border-radius: 5px;
-  padding: 8px;
+  padding: 4px 8px;
   outline: none;
   background: linear-gradient(to right, #ffffff 0%, #D9D9D9 100%);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 15%);
+  text-align: center;
+  width: auto;
+  margin: 0 auto;
 }
 
 .clickToLoad:hover {

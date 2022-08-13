@@ -1,5 +1,6 @@
 from msilib.schema import Error
 import re
+from traceback import print_tb
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from flask_cors import CORS
 import DB,json
@@ -131,7 +132,7 @@ def insertArea():
     basedir = os.path.abspath(os.path.dirname(__file__))
     temp['Route'] = basedir + "\\" + temp['fileName']
     del temp['fileName']
-    result = DB.insert_data(temp['Venue'],temp)
+    result = DB.insert_data(temp['Venue'],temp) 
     if(result['success']):
         result = DB.insert_data("Map",temp)
         if(result['success']):
@@ -215,13 +216,17 @@ def insertBLE():
 def uploadPic():
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))
-        exist = os.path.exists('Pic')
+        basedir = basedir + '\public'
+        print(basedir)
+        exist = os.path.exists('\images')       
+        print(exist)  
         if(exist == False):
-            os.mkdir(os.path.join(basedir,'Pic'))
-        img = request.files.get('RegionImage')
+            os.mkdir(os.path.join(basedir,'images'))     
+        img = request.files.get('file')
         format = img.filename[img.filename.index('.'):]
-        if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
-            dir = basedir + '\\Pic\\' + img.filename.replace(format,'.jpg')
+        if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):           
+            dir = basedir + '\\images\\' + img.filename.replace(format,'.jpg') 
+            print(dir)          
             img.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
