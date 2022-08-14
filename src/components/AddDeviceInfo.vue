@@ -4,10 +4,12 @@
     </h3>
     <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置編號</div>
-      <div class="edit" v-if="info[0].UUID != null" style="color: #FFFFFF;
-  background-color: rgba(0, 0, 0, 0.5); cursor: not-allowed">{{ info[0].UUID }}</div>
-      <div class="edit" style="color: rgba(255, 255, 255, 0.65);
-  background-color: rgba(0, 0, 0, 0.5);" v-else>尚未選取裝置</div>
+      <n-select @change="onChangeMethod($event)" size="medium" :consistent-menu-width="false" v-model:show="show"
+        v-model:value="BLEUUID" filterable placeholder="請選擇欲配對之裝置" :options="options">
+        <template v-if="show" #arrow>
+          <md-search />
+        </template>
+      </n-select>
     </div>
     <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置區域</div>
@@ -33,8 +35,9 @@
 
 <script>
 import axios from 'axios'
-import { defineComponent, inject } from 'vue'
+import { defineComponent, inject, ref } from 'vue'
 import { useMessage } from 'naive-ui'
+import MdSearch from '@vicons/ionicons4/MdSearch'
 import ok from '../assets/pic/ok.png'
 import store_black from '../assets/pic/store_black.png'
 import store_green from '../assets/pic/store_green.png'
@@ -55,12 +58,14 @@ export default defineComponent({
         { duration: 1000 }
     }
     return {
+      show: ref(false),
+      options: [],
       update,
       mistake
     }
   },
   components: {
-
+    MdSearch,
   },
   props: {
     info: {
@@ -69,12 +74,12 @@ export default defineComponent({
   },
   data() {
     return {
+      BLEUUID: null,
       device: this.info,
       placevalue: '',
       messagecontent: '',
       connectSuccess: true,
       disableBtn: true,
-
       //
       ok: ok,
       store_black: store_black,
@@ -83,6 +88,28 @@ export default defineComponent({
     }
   },
   methods: {
+    onChangeMethod(event) {
+      this.BLEUUID = event
+    },
+    async fetchUUID() {
+      let UUIDs
+      await axios({
+        method: 'get',
+        baseURL: this.$store.state.api + '/newDevice',
+        'Content-Type': 'application/json',
+      })
+        .then((response) => UUIDs = response.data)
+        .catch((err) => { console.error(err) })
+
+      if (UUIDs['free'].length != 0) {
+        for (let i = 0; i < UUIDs['free'].length; i++) {
+          this.options.push({ 'label': UUIDs['free'][i], 'value': UUIDs['free'][i] })
+        }
+      }
+      else {
+        return
+      }
+    },
     async sendToAddDevice() {
       if (this.placevalue == '' || this.messagecontent == '') {
         this.mistake()
@@ -113,12 +140,39 @@ export default defineComponent({
       }
     }
   },
-  mounted() { }
+  mounted() {
+    this.fetchUUID()
+  }
 })
 </script>
 
 
 <style scoped>
+.listFreeBLE {
+  min-width: 200px;
+  width: 200px;
+  background-color: rgba(240, 248, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ble {
+  background-color: rgba(240, 248, 255, 0.8);
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 2;
+  border-radius: 10px;
+  margin: 10px 20px;
+}
+
+.ble:hover {
+  color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(217, 217, 217, 0.7);
+}
+
 .checkDevice {
   width: 500px;
   /* height: 600px; */

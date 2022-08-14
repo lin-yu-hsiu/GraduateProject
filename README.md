@@ -1,5 +1,3 @@
-# vue-test
-
 ## Project setup
 ```
 npm install
@@ -10,16 +8,19 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Open Server
 ```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
+execute app.py (F5 or app run)
 ```
 
-### Customize configuration
+### Server test
+```
+1. move to src/store/index.js 
+2. overwrite your api (personally)
+```
 
+### Server fake data
+```
+INSERT INTO BLE ('') VALUES ('');
+```
 

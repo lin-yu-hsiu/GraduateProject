@@ -94,6 +94,7 @@ export default {
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')
     }
+
   },
 };
 </script>

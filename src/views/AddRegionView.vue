@@ -117,24 +117,23 @@ export default defineComponent({
             if (this.regionName == res1[i].Area) {
               this.already()
               this.sendFlag = true
+              return
             }
           }
         }
-        else {
-          let formData = new FormData()
-          let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
-          formData.append('file', this.selectedFile, imgName)
+        let formData = new FormData()
+        let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+        formData.append('file', this.selectedFile, imgName)
 
-          let res = []
-          await axios({
-            method: 'post',
-            url: this.$store.state.api + '/uploadPic',
-            headers: { "Content-Type": "image/png" },
-            data: formData,
-          }).then((response) => res = response.data)
-            .catch((err) => { console.error(err) })
-          console.log(res)
-        }
+        let res = []
+        await axios({
+          method: 'post',
+          url: this.$store.state.api + '/uploadPic',
+          headers: { "Content-Type": "image/png" },
+          data: formData,
+        }).then((response) => res = response.data)
+          .catch((err) => { console.error(err) })
+        console.log(res)
       }
     },
     async UploadData() {

@@ -20,19 +20,18 @@
           }}
         </div>
       </div>
-      <n-select v-if="$store.state.currvenue && freeBLEFlag" @change="onChangeMethod($event)" size="large"
-        class="region" :consistent-menu-width="false" v-model:show="show" v-model:value="areavalue" filterable
+      <n-select v-if="$store.state.currvenue" @change="onChangeMethod($event)" size="large" class="region"
+        :consistent-menu-width="false" v-model:show="show" v-model:value="areavalue" filterable
         placeholder="請選擇欲新增裝置之區域" :options="options">
         <template v-if="show" #arrow>
           <md-search />
         </template>
       </n-select>
-      <button v-if="$store.state.currvenue && freeBLEFlag" class="locateBtn my-2 " @click="clickBtn()"
-        :style="clickBtnFlag()">
+      <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
         <img :src="locatePic">
       </button>
-      <div v-if="$store.state.currvenue && freeBLEFlag" id="Canvas" class="frame"
-        :class="(locating) ? notlocateCursor : normalCursor" @click="add_device = true; no_cursor = false;">
+      <div v-if="$store.state.currvenue" id="Canvas" class="frame" :class="(locating) ? notlocateCursor : normalCursor"
+        @click="add_device = true; no_cursor = false;">
         <div v-if="areapic == ''" style="font-weight: 800; font-size: 18px; color: rgba(0, 0, 0, 30%);">
           步驟如下
           <br />
@@ -56,23 +55,11 @@
       </div>
       <div id="draggable">
         <AddDeviceInfo :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
-          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.BLEUUID = null; areavalue = null">
+          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; areavalue = null; this.areapic = ''; this.clickBtnStatus = false">
         </AddDeviceInfo>
       </div>
     </div>
-    <div class="listFreeBLE" v-if="this.$store.state.currvenue">
-      <div style="font-weight: bold; font-size: 20px; text-align: center; word-wrap: none; margin-bottom: 50px;">
-        選取進行配對之裝置</div>
-      <div style="height: 55vh">
-        <div v-if="freeBLEFlag">
-          <div :style="listItemStyle(ble)" v-for="ble in freeBLE" :key="ble.id" class="ble" @click="chooseBLE(ble)">
-            {{ ble }}
-          </div>
-        </div>
-        <div v-else style="font-weight: bold; font-size: 16px; text-align: center;color: rgba(0, 0, 0, 0.5)">目前無裝置可配對
-        </div>
-      </div>
-    </div>
+
   </div>
 </template>
 
@@ -136,17 +123,13 @@ export default defineComponent({
         'x': 0,
         'y': 0,
       },
-      freeBLE: [],
-      freeBLEFlag: false,
-      BLEUUID: null,
       areavalue: null,
       areapic: '',
       currentdevice: [],
-
     };
   },
   methods: {
-    async onChangeMethod(event) {
+    onChangeMethod(event) {
       this.currentdevice = []
       this.areavalue = event
       if (this.areavalue != null) {
@@ -173,26 +156,26 @@ export default defineComponent({
       }
       regionSet.forEach((item) => this.options.push({ 'label': item, 'value': item }));
     },
-    async fetchUUID() {
-      let UUIDs
-      await axios({
-        method: 'get',
-        baseURL: this.$store.state.api + '/newDevice',
-        'Content-Type': 'application/json',
-      })
-        .then((response) => UUIDs = response.data)
-        .catch((err) => { console.error(err) })
+    // async fetchUUID() {
+    //   let UUIDs
+    //   await axios({
+    //     method: 'get',
+    //     baseURL: this.$store.state.api + '/newDevice',
+    //     'Content-Type': 'application/json',
+    //   })
+    //     .then((response) => UUIDs = response.data)
+    //     .catch((err) => { console.error(err) })
 
-      if (UUIDs['free'].length != 0) {
-        this.freeBLEFlag = true
-        for (let i = 0; i < UUIDs['free'].length; i++) {
-          this.freeBLE.push(UUIDs['free'][i])
-        }
-      }
-      else {
-        return
-      }
-    },
+    //   if (UUIDs['free'].length != 0) {
+    //     this.freeBLEFlag = true
+    //     for (let i = 0; i < UUIDs['free'].length; i++) {
+    //       this.freeBLE.push(UUIDs['free'][i])
+    //     }
+    //   }
+    //   else {
+    //     return
+    //   }
+    // },
     getCursorValue(event) {
       if (this.frame_status == true && this.locating == true) {
         let temp = this.$refs.Canvas
@@ -207,12 +190,10 @@ export default defineComponent({
         this.propdata.push({
           'UUID': this.BLEUUID, 'Xaxis': this.mouse.x - this.frameBoundary.x, 'Yaxis': this.mouse.y - this.frameBoundary.y, 'Area': this.areavalue, 'Venue': this.$store.state.currentvenue
         })
-        console.log(this.propdata)
+        // console.log(this.propdata)
       }
     },
-    chooseBLE(index) {
-      this.BLEUUID = index
-    },
+
     clickBtn() {
       if (this.clickBtnStatus) {
         this.frame_status = false;
@@ -236,14 +217,6 @@ export default defineComponent({
       return style;
     },
 
-    listItemStyle: function (index) {
-      var style = {};
-      if (index === this.BLEUUID) {
-        style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        style.color = 'rgba(255, 255, 255, 1)';
-      }
-      return style;
-    },
     // -----------------------------------
     async fetchPicInfo() {
       let devices
@@ -266,7 +239,7 @@ export default defineComponent({
   },
   mounted() {
     this.fetchApi()
-    this.fetchUUID()
+    // this.fetchUUID()
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')
     }
@@ -287,30 +260,8 @@ export default defineComponent({
   text-align: center;
 }
 
-.listFreeBLE {
-  min-width: 200px;
-  width: 200px;
-  background-color: rgba(240, 248, 255, 0.2);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
 
-.ble {
-  background-color: rgba(240, 248, 255, 0.8);
-  height: 40px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 2;
-  border-radius: 10px;
-  margin: 10px 20px;
-}
 
-.ble:hover {
-  color: rgba(0, 0, 0, 0.8);
-  background-color: rgba(217, 217, 217, 0.7);
-}
 
 .locateBtn {
   border: none;
