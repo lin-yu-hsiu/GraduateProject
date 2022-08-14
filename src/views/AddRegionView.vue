@@ -31,7 +31,7 @@
         </button>
         <input type="file" accept="image/*" style="display: none;" ref="regionimage" @change="UploadImage">
       </div>
-      <button v-if="$store.state.currvenue" class="clickToStore" @click="UploadData()">
+      <button v-if="$store.state.currvenue" class="clickToStore" @click="UploadData">
         <img :src="store_black" style="width: 45px; height: 55px">
       </button>
     </div>
@@ -40,6 +40,7 @@
 
 <script>
 import axios from 'axios'
+// import { defineComponent } from "vue";
 import { defineComponent, inject } from "vue";
 import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
@@ -57,18 +58,19 @@ export default defineComponent({
       reload()
     }
     const mistake = () => {
-      reload()
-      message.error('新增失敗'),
+      message.error('尚未載入平面圖'),
         { duration: 1000 }
+      reload()
     }
     const already = () => {
-      reload()
-      message.error('新增失敗\n已新增過相同名稱之區域'),
+      message.error('已新增過相同名稱之區域'),
         { duration: 1000 }
+      reload()
     }
     const noname = () => {
       message.error('請先填寫區域名稱'),
         { duration: 1000 }
+      reload()
     }
     return {
       update,
@@ -97,54 +99,58 @@ export default defineComponent({
         this.noname()
       }
       else {
+        event.preventDefault();
         this.selectedFile = event.target.files[0]
-        console.log(this.selectedFile)
+        // console.log(this.selectedFile)
         this.pic = this.selectedFile.name
         this.previewImage = URL.createObjectURL(this.selectedFile);
-        let formData = new FormData()
-        let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
-        formData.append('file', this.selectedFile, imgName)
-
-        let res = []
+        let res1 = []
         await axios({
-          method: 'post',
-          url: this.$store.state.api + '/uploadPic',
-          headers: { "Content-Type": "image/png" },
-          data: formData,
-        }).then((response) => res = response.data)
+          method: 'get',
+          url: this.$store.state.api + '/table/' + this.$store.state.currentvenue,
+          headers: { "Content-Type": 'application/json' },
+        }).then((response) => res1 = response.data)
           .catch((err) => { console.error(err) })
-        console.log(res)
+
+        if (this.regionName != '') {
+          for (let i = 0; i < Object.values(res1).length; i++) {
+            if (this.regionName == res1[i].Area) {
+              this.already()
+              this.sendFlag = true
+            }
+          }
+        }
+        else {
+          let formData = new FormData()
+          let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+          formData.append('file', this.selectedFile, imgName)
+
+          let res = []
+          await axios({
+            method: 'post',
+            url: this.$store.state.api + '/uploadPic',
+            headers: { "Content-Type": "image/png" },
+            data: formData,
+          }).then((response) => res = response.data)
+            .catch((err) => { console.error(err) })
+          console.log(res)
+        }
       }
     },
     async UploadData() {
       if (this.selectedFile == null) {
         this.mistake()
       }
-      let res1 = []
-      await axios({
-        method: 'get',
-        url: this.$store.state.api + '/table/' + this.$store.state.currentvenue,
-        headers: { "Content-Type": 'application/json' },
-      }).then((response) => res1 = response.data)
-        .catch((err) => { console.error(err) })
 
       if (this.regionName == '') {
         this.mistake()
         this.sendFlag = true
       }
-      if (this.regionName != '') {
-        for (let i = 0; i < Object.values(res1).length; i++) {
-          if (this.regionName == res1[i].Area) {
-            this.already()
-            this.sendFlag = true
-          }
-        }
-      }
       if (this.sendFlag === false && this.selectedFile != null) {
         let body = {
           'Venue': this.$store.state.currentvenue,
           'Area': this.regionName,
-          'fileName': this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+          'fileName': this.$store.state.currentvenue + '_' + this.regionName + '.jpg'
         }
         let res = []
         await axios({
@@ -155,6 +161,7 @@ export default defineComponent({
         }).then((response) => res = response.data)
           .catch((err) => { console.error(err) })
         // console.log(res)
+        console.log(this.$store.state.currentvenue)
         if (res.success == 1) {
           this.update()
         } else {
@@ -164,8 +171,9 @@ export default defineComponent({
     },
   },
   mounted() {
-
+    console.log(this.$store.state.currentvenue)
     if (this.$store.state.currvenue == false) {
+      console.log(this.$store.state.currentvenue)
       this.$router.push('/')
     }
   }

@@ -150,8 +150,7 @@ export default defineComponent({
       this.currentdevice = []
       this.areavalue = event
       if (this.areavalue != null) {
-        // this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
-        this.areapic = '1'
+        this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
         this.fetchPicInfo()
       }
     },
