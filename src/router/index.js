@@ -11,37 +11,43 @@ const routes = [
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginPageView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true },
+
   },
   {
     path: '/addregion',
     name: 'addregion',
     component: () => import('../views/AddRegionView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true },
+
   },
   {
     path: '/switchregion',
     name: 'switchregion',
     component: () => import('../views/SwitchBuildingView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true },
+
   },
   {
     path: '/adddevice',
     name: 'adddevice',
     component: () => import('../views/AddDeviceView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true },
+
   },
   {
     path: '/viewdevice',
     name: 'viewdevice',
     component: () => import('../views/ViewDeviceView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true },
+
   },
   {
     path: '/FAQ',
     name: 'FAQ',
     component: () => import('../views/FAQView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true },
+
   },
   // {
   //   path: '/404',

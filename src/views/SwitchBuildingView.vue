@@ -37,7 +37,7 @@
 
 <script>
 import axios from 'axios';
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 import MenuBar from '@/components/MenuBar.vue';
 import SwitchBuilding from '@/components/SwitchBuilding.vue';
 import add from '../assets/pic/add.png'
@@ -46,6 +46,15 @@ import add_hover from '../assets/pic/add_hover.png'
 
 
 export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update,
+    }
+  },
   components: {
     MenuBar,
     SwitchBuilding
@@ -90,7 +99,7 @@ export default defineComponent({
         return item !== toRemove
       });
       this.venues = arr
-      window.location.reload()
+      this.update()
     },
     async sendToAddVenue() {
       if (this.venuedata.name != '') {
@@ -108,26 +117,29 @@ export default defineComponent({
 
         this.venuedata.name = ''  //清空輸入格
         this.fetchAllVenues()
-        window.location.reload()
+        this.update()
       }
     },
   },
   mounted() {
     this.fetchAllVenues()
+    // if (this.$store.state.currvenue == false) {
+    //   this.$router.push('/')
+    // }
   }
 });
 </script>
 
 <style scoped>
 .AddVenue {
-  width: 320px;
-  height: 200px;
+  width: 300px;
+  height: 180px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  border-radius: 0 0 20px 20px;
+  border-radius: 20px 20px;
   padding: 20px;
 }
 

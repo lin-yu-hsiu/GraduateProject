@@ -27,11 +27,20 @@
 
 <script>
 import axios from 'axios'
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 import DeviceInfo from './DeviceInfo.vue'
 
 
 export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update,
+    }
+  },
   data() {
     return {
       devices: [],

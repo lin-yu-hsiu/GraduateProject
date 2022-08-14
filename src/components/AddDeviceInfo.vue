@@ -2,19 +2,21 @@
   <n-card hoverable closable class="checkDevice">
     <h3 class="text-center mb-5" style="font-weight: bold;">欲新增裝置之必填資料
     </h3>
-    <div class="d-flex justify-content-between mx-auto mb-1" style="width: 300px">
+    <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置編號</div>
-      <div class="edit" v-if="info.UUID" style="color: #000000;
-  background-color: rgba(0, 0, 0, 30%);">{{ info.UUID }}</div>
-      <div class="edit" style="color: #000000;
-  background-color: rgba(0, 0, 0, 30%);" v-else>尚未選取裝置</div>
+      <n-select @change="onChangeMethod($event)" size="medium" :consistent-menu-width="false" v-model:show="show"
+        v-model:value="BLEUUID" filterable placeholder="請選擇欲配對之裝置" :options="options">
+        <template v-if="show" #arrow>
+          <md-search />
+        </template>
+      </n-select>
     </div>
-    <div class="d-flex justify-content-between mx-auto mb-1" style="width: 300px">
+    <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置區域</div>
-      <div class="edit" style="color: #000000;
-  background-color: rgba(0, 0, 0, 30%);" v-if="info.Area">{{ info.Area }}</div>
-      <div class="edit" style="color: #000000;
-  background-color: rgba(0, 0, 0, 30%);" v-else>尚未選取區域</div>
+      <div class="edit" disabled style="color: #FFFFFF;
+  background-color: rgba(0, 0, 0, 0.5);cursor: not-allowed" v-if="info[0].Area != null">{{ info[0].Area }}</div>
+      <div class="edit" style="color: rgba(255, 255, 255, 0.65);
+  background-color: rgba(0, 0, 0, 0.5);" v-else>尚未選取區域</div>
     </div>
     <div class="d-flex justify-content-between mx-auto" style="width: 300px">
       <div class="subTitle">裝置地點</div>
@@ -24,14 +26,8 @@
       <div class="subTitle my-4" style="align-self: flex-start">訊息內容</div>
       <textarea v-model="messagecontent" class="message scroll p-3"></textarea>
     </div>
-    <div class="d-flex justify-content-center align-items-center mt-5" style="font-weight: bold; font-size: 18px;">
-      <Icon v-if="!connectSuccess" icon="eos-icons:loading" color="rgba(0, 0, 0, 70%)" height="40" />
-      <img v-else :src="ok" class="me-3" style="width:30px; height:30px">
-      確認此裝置已連上網
-    </div>
-    <button @click="sendToAddDevice()" class="addBtn mt-5">
+    <button @click="sendToAddDevice();" class="addBtn mt-5">
       <img v-if="disableBtn" :src="store_black" style="width: 45px; height: 55px">
-      <!-- <img v-if="!disableBtn && connectSuccess" :src="store_green" style="width: 45px; height: 55px"> -->
       <img v-if="!disableBtn && !connectSuccess" :src="store_red" style="width: 45px; height: 55px">
     </button>
   </n-card>
@@ -39,16 +35,37 @@
 
 <script>
 import axios from 'axios'
-import { defineComponent } from 'vue'
-import { Icon } from '@iconify/vue';
+import { defineComponent, inject, ref } from 'vue'
+import { useMessage } from 'naive-ui'
+import MdSearch from '@vicons/ionicons4/MdSearch'
 import ok from '../assets/pic/ok.png'
 import store_black from '../assets/pic/store_black.png'
 import store_green from '../assets/pic/store_green.png'
 import store_red from '../assets/pic/store_red.png'
 
+
 export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const message = useMessage()
+    const update = () => {
+      message.success('新增成功'),
+        { duration: 1000 }
+      reload()
+    }
+    const mistake = () => {
+      message.error('新增失敗\n資料尚未填齊'),
+        { duration: 1000 }
+    }
+    return {
+      show: ref(false),
+      options: [],
+      update,
+      mistake
+    }
+  },
   components: {
-    Icon,
+    MdSearch,
   },
   props: {
     info: {
@@ -57,12 +74,12 @@ export default defineComponent({
   },
   data() {
     return {
+      BLEUUID: null,
       device: this.info,
       placevalue: '',
       messagecontent: '',
       connectSuccess: true,
       disableBtn: true,
-
       //
       ok: ok,
       store_black: store_black,
@@ -71,33 +88,91 @@ export default defineComponent({
     }
   },
   methods: {
-    async sendToAddDevice() {
-      let body = {
-        'Place': this.placevalue,
-        'Message': this.messagecontent
-      }
-      let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-      const json = JSON.stringify(temp);
-      console.log(json)
-      let res
+    onChangeMethod(event) {
+      this.BLEUUID = event
+    },
+    async fetchUUID() {
+      let UUIDs
       await axios({
-        method: 'post',
-        baseURL: this.$store.state.api + '/insertBLE',
-        headers: { 'Content-Type': 'application/json' },
-        data: json
+        method: 'get',
+        baseURL: this.$store.state.api + '/newDevice',
+        'Content-Type': 'application/json',
       })
-        .then((response) => res = response.data)
-        .catch((error) => console.log(error))
-      console.log(res)
+        .then((response) => UUIDs = response.data)
+        .catch((err) => { console.error(err) })
+
+      if (UUIDs['free'].length != 0) {
+        for (let i = 0; i < UUIDs['free'].length; i++) {
+          this.options.push({ 'label': UUIDs['free'][i], 'value': UUIDs['free'][i] })
+        }
+      }
+      else {
+        return
+      }
+    },
+    async sendToAddDevice() {
+      if (this.placevalue == '' || this.messagecontent == '') {
+        this.mistake()
+      }
+      else {
+        let body = {
+          'Place': this.placevalue,
+          'Message': this.messagecontent
+        }
+        let temp = Object.assign({}, this.device[0], body) //合併兩個物件
+        const json = JSON.stringify(temp);
+        let res
+        await axios({
+          method: 'post',
+          baseURL: this.$store.state.api + '/insertBLE',
+          headers: { 'Content-Type': 'application/json' },
+          data: json
+        })
+          .then((response) => res = response.data)
+          .catch((error) => console.log(error))
+        // console.log(res)
+        if (res.success == 1) {
+          this.update()
+        }
+        else {
+          this.mistake()
+        }
+      }
     }
   },
   mounted() {
-
+    this.fetchUUID()
   }
 })
 </script>
 
+
 <style scoped>
+.listFreeBLE {
+  min-width: 200px;
+  width: 200px;
+  background-color: rgba(240, 248, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ble {
+  background-color: rgba(240, 248, 255, 0.8);
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 2;
+  border-radius: 10px;
+  margin: 10px 20px;
+}
+
+.ble:hover {
+  color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(217, 217, 217, 0.7);
+}
+
 .checkDevice {
   width: 500px;
   /* height: 600px; */
@@ -130,6 +205,7 @@ export default defineComponent({
   padding: 8px;
   resize: none;
   font-size: 16px;
+  cursor: auto;
 }
 
 .edit {

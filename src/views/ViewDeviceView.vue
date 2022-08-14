@@ -17,8 +17,16 @@
           }}
         </div>
       </div>
-      <div v-if="$store.state.currvenue" class="d-flex" @ifEmpty="ifEmpty_ViewDevice">
+      <div v-if="$store.state.currvenue && mapFlag" class="d-flex flex-wrap" @ifEmpty="ifEmpty_ViewDevice">
         <ViewRegion v-for="item in maps" :key="item.id" :region="item" @_reDisplay="reDisplay"></ViewRegion>
+      </div>
+      <div v-if="mapFlag == false"
+        style="font-weight: 800; font-size: 22px; color: rgba(0, 0, 0, 70%); margin-top: 25vh; text-align: center;">
+        目前
+        {{
+            $store.state.currentvenue
+        }}館
+        無任何區域，請移至新增區域此功能
       </div>
     </div>
   </div>
@@ -26,11 +34,21 @@
 
 <script>
 import axios from 'axios';
+import { inject } from "vue";
 import MenuBar from '@/components/MenuBar.vue';
 import ViewRegion from '@/components/ViewRegion.vue';
 
 
 export default {
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update
+    }
+  },
   components: {
     MenuBar,
     ViewRegion
@@ -38,6 +56,7 @@ export default {
   data() {
     return {
       maps: [],
+      mapFlag: false,
     };
   },
   methods: {
@@ -56,22 +75,26 @@ export default {
         // console.log(key, maps[key]);
         if (tempmaps[key].Venue == this.$store.state.currentvenue) {
           this.maps.push(tempmaps[key])
+          this.mapFlag = true
         }
       }
-      console.log(this.maps)
+      // console.log(this.maps)
     },
     ifEmpty_ViewDevice() {
-      // console.log('viewdevice')
       this.fetchTableMap()
+      this.update()
     },
     reDisplay() {
-      console.log('redisplay region')
       this.maps = []
       this.fetchTableMap()
     }
   },
   mounted() {
     this.fetchTableMap()
+    if (this.$store.state.currvenue == false) {
+      this.$router.push('/')
+    }
+
   },
 };
 </script>

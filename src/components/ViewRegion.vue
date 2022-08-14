@@ -34,7 +34,7 @@
 <script>
 import axios from 'axios'
 import DeviceRegion from './DeviceRegion.vue'
-
+import { inject } from "vue";
 import detail from '../assets/pic/fordetail_red.png'
 import good from '../assets/pic/good_green.png'
 import none from '../assets/pic/eyes_none.png'
@@ -42,6 +42,15 @@ import remove from '../assets/pic/trash.png'
 import remove_hover from '../assets/pic/trash_hover.png'
 
 export default {
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update
+    }
+  },
   components: {
     DeviceRegion
   },
@@ -127,15 +136,15 @@ export default {
 
 <style scoped>
 .regionList {
-  width: 320px;
-  height: 200px;
+  width: 300px;
+  height: 180px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  border-radius: 0 0 20px 20px;
+  border-radius: 20px;
   padding: 20px;
 }
 

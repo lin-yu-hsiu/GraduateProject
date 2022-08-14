@@ -38,6 +38,9 @@ export default {
   },
   mounted() {
     this.fetchApi()
+    if (this.$store.state.currvenue == false) {
+      this.$router.push('/')
+    }
   }
 }
 </script>

@@ -67,7 +67,7 @@
 
 <script>
 import axios from 'axios'
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 
 import edit from '../assets/pic/edit_green.png'
 import edit_hover from '../assets/pic/edit_green_hover.png'
@@ -83,6 +83,15 @@ import battery0 from '../assets/pic/battery0.png'
 
 
 export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update,
+    }
+  },
   props: {
     device: {
       type: Object,
@@ -159,7 +168,6 @@ export default defineComponent({
         .catch((error) => console.log(error))
 
       this.isRemoving = false
-
       this.$emit('ifEmpty') //如果此區域已無裝置回傳到父元件以更新畫面
     },
   },

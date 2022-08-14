@@ -1,5 +1,6 @@
 from msilib.schema import Error
 import re
+from traceback import print_tb
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from flask_cors import CORS
 import DB,json
@@ -215,18 +216,21 @@ def insertBLE():
 def uploadPic():
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))
-        exist = os.path.exists('Pic')       
+        targetdir = os.path.join(basedir,'public\\images')
+        exist = os.path.exists(targetdir)
         if(exist == False):
-            os.mkdir(os.path.join(basedir,'Pic'))      
+            os.mkdir(targetdir)
         img = request.files.get('file')
         format = img.filename[img.filename.index('.'):]
         if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
-            dir = basedir + '\\Pic\\' + img.filename.replace(format,'.jpg')
+            dir = targetdir + '\\' + img.filename.replace(format,'.jpg')
             img.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
             result = {'success': 0, 'result': 'Type Wrong'}
-    except:
+
+    except Exception as e:
+        print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 
