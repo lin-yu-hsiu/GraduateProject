@@ -15,11 +15,22 @@
       <div v-else style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 70%); text-align: center;">切換成功 !
         您目前所在場館為 {{ $store.state.currentvenue }}
       </div>
+      <div class="w-100 d-flex justify-content-end">
+        <div class="editMode">
+          編輯模式
+          <n-switch v-model:value="this.$store.state.venueEditMode" style="margin-left: 10px;"
+            @change="openEditMode(this.$store.state.venueEditMode)" />
+        </div>
+      </div>
+
+
       <div class="d-flex justify-content-center" style="flex-wrap: wrap">
-        <SwitchBuilding class="m-3" v-for="item in venues" :key="item.id" :region="item" @removeDisplay="reDisplay"
-          @dblclick="$store.commit('switchRegion', item);">
-        </SwitchBuilding>
-        <div class="AddVenue m-3">
+        <div v-for="item in this.$store.state.allvenues" :key="item.id">
+          <SwitchBuilding class="m-3" :region="item" @removeDisplay="reDisplay" :style="listItemStyle(item.name)">
+          </SwitchBuilding>
+        </div>
+
+        <div class="AddVenue m-3" v-if="this.$store.state.venueEditMode">
           <div style="font-weight: bold; font-size: 22px; color: rgba(0, 0, 0, 100%); text-align: center;">欲新增之場館名稱
           </div>
           <div class="d-flex justify-content-around">
@@ -73,6 +84,18 @@ export default defineComponent({
     };
   },
   methods: {
+    openEditMode() {
+      this.fetchAllVenues()
+      this.update()
+    },
+    listItemStyle: function (index) {
+      var style = {};
+      if (index === this.$store.state.currentvenue) {
+        style.background = 'rgba(0, 0, 0, 0.2) 100%';
+        style.color = 'rgba(255, 255, 255, 1)';
+      }
+      return style;
+    },
     async fetchAllVenues() {
       let tempmaps = []
       await axios({
@@ -83,22 +106,24 @@ export default defineComponent({
         .then((response) => tempmaps = response.data)
         .catch((err) => { console.error(err) })
       const venueSet = new Set();
-      for (let i = 0; i < tempmaps['場館'].length; i++) {
-        venueSet.add(tempmaps['場館'][i])
-      }
 
+      for (let i = 0; i < tempmaps['場館'].length; i++) {
+        venueSet.add({ 'name': tempmaps['場館'][i], 'editMode': this.$store.state.venueEditMode })
+      }
       let SetToArray = [...venueSet];    // Set 轉成 Array
       SetToArray.sort()
       this.venues = SetToArray
+      this.$store.state.allvenues = this.venues
     },
     reDisplay(toRemoveVenue, flag) {
       this.removingflag = flag
       var toRemove = toRemoveVenue;
-      var arr = this.venues;
+      var arr = this.$store.state.allvenues;
       arr = arr.filter(function (item) {
-        return item !== toRemove
+        return item.name !== toRemove
       });
       this.venues = arr
+      this.$store.state.allvenues = this.venues
       this.update()
     },
     async sendToAddVenue() {
@@ -123,14 +148,26 @@ export default defineComponent({
   },
   mounted() {
     this.fetchAllVenues()
-    // if (this.$store.state.currvenue == false) {
-    //   this.$router.push('/')
-    // }
+    if (this.$store.state.currvenue == false) {
+      this.$router.push('/switchregion')
+    }
   }
 });
 </script>
 
 <style scoped>
+.editMode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  padding: 5px 5px;
+}
+
 .AddVenue {
   width: 300px;
   height: 180px;

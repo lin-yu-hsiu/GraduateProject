@@ -3,7 +3,7 @@
   height: 600px; width: 900px; margin: 0 auto;">
     <n-scrollbar style="max-height: 500px; background-color: #ffffff;">
       <div style="position: relative;">
-        <div v-if="!emptyflag" class="detailFrameTitle d-flex justify-content-evenly align-items-center mx-3 py-3">
+        <div v-if="!emptyflag" class="detailFrameTitle d-flex justify-content-evenly align-items-center mx-3 pb-4">
           <div style="width: 100px; background-color: #ffffff; height: 35px;"></div>
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>

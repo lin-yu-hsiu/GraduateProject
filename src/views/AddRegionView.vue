@@ -29,7 +29,8 @@
           <img :src="loadpic" style="width: 45px; height: 45px">
           {{ pic }}
         </button>
-        <input type="file" accept="image/*" style="display: none;" ref="regionimage" @change="UploadImage">
+        <input id="upload" type="file" accept="image/*" style="display: none;" ref="regionimage"
+          @change.prevent.stop="UploadImage">
       </div>
       <button v-if="$store.state.currvenue" class="clickToStore" @click="UploadData">
         <img :src="store_black" style="width: 45px; height: 55px">
@@ -76,7 +77,7 @@ export default defineComponent({
       update,
       mistake,
       already,
-      noname
+      noname,
     }
   },
   components: {
@@ -95,15 +96,12 @@ export default defineComponent({
   },
   methods: {
     async UploadImage(event) {
+      // event.preventDefault();
+      // event.stopPropagation();
       if (this.regionName == '') {
         this.noname()
       }
       else {
-        event.preventDefault();
-        this.selectedFile = event.target.files[0]
-        // console.log(this.selectedFile)
-        this.pic = this.selectedFile.name
-        this.previewImage = URL.createObjectURL(this.selectedFile);
         let res1 = []
         await axios({
           method: 'get',
@@ -112,28 +110,37 @@ export default defineComponent({
         }).then((response) => res1 = response.data)
           .catch((err) => { console.error(err) })
 
+        let continueFlag = true
         if (this.regionName != '') {
           for (let i = 0; i < Object.values(res1).length; i++) {
             if (this.regionName == res1[i].Area) {
               this.already()
               this.sendFlag = true
-              return
+              continueFlag = false
             }
           }
         }
-        let formData = new FormData()
-        let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
-        formData.append('file', this.selectedFile, imgName)
 
-        let res = []
-        await axios({
-          method: 'post',
-          url: this.$store.state.api + '/uploadPic',
-          headers: { "Content-Type": "image/png" },
-          data: formData,
-        }).then((response) => res = response.data)
-          .catch((err) => { console.error(err) })
-        console.log(res)
+        if (continueFlag == true) {
+          this.selectedFile = event.target.files[0]
+          this.pic = this.selectedFile.name
+          this.previewImage = URL.createObjectURL(this.selectedFile);
+
+          let formData = new FormData()
+          let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+          formData.append('file', this.selectedFile, imgName)
+
+          let res = []
+          await axios({
+            method: 'post',
+            url: this.$store.state.api + '/uploadPic',
+            headers: { "Content-Type": "image/png" },
+            data: formData,
+          }).then((response) => res = response.data)
+            .catch((err) => { console.error(err) })
+          console.log(res)
+
+        }
       }
     },
     async UploadData() {
@@ -170,7 +177,6 @@ export default defineComponent({
     },
   },
   mounted() {
-    console.log(this.$store.state.currentvenue)
     if (this.$store.state.currvenue == false) {
       console.log(this.$store.state.currentvenue)
       this.$router.push('/')

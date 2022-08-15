@@ -25,7 +25,7 @@
         </button>
       </router-link>
 
-      <router-link :to="{ name: 'addregion' }" v-show="this.$store.state.currvenue"
+      <!-- <router-link :to="{ name: 'addregion' }" v-show="this.$store.state.currvenue"
         @click="$store.commit('addRegion');">
         <button class="content">
           <div id="addRegion" class="option" @mouseover="icon1 = addRegion_icon_blue"
@@ -35,9 +35,9 @@
           </div>
           <div class="decoration"></div>
         </button>
-      </router-link>
+      </router-link> -->
 
-      <router-link :to="{ name: 'adddevice' }" v-show="this.$store.state.currvenue"
+      <!-- <router-link :to="{ name: 'adddevice' }" v-show="this.$store.state.currvenue"
         @click="$store.commit('addDevice');">
         <button class="content">
           <div id="addDevice" class="option" @mouseover="icon2 = addDevice_icon_blue"
@@ -47,7 +47,7 @@
           </div>
           <div class="decoration"></div>
         </button>
-      </router-link>
+      </router-link> -->
 
       <router-link :to="{ name: 'viewdevice' }" v-show="this.$store.state.currvenue">
         <button class="content">

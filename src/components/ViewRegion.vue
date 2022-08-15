@@ -4,23 +4,30 @@
     :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
     <div class="d-flex justify-content-around align-items-center w-100">
       <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
-      <button class="detailBtn p-0" @click="sendToRemoveRegion()" @mouseover="icon = remove_hover"
-        @mouseleave="icon = remove">
+      <button class="detailBtn p-0" v-if="this.$store.state.deviceEditMode" @click="sendToRemoveRegion()"
+        @mouseover="icon = remove_hover" @mouseleave="icon = remove">
         <img :src="icon" style="width: 30px; height: 35px">
       </button>
     </div>
-    <button v-if="regionStatus == 'error'" class="viewDetail" @click="open = true">
+    <button v-if="regionStatus == 'error' && !this.$store.state.deviceEditMode" class="viewDetail" @click="open = true">
       <img :src="fordetail">
       查看裝置問題
     </button>
-    <button v-if="regionStatus == 'good'" class="viewDevice" @click="open = true">
+    <button v-if="regionStatus == 'good' && !this.$store.state.deviceEditMode" class="viewDevice" @click="open = true">
       <img :src="devicegood">
       裝置一切正常
     </button>
-    <button v-if="regionStatus == 'normal'" class="viewNone">
+    <button v-if="regionStatus == 'normal' && !this.$store.state.deviceEditMode" class="viewNone"
+      style="cursor: not-allowed;">
       <img :src="none" style="width: 50px; height: 50px">
       此區域無裝置
     </button>
+    <router-link :to="{ name: 'adddevice' }">
+      <button v-if="this.$store.state.deviceEditMode" class="AddDevice"
+        @click="this.$store.state.regionAddName = region.Area">
+        新增裝置
+      </button>
+    </router-link>
   </div>
   <DeviceRegion @ifEmpty="ifEmpty_ViewRegion" :passMapNum="region.Number" v-if="open" @close="open = false" style="position: absolute; 
         top: 0;             
@@ -136,8 +143,8 @@ export default {
 
 <style scoped>
 .regionList {
-  width: 300px;
-  height: 180px;
+  width: 270px;
+  height: 150px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
@@ -150,6 +157,24 @@ export default {
 
 .regionList:hover {
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 5%) inset;
+}
+
+.AddDevice {
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  padding: 5px 5px;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.AddDevice:hover {
+  /* background-color: rgba(215, 215, 215, 0.8); */
+  color: rgb(0, 200, 83);
+  width: 155px;
 }
 
 .detailBtn {
