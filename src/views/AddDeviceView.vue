@@ -21,8 +21,8 @@
         </div>
       </div>
       <n-select v-if="$store.state.currvenue" @change="onChangeMethod($event)" size="large" class="region"
-        :consistent-menu-width="false" v-model:show="show" v-model:value="areavalue" filterable
-        placeholder="請選擇欲新增裝置之區域" :options="options">
+        :consistent-menu-width="true" v-model:show="show" v-model:value="areavalue" filterable placeholder="請選擇欲新增裝置之區域"
+        :options="options">
         <template v-if="show" #arrow>
           <md-search />
         </template>
@@ -30,8 +30,9 @@
       <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
         <img :src="locatePic">
       </button>
+
       <div v-if="$store.state.currvenue" id="Canvas" class="frame" :class="(locating) ? notlocateCursor : normalCursor"
-        @click="add_device = true; no_cursor = false;">
+        @click="add_device = true; no_cursor = false; ">
         <div v-if="areapic == ''" style="font-weight: 800; font-size: 18px; color: rgba(0, 0, 0, 30%);">
           步驟如下
           <br />
@@ -51,13 +52,13 @@
         <div v-for="item in currentdevice" :key="item">
           <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
         </div>
-
       </div>
       <div id="draggable">
         <AddDeviceInfo :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
-          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; areavalue = null; this.areapic = ''; this.clickBtnStatus = false">
+          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.clickBtnStatus = false">
         </AddDeviceInfo>
       </div>
+
     </div>
 
   </div>
@@ -156,7 +157,7 @@ export default defineComponent({
       }
       regionSet.forEach((item) => this.options.push({ 'label': item, 'value': item }));
     },
-    // async fetchUUID() {
+
     //   let UUIDs
     //   await axios({
     //     method: 'get',
@@ -188,7 +189,7 @@ export default defineComponent({
         // TODO: 應該要標記icon給目前要新增裝置之點
 
         this.propdata.push({
-          'UUID': this.BLEUUID, 'Xaxis': this.mouse.x - this.frameBoundary.x, 'Yaxis': this.mouse.y - this.frameBoundary.y, 'Area': this.areavalue, 'Venue': this.$store.state.currentvenue
+          'Xaxis': this.mouse.x - this.frameBoundary.x, 'Yaxis': this.mouse.y - this.frameBoundary.y, 'Area': this.areavalue, 'Venue': this.$store.state.currentvenue
         })
         // console.log(this.propdata)
       }
@@ -238,8 +239,8 @@ export default defineComponent({
     },
   },
   mounted() {
+    console.log('1')
     this.fetchApi()
-    // this.fetchUUID()
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')
     }

@@ -4,8 +4,8 @@
     </h3>
     <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置編號</div>
-      <n-select @change="onChangeMethod($event)" size="medium" :consistent-menu-width="false" v-model:show="show"
-        v-model:value="BLEUUID" filterable placeholder="請選擇欲配對之裝置" :options="options">
+      <n-select @change="onChangeMethod($event)" size="medium" :consistent-menu-width="true" v-model:show="show"
+        v-model:value="BLEUUID" filterable placeholder="選擇欲配對之裝置" :options="options" id="selectBar">
         <template v-if="show" #arrow>
           <md-search />
         </template>
@@ -61,7 +61,8 @@ export default defineComponent({
       show: ref(false),
       options: [],
       update,
-      mistake
+      mistake,
+      reload
     }
   },
   components: {
@@ -116,11 +117,13 @@ export default defineComponent({
       }
       else {
         let body = {
+          'UUID': this.BLEUUID,
           'Place': this.placevalue,
           'Message': this.messagecontent
         }
         let temp = Object.assign({}, this.device[0], body) //合併兩個物件
         const json = JSON.stringify(temp);
+        // console.log(json)
         let res
         await axios({
           method: 'post',
@@ -148,29 +151,9 @@ export default defineComponent({
 
 
 <style scoped>
-.listFreeBLE {
-  min-width: 200px;
-  width: 200px;
-  background-color: rgba(240, 248, 255, 0.2);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.ble {
-  background-color: rgba(240, 248, 255, 0.8);
-  height: 40px;
+#selectBar {
+  width: 180px;
   text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 2;
-  border-radius: 10px;
-  margin: 10px 20px;
-}
-
-.ble:hover {
-  color: rgba(0, 0, 0, 0.8);
-  background-color: rgba(217, 217, 217, 0.7);
 }
 
 .checkDevice {
@@ -220,7 +203,7 @@ export default defineComponent({
   color: #000000;
   background-color: rgba(217, 217, 217, 50%);
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 15%);
-  width: 150px;
+  width: 180px;
 }
 
 .addBtn {
