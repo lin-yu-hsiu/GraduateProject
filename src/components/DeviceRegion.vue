@@ -8,8 +8,7 @@
           <div class="subtitle">地點</div>
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 150px">訊息</div>
-          <button class="openBtn" name="OpenAllDevice" v-if="this.shutdown" @click="alldevicestatusChange">一鍵開機</button>
-          <button class="closeBtn" name="CloseAllDevice" v-else @click="alldevicestatusChange">一鍵關機</button>
+          <div class="subtitle">狀態</div>
           <div class="subtitle" style="width: 150px">備註</div>
         </div>
         <div v-else class="text-center m-auto"
@@ -45,7 +44,6 @@ export default defineComponent({
     return {
       devices: [],
       alldevices: [],
-      shutdown: '',
       mapNum: this.passMapNum,
       emptyflag: '',
     }
@@ -75,37 +73,11 @@ export default defineComponent({
       })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
-      // 偵測是否有裝置
-      for (let i = 0; i < this.devices.length; i++) {
-        if (this.devices[i].Status == false) {
-          this.shutdown = true
-        }
-        else this.shutdown = false
-      }
 
       if (this.devices.length == 0) {
         this.emptyflag = true   // 一開始此區域即無裝置
         this.$emit('emptyregion', this.emptyflag)
       }
-    },
-    async alldevicestatusChange() {
-      const body = {
-        // 傳其中一個device的MapNum跟Status就好
-        'MapNum': this.devices[0].MapNum,
-        'Status': this.shutdown
-      }
-      const json = JSON.stringify(body);
-      console.log(json)
-      let res = []
-      await axios.post(this.$store.state.api + '/switchBLE', json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then((response) => res = response.data)
-        .catch((err) => console.log(err))
-      console.log(res)
-      this.handleAPI(this.mapNum)
     },
     ifEmpty_DeviceRegion() {
       this.handleAPI(this.mapNum)
@@ -138,7 +110,8 @@ export default defineComponent({
   font-weight: bold;
   text-align: center;
   font-size: 20px;
-  line-height: 2;
+  line-height: 1.9;
+  border-radius: 5px;
 }
 
 .openBtn {

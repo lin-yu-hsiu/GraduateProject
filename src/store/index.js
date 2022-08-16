@@ -5,7 +5,7 @@ export default createStore({
     step: '',
     currvenue: false,
     currentvenue: '(需先切換場館)',
-    api: 'http://192.168.0.103:5000',
+    api: 'http://192.168.0.102:5000',
     currentUser: '',
     venueEditMode: false,
     allvenues: [],

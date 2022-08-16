@@ -19,7 +19,7 @@
         <div class="editMode">
           編輯模式
           <n-switch v-model:value="this.$store.state.venueEditMode" style="margin-left: 10px;"
-            @change="openEditMode(this.$store.state.venueEditMode)" />
+            @change="openEditMode()" />
         </div>
       </div>
 
@@ -29,7 +29,6 @@
           <SwitchBuilding class="m-3" :region="item" @removeDisplay="reDisplay" :style="listItemStyle(item.name)">
           </SwitchBuilding>
         </div>
-
         <div class="AddVenue m-3" v-if="this.$store.state.venueEditMode">
           <div style="font-weight: bold; font-size: 22px; color: rgba(0, 0, 0, 100%); text-align: center;">欲新增之場館名稱
           </div>
@@ -40,6 +39,10 @@
               <img :src="icon" style="width: 50px; height: 50px">
             </button>
           </div>
+        </div>
+        <div v-if="this.$store.state.allvenues.length == 0 && !this.$store.state.venueEditMode"
+          style="font-weight: bold; font-size: 18px; color: rgba(0, 0, 0, 50%); margin: 30vh 0;">
+          目前無任何場館，請開啟右上方的編輯按鈕
         </div>
       </div>
     </div>
