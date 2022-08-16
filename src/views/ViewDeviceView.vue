@@ -6,7 +6,7 @@
         /
         {{
             $store.state.currentvenue
-        }}
+        }} 館
         / 查看裝置
       </div>
       <div class="d-flex align-items-center justify-content-center mx-auto">
@@ -14,10 +14,10 @@
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
           {{
               $store.state.currentvenue
-          }}
+          }} 館
         </div>
       </div>
-      <div class="w-100 d-flex justify-content-end">
+      <div class="w-100 d-flex justify-content-end mt-2">
         <div class="editRegion">
           <div class="editMode">
             編輯模式
@@ -114,6 +114,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.state.deviceEditMode = false
     this.fetchTableMap()
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')

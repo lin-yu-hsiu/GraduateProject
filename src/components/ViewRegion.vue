@@ -2,8 +2,8 @@
   <div class="regionList m-3"
     :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
     <div class="d-flex justify-content-around align-items-center w-100 mb-1">
-      <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
-      <button class="detailBtn p-0" v-if="this.$store.state.deviceEditMode" @click="sendToRemoveRegion()"
+      <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }} 區</div>
+      <button class="detailBtn p-0" v-if="this.$store.state.deviceEditMode" @click="showModal = true"
         @mouseover="icon = remove_hover" @mouseleave="icon = remove">
         <n-tooltip trigger="hover">
           <template #trigger>
@@ -12,6 +12,9 @@
           刪除此區域
         </n-tooltip>
       </button>
+      <n-modal v-model:show="showModal" type="warning" preset="dialog" title="確定刪除 ?"
+        :content="'確認刪除 ' + region.Area + ' 此區域'" positive-text="確定" negative-text="取消"
+        @positive-click="sendToRemoveRegion" style="font-weight: bold;" />
     </div>
     <button v-if="regionStatus == 'error' && !this.$store.state.deviceEditMode" class="viewDetail" @click="open = true">
       <img :src="fordetail" style="width: 35px; height: 40px">
@@ -53,7 +56,7 @@
 <script>
 import axios from 'axios'
 import DeviceRegion from './DeviceRegion.vue'
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import detail from '../assets/pic/fordetail_red.png'
 import good from '../assets/pic/good_green.png'
 import none from '../assets/pic/eyes_none.png'
@@ -69,7 +72,8 @@ export default {
       reload()
     }
     return {
-      update
+      update,
+      showModal: ref(false),
     }
   },
   components: {
@@ -100,6 +104,7 @@ export default {
       devicegood: good,
       none: none,
 
+      // removeTitle: '確認刪除' + this.regions.Area + '此區域',
       regions: this.region,
       shutdown: '',
       open: false,

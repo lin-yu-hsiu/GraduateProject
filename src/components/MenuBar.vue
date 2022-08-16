@@ -19,7 +19,7 @@
 
     <div class="w-100" style="margin: 0 0 20vh 0">
       <router-link :to="{ name: 'switchregion' }">
-        <button class="content">
+        <button class="content" @click="this.$store.commit('switchVenue');">
           <div id="switchRegion" class="option" @mouseover="icon4 = switchRegion_icon_blue"
             @mouseleave="icon4 = switchRegion_icon">
             <n-tooltip placement="right" trigger="hover">
@@ -34,7 +34,7 @@
       </router-link>
 
       <router-link :to="{ name: 'viewdevice' }" v-show="this.$store.state.currvenue">
-        <button class="content">
+        <button class="content" @click="this.$store.commit('viewDevice');">
           <div id="viewDevice" class="option" @mouseover="icon3 = viewDevice_icon_blue"
             @mouseleave="icon3 = viewDevice_icon">
             <n-tooltip placement="right" trigger="hover">
@@ -109,7 +109,7 @@ a {
   transition: 250ms all ease;
   background: linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255, 255, 255, 0.40) 0%, rgba(0, 0, 0, 0.25) 200%);
   background-blend-mode: multiply;
-  height: 100vh;
+  min-height: 100vh;
   width: 100px;
   display: flex;
   flex-direction: column;

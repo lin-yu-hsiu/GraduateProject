@@ -2,37 +2,56 @@
   <div class="d-flex">
     <MenuBar></MenuBar>
     <div class="d-flex flex-column align-items-center p-5" style="width: 100%; position: relative;"
-      :class="(locating && no_cursor) ? notlocateCursor : ''" @AddSuccess="AddSuccess()">
+      :class="(locating && no_cursor) ? notlocateCursor : ''">
 
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         /
         {{
             $store.state.currentvenue
         }}
-        / 新增裝置
+        館 /
+        {{ $store.state.regionAddName }}
+        區 /
+        新增裝置
       </div>
-      <div class="d-flex justify-content-center align-items-center">
-        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
-        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
+      <div class="d-flex justify-content-center align-items-center w-100 mt-2">
+        <div style="margin-right:auto">
+          <n-tooltip placement="right" trigger="hover">
+            <template #trigger>
+              <router-link :to="{ name: 'viewdevice' }">
+                <img :src="icon1" @mouseover="icon1 = arrowback_hover" @mouseleave="icon1 = arrowback">
+              </router-link>
+            </template>
+            回上一頁
+          </n-tooltip>
+        </div>
+        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在區域為 </div>
+        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;margin-right:auto">
           {{
-              $store.state.currentvenue
-          }}
+              $store.state.regionAddName
+          }} 區
         </div>
       </div>
-      <n-select v-if="$store.state.currvenue" @change="onChangeMethod($event)" size="large" class="region"
+      <!-- <n-select v-if="$store.state.currvenue" @change="onChangeMethod($event)" size="large" class="region"
         :consistent-menu-width="true" v-model:show="show" v-model:value="areavalue" filterable placeholder="請選擇欲新增裝置之區域"
         :options="options">
         <template v-if="show" #arrow>
           <md-search />
         </template>
-      </n-select>
+      </n-select> -->
       <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
-        <img :src="icon" @mouseover="icon = locatePic" @mouseleave="icon = locatePic_change">
+        <n-tooltip placement="right" trigger="hover">
+          <template #trigger>
+            <img :src="icon" @mouseover="icon = locatePic" @mouseleave="icon = locatePic_change">
+          </template>
+          選擇裝置設置之位置
+        </n-tooltip>
       </button>
 
       <div v-if="$store.state.currvenue" id="Canvas" class="frame" :class="(locating) ? notlocateCursor : normalCursor"
         @click="add_device = true; no_cursor = false; ">
-        <img v-if="areapic != ''" :src="'../../images/' + areapic + '.jpg'"
+        <img v-if="areapic != ''"
+          :src="'../../images/' + this.$store.state.currentvenue.toString() + '/' + areapic + '.jpg'"
           :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域"
           @mousedown="getCursorValue($event)" ref="Canvas">
         <div v-for="item in currentdevice" :key="item">
@@ -40,7 +59,8 @@
         </div>
       </div>
       <div id="draggable">
-        <AddDeviceInfo :info="propdata" style="cursor: default;" v-if="frame_status && add_device"
+        <AddDeviceInfo @AddSuccess="AddSuccessFunc" :info="propdata" style="cursor: default;"
+          v-if="frame_status && add_device"
           @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.clickBtnStatus = false">
         </AddDeviceInfo>
       </div>
@@ -55,7 +75,7 @@ import $ from 'jquery'
 import 'jquery-ui-dist/jquery-ui.js'
 import 'jquery-ui-dist/jquery-ui.css'
 import axios from 'axios'
-import MdSearch from '@vicons/ionicons4/MdSearch'
+// import MdSearch from '@vicons/ionicons4/MdSearch'
 import { defineComponent, ref, reactive } from 'vue'
 import MenuBar from '@/components/MenuBar.vue';
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
@@ -63,6 +83,8 @@ import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
 import locatePic from '../assets/pic/location.png'
 import locatePic_change from '../assets/pic/location_change.png'
 import already_locate from '../assets/pic/already_locate.png'
+import arrowback from '../assets/pic/arrowback.jpg'
+import arrowback_hover from '../assets/pic/arrowback_hover.jpg'
 
 export default defineComponent({
   setup() {
@@ -86,7 +108,7 @@ export default defineComponent({
     }
   },
   components: {
-    MdSearch,
+    // MdSearch,
     MenuBar,
     AddDeviceInfo,
   },
@@ -103,6 +125,9 @@ export default defineComponent({
       notlocateCursor: 'notlocateCursor',
       normalCursor: 'normalCursor',
       blechosen: 'blechosen',
+      icon1: arrowback,
+      arrowback: arrowback,
+      arrowback_hover: arrowback_hover,
       already_locate: already_locate,
       no_cursor: true,
       mouse: {
@@ -125,34 +150,20 @@ export default defineComponent({
       this.areavalue = event
       if (this.areavalue != null) {
         this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
+        console.log(this.areapic)
         this.fetchPicInfo()
       }
     },
-    async fetchApi() {
-      let regions
-      await axios({
-        method: 'get',
-        baseURL: this.$store.state.api + '/table/',
-        url: this.$store.state.currentvenue.toString(),
-        'Content-Type': 'application/json',
-      })
-        .then((response) => regions = response.data)
-        .catch((err) => { console.error(err) })
-
-      let regionSet = new Set()
-      for (let i = 0; i < Object.values(regions).length; i++) {
-        if (regions[i].Venue == this.$store.state.currentvenue) {
-          regionSet.add(regions[i].Area)
-        }
-      }
-      regionSet.forEach((item) => this.options.push({ 'label': item, 'value': item }));
-    },
-    AddSuccess(areaname) {
-      this.areavalue = areaname
-      this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
-      console.log(this.areavalue)
-      console.log('addcsda')
-      console.log(this.areapic)
+    AddSuccessFunc(value) {
+      this.frame_status = false;
+      this.add_device = false;
+      this.locating = false;
+      this.no_cursor = true;
+      this.propdata = [];
+      this.clickBtnStatus = false
+      this.areavalue = value
+      this.areapic = this.$store.state.currentvenue.toString() + "_" + this.$store.state.regionAddName
+      this.fetchPicInfo()
     },
     getCursorValue(event) {
       if (this.frame_status == true && this.locating == true) {
@@ -163,10 +174,9 @@ export default defineComponent({
 
         this.mouse.x = event.clientX
         this.mouse.y = event.clientY
-        // TODO: 應該要標記icon給目前要新增裝置之點
 
         this.propdata.push({
-          'Xaxis': this.mouse.x - this.frameBoundary.x, 'Yaxis': this.mouse.y - this.frameBoundary.y, 'Area': this.areavalue, 'Venue': this.$store.state.currentvenue
+          'Xaxis': this.mouse.x - this.frameBoundary.x, 'Yaxis': this.mouse.y - this.frameBoundary.y, 'Area': this.$store.state.regionAddName, 'Venue': this.$store.state.currentvenue
         })
         // console.log(this.propdata)
       }
@@ -213,7 +223,8 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.fetchApi()
+    this.areapic = this.$store.state.currentvenue + "_" + this.$store.state.regionAddName
+    this.fetchPicInfo()
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')
     }
@@ -243,13 +254,12 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  align-self: flex-start;
 }
 
 
 .frame {
-  width: 550px;
-  height: 550px;
+  width: 650px;
+  height: 650px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 10%);
   display: flex;
   justify-content: center;
@@ -261,8 +271,8 @@ export default defineComponent({
 
 .frame img {
   margin: 20px;
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 55%);
   border-radius: 5px;
   font-weight: bold;

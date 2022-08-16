@@ -18,13 +18,16 @@ export default createStore({
     switchRegion(state, curr) {
       state.currentvenue = curr;
       state.currvenue = true
+    },
+    switchVenue(state) {
       state.step = 'switch'
+      state.venueEditMode = false
+      state.deviceEditMode = false
     },
-    addRegion(state) {
-      state.step = 'addregion'
-    },
-    addDevice(state) {
-      state.step = 'addDevice'
+    viewDevice(state) {
+      state.step = 'view'
+      state.venueEditMode = false
+      state.deviceEditMode = false
     },
   },
   actions: {

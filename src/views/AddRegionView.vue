@@ -9,9 +9,19 @@
         }}
         / 新增區域
       </div>
-      <div class="d-flex justify-content-center align-items-center">
+      <div class="d-flex justify-content-center align-items-center w-100 mt-2">
+        <div style="margin-right:auto">
+          <n-tooltip placement="right" trigger="hover">
+            <template #trigger>
+              <router-link :to="{ name: 'viewdevice' }">
+                <img :src="icon" @mouseover="icon = arrowback_hover" @mouseleave="icon = arrowback">
+              </router-link>
+            </template>
+            回上一頁
+          </n-tooltip>
+        </div>
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
-        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
+        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%);margin-left: 10px;margin-right:auto">
           {{
               $store.state.currentvenue
           }}
@@ -47,6 +57,8 @@ import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
 import loadpic from '../assets/pic/loadpic.png'
 import store_black from '../assets/pic/store_black.png'
+import arrowback from '../assets/pic/arrowback.jpg'
+import arrowback_hover from '../assets/pic/arrowback_hover.jpg'
 
 
 export default defineComponent({
@@ -85,6 +97,9 @@ export default defineComponent({
   },
   data() {
     return {
+      icon: arrowback,
+      arrowback: arrowback,
+      arrowback_hover: arrowback_hover,
       store_black: store_black,
       loadpic: loadpic,
       selectedFile: null,
@@ -153,6 +168,9 @@ export default defineComponent({
         this.sendFlag = true
       }
       if (this.sendFlag === false && this.selectedFile != null) {
+        if (this.regionName[this.regionName.length - 1] == '區') {
+          this.regionName = this.regionName.slice(0, this.regionName.length - 1)
+        }
         let body = {
           'Venue': this.$store.state.currentvenue,
           'Area': this.regionName,

@@ -6,27 +6,30 @@
         /
         {{
             $store.state.currentvenue
-        }}
+        }}<div style="display: inline;" v-if="this.$store.state.currvenue"> 館</div>
       </div>
       <div v-if="!this.$store.state.currvenue"
         style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 70%); text-align: center;">
-        請雙擊以下欲切換之場館
+        請點擊以下欲切換之場館
       </div>
-      <div v-else style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 70%); text-align: center;">切換成功 !
-        您目前所在場館為 {{ $store.state.currentvenue }}
+      <div v-else class="d-flex justify-content-center">
+        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
+        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
+          {{
+              $store.state.currentvenue
+          }} 館
+        </div>
       </div>
-      <div class="w-100 d-flex justify-content-end">
+      <div class="w-100 d-flex justify-content-end mt-2">
         <div class="editMode">
           編輯模式
           <n-switch v-model:value="this.$store.state.venueEditMode" style="margin-left: 10px;"
             @change="openEditMode()" />
         </div>
       </div>
-
-
       <div class="d-flex justify-content-center" style="flex-wrap: wrap">
         <div v-for="item in this.$store.state.allvenues" :key="item.id">
-          <SwitchBuilding class="m-3" :region="item" @removeDisplay="reDisplay" :style="listItemStyle(item.name)">
+          <SwitchBuilding class="m-3" :venue="item" @removeDisplay="reDisplay" :style="listItemStyle(item.name)">
           </SwitchBuilding>
         </div>
         <div class="AddVenue m-3" v-if="this.$store.state.venueEditMode">
@@ -117,6 +120,7 @@ export default defineComponent({
       SetToArray.sort()
       this.venues = SetToArray
       this.$store.state.allvenues = this.venues
+
     },
     reDisplay(toRemoveVenue, flag) {
       this.removingflag = flag
@@ -131,6 +135,10 @@ export default defineComponent({
     },
     async sendToAddVenue() {
       if (this.venuedata.name != '') {
+        // console.log(typeof (this.venuedata.name))
+        if (this.venuedata.name[this.venuedata.name.length - 1] == '館') {
+          this.venuedata.name = this.venuedata.name.slice(0, this.venuedata.name.length - 1)
+        }
         let body = {
           'Venue': this.venuedata.name,
         }

@@ -51,7 +51,6 @@ export default defineComponent({
     const update = () => {
       message.success('新增成功'),
         { duration: 1000 }
-      reload()
     }
     const mistake = () => {
       message.error('新增失敗\n資料尚未填齊'),
@@ -93,7 +92,6 @@ export default defineComponent({
       this.BLEUUID = event
     },
     async fetchUUID() {
-      console.log(this.device[0])
       let UUIDs
       await axios({
         method: 'get',
