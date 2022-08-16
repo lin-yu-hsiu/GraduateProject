@@ -26,10 +26,10 @@
 
         </div>
       </div>
-      <div v-if="$store.state.currvenue && mapFlag" class="d-flex flex-wrap" @ifEmpty="ifEmpty_ViewDevice">
+      <div v-if="$store.state.currvenue" class="d-flex flex-wrap" @ifEmpty="ifEmpty_ViewDevice">
         <ViewRegion v-for="item in maps" :key="item.id" :region="item" @_reDisplay="reDisplay"></ViewRegion>
         <div v-if="this.$store.state.deviceEditMode" class="AddRegion m-3">
-          <router-link :to="{ name: 'addregion' }">
+          <router-link :to="{ name: 'addregion' }" style="text-decoration: none">
             <button class="AddRegionBtn" @mouseover="icon1 = addRegion_icon_blue" @mouseleave="icon1 = addRegion_icon">
               <img :src="icon1" style="width: 40px; height: 40px">
               新增區域
@@ -111,7 +111,7 @@ export default {
       this.maps = []
       this.fetchTableMap()
       this.update()
-    }
+    },
   },
   mounted() {
     this.fetchTableMap()

@@ -51,7 +51,6 @@ export default defineComponent({
     const update = () => {
       message.success('新增成功'),
         { duration: 1000 }
-      reload()
     }
     const mistake = () => {
       message.error('新增失敗\n資料尚未填齊'),
@@ -123,7 +122,7 @@ export default defineComponent({
         }
         let temp = Object.assign({}, this.device[0], body) //合併兩個物件
         const json = JSON.stringify(temp);
-        // console.log(json)
+
         let res
         await axios({
           method: 'post',
@@ -136,6 +135,7 @@ export default defineComponent({
         // console.log(res)
         if (res.success == 1) {
           this.update()
+          this.$emit('AddSuccess', this.device[0].Area)
         }
         else {
           this.mistake()
