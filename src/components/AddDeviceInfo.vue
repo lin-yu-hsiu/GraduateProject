@@ -93,6 +93,7 @@ export default defineComponent({
       this.BLEUUID = event
     },
     async fetchUUID() {
+      console.log(this.device[0])
       let UUIDs
       await axios({
         method: 'get',
@@ -123,7 +124,7 @@ export default defineComponent({
         }
         let temp = Object.assign({}, this.device[0], body) //合併兩個物件
         const json = JSON.stringify(temp);
-        // console.log(json)
+
         let res
         await axios({
           method: 'post',
@@ -136,6 +137,7 @@ export default defineComponent({
         // console.log(res)
         if (res.success == 1) {
           this.update()
+          this.$emit('AddSuccess', this.device[0].Area)
         }
         else {
           this.mistake()

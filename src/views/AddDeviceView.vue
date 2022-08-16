@@ -1,9 +1,8 @@
 <template>
   <div class="d-flex">
-
     <MenuBar></MenuBar>
     <div class="d-flex flex-column align-items-center p-5" style="width: 100%; position: relative;"
-      :class="(locating && no_cursor) ? notlocateCursor : ''">
+      :class="(locating && no_cursor) ? notlocateCursor : ''" @AddSuccess="AddSuccess()">
 
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         /
@@ -28,7 +27,7 @@
         </template>
       </n-select>
       <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
-        <img :src="locatePic">
+        <img :src="icon" @mouseover="icon = locatePic" @mouseleave="icon = locatePic_change">
       </button>
 
       <div v-if="$store.state.currvenue" id="Canvas" class="frame" :class="(locating) ? notlocateCursor : normalCursor"
@@ -62,6 +61,7 @@ import MenuBar from '@/components/MenuBar.vue';
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
 
 import locatePic from '../assets/pic/location.png'
+import locatePic_change from '../assets/pic/location_change.png'
 import already_locate from '../assets/pic/already_locate.png'
 
 export default defineComponent({
@@ -92,7 +92,9 @@ export default defineComponent({
   },
   data() {
     return {
+      icon: locatePic_change,
       locatePic: locatePic,
+      locatePic_change: locatePic_change,
       clickBtnStatus: false,
       frame_status: false,
       add_device: false,
@@ -145,26 +147,13 @@ export default defineComponent({
       }
       regionSet.forEach((item) => this.options.push({ 'label': item, 'value': item }));
     },
-
-    //   let UUIDs
-    //   await axios({
-    //     method: 'get',
-    //     baseURL: this.$store.state.api + '/newDevice',
-    //     'Content-Type': 'application/json',
-    //   })
-    //     .then((response) => UUIDs = response.data)
-    //     .catch((err) => { console.error(err) })
-
-    //   if (UUIDs['free'].length != 0) {
-    //     this.freeBLEFlag = true
-    //     for (let i = 0; i < UUIDs['free'].length; i++) {
-    //       this.freeBLE.push(UUIDs['free'][i])
-    //     }
-    //   }
-    //   else {
-    //     return
-    //   }
-    // },
+    AddSuccess(areaname) {
+      this.areavalue = areaname
+      this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
+      console.log(this.areavalue)
+      console.log('addcsda')
+      console.log(this.areapic)
+    },
     getCursorValue(event) {
       if (this.frame_status == true && this.locating == true) {
         let temp = this.$refs.Canvas
@@ -182,7 +171,6 @@ export default defineComponent({
         // console.log(this.propdata)
       }
     },
-
     clickBtn() {
       if (this.clickBtnStatus) {
         this.frame_status = false;
@@ -205,8 +193,6 @@ export default defineComponent({
       }
       return style;
     },
-
-    // -----------------------------------
     async fetchPicInfo() {
       let devices
       await axios({
@@ -227,7 +213,6 @@ export default defineComponent({
     },
   },
   mounted() {
-    console.log('1')
     this.fetchApi()
     if (this.$store.state.currvenue == false) {
       this.$router.push('/')
@@ -249,9 +234,6 @@ export default defineComponent({
   text-align: center;
 }
 
-
-
-
 .locateBtn {
   border: none;
   background-color: transparent;
@@ -263,6 +245,7 @@ export default defineComponent({
   align-items: center;
   align-self: flex-start;
 }
+
 
 .frame {
   width: 550px;
