@@ -1,19 +1,29 @@
 <template>
-  <div class="regionList">
-    <div style="font-weight: bold; font-size: 26px;">{{ regionInfo }}</div>
-    <button class="detailBtn p-0" @click="removeVenue" @mouseover="icon = remove_hover" @mouseleave="icon = remove">
-      <img :src="icon" style="width: 36px; height: 42px">
+  <div class="regionList" @click="switchVenue">
+    <div style=" font-weight: bold; font-size: 26px;">{{ regionInfo.name }}</div>
+    <button class="detailBtn p-0" v-if="this.$store.state.venueEditMode" @click="removeVenue"
+      @mouseover="icon = remove_hover" @mouseleave="icon = remove">
+      <img :src="icon" style="width: 36px; height: 42px; z-index: 10;">
     </button>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 import remove from '../assets/pic/trash.png'
 import remove_hover from '../assets/pic/trash_hover.png'
 
 export default defineComponent({
+  setup() {
+    const reload = inject('reload')
+    const update = () => {
+      reload()
+    }
+    return {
+      update,
+    }
+  },
   props: {
     region: {
       required: true
@@ -32,11 +42,18 @@ export default defineComponent({
     }
   },
   methods: {
+    switchVenue() {
+      if (this.$store.state.venueEditMode == false) {
+        this.$store.commit('switchRegion', this.regionInfo.name);
+      }
+    },
     async removeVenue() {
+
       const body = {
-        'Venue': this.regionInfo,
+        'Venue': this.regionInfo.name,
       }
       const json = JSON.stringify(body);
+
       await axios({
         method: 'post',
         baseURL: this.$store.state.api + '/deleteVenue',
@@ -47,9 +64,11 @@ export default defineComponent({
         .catch((error) => console.log(error))
 
       this.removeflag = true
-      this.$emit('removeDisplay', this.regionInfo, this.removeflag) //刪除此場館並回傳到父元件以更新畫面
+      this.$emit('removeDisplay', this.regionInfo.name, this.removeflag) //刪除此場館並回傳到父元件以更新畫面
     },
+    te() {
 
+    }
   },
   mounted() {
 
@@ -84,5 +103,6 @@ export default defineComponent({
 .detailBtn {
   background-color: transparent;
   border: none;
+  z-index: 10;
 }
 </style>

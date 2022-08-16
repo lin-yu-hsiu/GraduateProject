@@ -33,19 +33,6 @@
 
       <div v-if="$store.state.currvenue" id="Canvas" class="frame" :class="(locating) ? notlocateCursor : normalCursor"
         @click="add_device = true; no_cursor = false; ">
-        <div v-if="areapic == ''" style="font-weight: 800; font-size: 18px; color: rgba(0, 0, 0, 30%);">
-          步驟如下
-          <br />
-          1. 選取區域
-          <br />
-          2.選取右表中任一裝置
-          <br />
-          3.點擊左上方之新增按鈕
-          <br />
-          4.選取平面圖中欲將裝置設置之位置
-          <br />
-          5.送出資料
-        </div>
         <img v-if="areapic != ''" :src="'../../images/' + areapic + '.jpg'"
           :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域"
           @mousedown="getCursorValue($event)" ref="Canvas">
@@ -124,6 +111,7 @@ export default defineComponent({
         'x': 0,
         'y': 0,
       },
+      // areavalue: this.$store.state.regionAddName,
       areavalue: null,
       areapic: '',
       currentdevice: [],

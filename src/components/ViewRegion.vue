@@ -1,26 +1,45 @@
 <template>
-  <!-- :class="[regionStatus ? noError : Error]" -->
   <div class="regionList m-3"
     :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
-    <div class="d-flex justify-content-around align-items-center w-100">
+    <div class="d-flex justify-content-around align-items-center w-100 mb-1">
       <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }}</div>
-      <button class="detailBtn p-0" @click="sendToRemoveRegion()" @mouseover="icon = remove_hover"
-        @mouseleave="icon = remove">
-        <img :src="icon" style="width: 30px; height: 35px">
+      <button class="detailBtn p-0" v-if="this.$store.state.deviceEditMode" @click="sendToRemoveRegion()"
+        @mouseover="icon = remove_hover" @mouseleave="icon = remove">
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <img :src="icon" style="width: 25px; height: 30px">
+          </template>
+          刪除此區域
+        </n-tooltip>
       </button>
     </div>
-    <button v-if="regionStatus == 'error'" class="viewDetail" @click="open = true">
-      <img :src="fordetail">
+    <button v-if="regionStatus == 'error' && !this.$store.state.deviceEditMode" class="viewDetail" @click="open = true">
+      <img :src="fordetail" style="width: 35px; height: 40px">
       查看裝置問題
     </button>
-    <button v-if="regionStatus == 'good'" class="viewDevice" @click="open = true">
-      <img :src="devicegood">
+    <button v-if="regionStatus == 'good' && !this.$store.state.deviceEditMode" class="viewDevice" @click="open = true">
+      <img :src="devicegood" style="width: 35px; height: 35px">
       裝置一切正常
     </button>
-    <button v-if="regionStatus == 'normal'" class="viewNone">
-      <img :src="none" style="width: 50px; height: 50px">
+    <button v-if="regionStatus == 'normal' && !this.$store.state.deviceEditMode" class="viewNone"
+      style="cursor: not-allowed;">
+      <img :src="none" style="width: 35px; height: 35px">
       此區域無裝置
     </button>
+    <router-link :to="{ name: 'adddevice' }" style="text-decoration: none">
+      <button v-if="this.$store.state.deviceEditMode" class="AddDevice my-1"
+        @click="this.$store.state.regionAddName = region.Area" @mouseover="icon2 = addDevice_icon_blue"
+        @mouseleave="icon2 = addDevice_icon">
+        <img :src="icon2" alt="" style="width: 35px; height: 35px">
+        新增裝置
+      </button>
+    </router-link>
+    <div v-if="this.$store.state.deviceEditMode" class="mb-1">
+      <button class="openBtn" name="OpenAllDevice" v-if="this.shutdown && this.regionStatus != 'normal'"
+        @click="alldevicestatusChange">一鍵開機</button>
+      <button class="closeBtn" name="CloseAllDevice" v-if="!this.shutdown && this.regionStatus != 'normal'"
+        @click="alldevicestatusChange">一鍵關機</button>
+    </div>
   </div>
   <DeviceRegion @ifEmpty="ifEmpty_ViewRegion" :passMapNum="region.Number" v-if="open" @close="open = false" style="position: absolute; 
         top: 0;             
@@ -40,6 +59,8 @@ import good from '../assets/pic/good_green.png'
 import none from '../assets/pic/eyes_none.png'
 import remove from '../assets/pic/trash.png'
 import remove_hover from '../assets/pic/trash_hover.png'
+import addDevice_icon from '../assets/pic/addDevice_icon.png'
+import addDevice_icon_blue from '../assets/pic/addDevice_icon_blue.png'
 
 export default {
   setup() {
@@ -69,6 +90,9 @@ export default {
   },
   data() {
     return {
+      icon2: addDevice_icon,
+      addDevice_icon: addDevice_icon,
+      addDevice_icon_blue: addDevice_icon_blue,
       icon: remove,
       remove: remove,
       remove_hover: remove_hover,
@@ -77,12 +101,32 @@ export default {
       none: none,
 
       regions: this.region,
-
+      shutdown: '',
       open: false,
       regionStatus: 'good',
     }
   },
   methods: {
+    async alldevicestatusChange() {
+      console.log(this.shutdown)
+      const body = {
+        // 傳其中一個device的MapNum跟Status就好
+        'MapNum': this.devices[0].MapNum,
+        'Status': this.shutdown
+      }
+      const json = JSON.stringify(body);
+      console.log(json)
+      let res = []
+      await axios.post(this.$store.state.api + '/switchBLE', json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => res = response.data)
+        .catch((err) => console.log(err))
+      console.log(res)
+      this.update()
+    },
     async viewRegion(mapNum) {
       const API = this.$store.state.api + '/deviceInfo/'
       await axios({
@@ -104,6 +148,14 @@ export default {
         if (this.devices[i].Battery == '0%') {
           this.regionStatus = 'error'
         }
+      }
+
+      // 偵測是否有裝置  一個裝置未開機便顯示"一鍵開機"
+      for (let i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].Status == false) {
+          this.shutdown = true
+        }
+        else this.shutdown = false
       }
 
     },
@@ -136,8 +188,8 @@ export default {
 
 <style scoped>
 .regionList {
-  width: 300px;
-  height: 180px;
+  width: 270px;
+  height: 150px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
@@ -152,6 +204,63 @@ export default {
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 5%) inset;
 }
 
+.AddDevice {
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.8);
+  width: 130px;
+  padding: 5px 5px;
+  border: none;
+  outline: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.AddDevice:hover {
+  color: rgba(0, 0, 0, 0.8);
+  background-color: rgb(224, 224, 224);
+  width: 150px;
+}
+
+.openBtn {
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  padding: 5px 5px;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.openBtn:hover {
+  color: rgb(0, 200, 83);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.closeBtn {
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  padding: 5px 5px;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #fd2d2d;
+  background-color: rgba(255, 255, 255, 1);
+}
+
 .detailBtn {
   background-color: transparent;
   border: none;
@@ -161,8 +270,8 @@ export default {
   background-color: #363636;
   color: #fd2d2d;
   font-weight: bold;
-  font-size: 24px;
-  width: 220px;
+  font-size: 22px;
+  width: 200px;
   height: 60px;
   border-radius: 10px;
   padding: 4px 8px;
@@ -173,8 +282,8 @@ export default {
   background-color: #363636;
   color: #0FA958;
   font-weight: bold;
-  font-size: 24px;
-  width: 220px;
+  font-size: 22px;
+  width: 200px;
   height: 60px;
   border-radius: 10px;
   padding: 4px 8px;
@@ -185,8 +294,8 @@ export default {
   background-color: #363636;
   color: #D9D9D9;
   font-weight: bold;
-  font-size: 24px;
-  width: 220px;
+  font-size: 22px;
+  width: 200px;
   height: 60px;
   border-radius: 10px;
   padding: 4px 8px;
