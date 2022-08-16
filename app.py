@@ -123,8 +123,8 @@ def deleteVenue():
     if(result['success']):
         data = DB.show_data('Map')
         for i in data:
-            if(i['Venue'] == temp['Venue']):
-                result = DB.delete_data('Map',i['Number'])
+            if(data[i]['Venue'] == temp['Venue']):
+                result = DB.delete_data('Map',data[i]['Number'])
                 if(not result['success']):
                     return jsonify({'success': 0, 'result': 'Fail to Delete Map Content.'})
         return jsonify({'success': 1, 'result': 'Success to Delete Content.'})
