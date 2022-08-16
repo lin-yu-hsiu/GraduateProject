@@ -121,9 +121,15 @@ def deleteVenue():
     temp = json.loads(data)
     result = DB.delete_venue(temp['Venue'])
     if(result['success']):
-        return jsonify(result)
+        data = DB.show_data('Map')
+        for i in data:
+            if(i['Venue'] == temp['Venue']):
+                result = DB.delete_data('Map',i['Number'])
+                if(not result['success']):
+                    return jsonify({'success': 0, 'result': 'Fail to Delete Map Content.'})
+        return jsonify({'success': 1, 'result': 'Success to Delete Content.'})
     else:
-        return jsonify(result)
+        return jsonify({'success': 0, 'result':'Fail to Delete Venue'})
 
 @app.route("/insertArea",methods=["POST"])
 def insertArea():

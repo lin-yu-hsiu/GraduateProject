@@ -56,7 +56,7 @@ def show_data(table_name):                  #回傳表格內容
         records = cursor.fetchall()
         cursor.close()
         conn.close()
-        result = {}
+        result = []
         for row in range(0,len(records)):
             temp = {}
             for col in range(0, len(records[row])):
@@ -64,7 +64,7 @@ def show_data(table_name):                  #回傳表格內容
                     temp[dbContent[table_name][col]] = records[row][col]
                 else:
                     temp[dbContent['場館內容'][col]] = records[row][col]
-            result[row] = temp
+            result.append(temp)
         return result
     except sqlite3.OperationalError as e:
         return e
