@@ -1,5 +1,4 @@
-from msilib.schema import Error
-import re
+import shutil
 from traceback import print_tb
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from flask_cors import CORS
@@ -119,12 +118,15 @@ def createVenue():
 def deleteVenue():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
-    result = DB.delete_venue(temp['Venue'])
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    targetdir = os.path.join(basedir,'public\\images\\' + temp['Venue'])
+    shutil.rmtree(targetdir)                                        # 刪除場館檔案夾
+    result = DB.delete_venue(temp['Venue'])                         # 刪除 Venue 的 table
     if(result['success']):
         data = DB.show_data('Map')
         for i in data:
             if(data[i]['Venue'] == temp['Venue']):
-                result = DB.delete_data('Map',data[i]['Number'])
+                result = DB.delete_data('Map',data[i]['Number'])    # 刪除 Map 內部資料
                 if(not result['success']):
                     return jsonify({'success': 0, 'result': 'Fail to Delete Map Content.'})
         return jsonify({'success': 1, 'result': 'Success to Delete Content.'})
@@ -159,15 +161,19 @@ def deleteArea():
         if (content[i]['Number'] == temp['MapNum']):
             venue = content[i]['Venue']
             area = content[i]['Area']
-    result = DB.delete_data("Map",temp["MapNum"])
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    fileName = str(venue) + '_' + str(area) + '.jpg'
+    targetdir = os.path.join(basedir,'public\\images\\' + venue + '\\' + fileName )
+    os.remove(targetdir)                                # 刪除檔案夾內部圖片
+    result = DB.delete_data("Map",temp["MapNum"])       # 刪除 Map 內部資料
     if(result['success']):
-        result = DB.delete_data(venue,area)
+        result = DB.delete_data(venue,area)             # 刪除 Venue 內部資料
         if(result['success']):
-            return jsonify(result)
+            return jsonify({'success': 1, 'result':'Success to Delete Data'})
         else:
-            return jsonify(result)
+            return jsonify({'success': 0, 'result':'Fail to Delete Venue Data'})
     else:
-        return jsonify(result)
+        return jsonify({'success': 0, 'result':'Fail to Delete Map Data'})
 
 @app.route("/showVenue")
 def showVenue():
@@ -228,6 +234,11 @@ def uploadPic():
             os.mkdir(targetdir)
         img = request.files.get('file')
         format = img.filename[img.filename.index('.'):]
+        venueName = img.filename.split('_')[0]
+        targetdir = os.path.join(targetdir,venueName)
+        exist = os.path.exists(targetdir)
+        if(exist == False):
+            os.mkdir(targetdir)
         if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
             dir = targetdir + '\\' + img.filename.replace(format,'.jpg')
             img.save(dir)
