@@ -142,14 +142,17 @@ export default defineComponent({
         'Note': this.deviceInfo.Note,
       }
       const json = JSON.stringify(body);
+      console.log(json)
+      let res = []
       await axios({
         method: 'post',
         baseURL: this.$store.state.api + '/modifyBLE',
         headers: { 'Content-Type': 'application/json' },
         data: json
       })
-        .then((response) => response = response.data)
+        .then((response) => res = response.data)
         .catch((error) => console.log(error))
+      console.log(res)
 
       this.isEditing = false
     },

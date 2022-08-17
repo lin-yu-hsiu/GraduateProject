@@ -3,16 +3,15 @@
     <div class="logout w-100">
       <router-link :to="{ name: 'login' }">
         <button class="content">
-          <div id="login" class="option" style="padding: 5px 0 5px 30px;" @mouseover="icon5 = logout_icon_blue"
+          <div id="login" style="margin: 0 auto;" @mouseover="icon5 = logout_icon_blue"
             @mouseleave="icon5 = logout_icon">
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="login_icon" :src="icon5" alt="" style="width: 45px; height: 45px; margin: 0;">
+                <img id="login_icon" :src="icon5" alt="" style="display: block; width: 40px; height: 40px;">
               </template>
               登出
             </n-tooltip>
           </div>
-          <div class="decoration"></div>
         </button>
       </router-link>
     </div>
@@ -20,39 +19,41 @@
     <div class="w-100" style="margin: 0 0 20vh 0">
       <router-link :to="{ name: 'switchregion' }">
         <button class="content" @click="this.$store.commit('switchVenue');">
-          <div id="switchRegion" class="option" @mouseover="icon4 = switchRegion_icon_blue"
+          <div v-if="this.$store.state.step == 'switch'" class="decoration"></div>
+          <div id="switchRegion" style="margin: 0 auto;" @mouseover="icon4 = switchRegion_icon_blue"
             @mouseleave="icon4 = switchRegion_icon">
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="switchRegion_icon" :src="icon4" alt="" style="width: 45px; height: 45px">
+                <img id="switchRegion_icon" :src="icon4" alt="" style="display: block; width: 45px; height: 45px;">
               </template>
               切換場館
             </n-tooltip>
           </div>
-          <div class="decoration"></div>
         </button>
       </router-link>
 
       <router-link :to="{ name: 'viewdevice' }" v-show="this.$store.state.currvenue">
         <button class="content" @click="this.$store.commit('viewDevice');">
-          <div id="viewDevice" class="option" @mouseover="icon3 = viewDevice_icon_blue"
+          <div v-if="this.$store.state.step == 'view'" class="decoration"></div>
+          <div id="viewDevice" style="margin: 0 auto;" @mouseover="icon3 = viewDevice_icon_blue"
             @mouseleave="icon3 = viewDevice_icon">
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="viewDevice_icon" :src="icon3" alt="" style="width: 45px; height: 45px">
+                <img id="viewDevice_icon" :src="icon3" alt="" style="display: block; width: 45px; height: 45px">
               </template>
-              查看裝置
+              查看區域
             </n-tooltip>
           </div>
-          <div class="decoration"></div>
         </button>
       </router-link>
     </div>
 
     <div class="info w-100">
       <router-link :to="{ name: 'FAQ' }">
-        <button class="content">
-          <div id="FAQ" class="option" @mouseover="icon6 = FAQ_icon_blue" @mouseleave="icon6 = FAQ_icon">
+        <button class="content" @click="this.$store.commit('FAQ');">
+          <div v-if="this.$store.state.step == 'faq'" class="decoration"></div>
+          <div id="FAQ" class="option" style="margin: 0 auto;" @mouseover="icon6 = FAQ_icon_blue"
+            @mouseleave="icon6 = FAQ_icon">
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
                 <img id="FAQ_icon" :src="icon6" alt="" style="width: 45px; height: 45px">
@@ -60,7 +61,6 @@
               FAQ
             </n-tooltip>
           </div>
-          <div class="decoration"></div>
         </button>
       </router-link>
     </div>
@@ -118,16 +118,24 @@ a {
   padding: 25px 0;
 }
 
-.option {
-  padding: 5px 0 5px 20px;
-}
+
 
 .content {
   display: flex;
-  justify-content: center;
   align-items: center;
   background-color: transparent;
   border: 0;
   padding: 0;
+  width: 100%;
+  position: relative;
+  margin: 10px 0;
+}
+
+.decoration {
+  height: 55px;
+  width: 3px;
+  background-color: aliceblue;
+  position: absolute;
+  left: 0;
 }
 </style>

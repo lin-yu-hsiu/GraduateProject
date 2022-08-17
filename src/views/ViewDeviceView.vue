@@ -2,19 +2,21 @@
   <div class="d-flex">
     <MenuBar></MenuBar>
     <div class="d-flex flex-column p-5 mx-auto w-100">
-      <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
-        /
+      <div
+        style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start; align-items: center;">
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
         {{
             $store.state.currentvenue
-        }} 館
-        / 查看裝置
+        }}
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        查看區域
       </div>
       <div class="d-flex align-items-center justify-content-center mx-auto">
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
           {{
               $store.state.currentvenue
-          }} 館
+          }}
         </div>
       </div>
       <div class="w-100 d-flex justify-content-end mt-2">
@@ -26,7 +28,7 @@
 
         </div>
       </div>
-      <div v-if="$store.state.currvenue" class="d-flex flex-wrap" @ifEmpty="ifEmpty_ViewDevice">
+      <div v-if="$store.state.currvenue" class="d-flex justify-content-center flex-wrap" @ifEmpty="ifEmpty_ViewDevice">
         <ViewRegion v-for="item in maps" :key="item.id" :region="item" @_reDisplay="reDisplay"></ViewRegion>
         <div v-if="this.$store.state.deviceEditMode" class="AddRegion m-3">
           <router-link :to="{ name: 'addregion' }" style="text-decoration: none">
@@ -43,7 +45,7 @@
         目前
         {{
             $store.state.currentvenue
-        }}館
+        }}
         無任何區域，請點擊右上方新增區域此功能
       </div>
     </div>
@@ -57,6 +59,7 @@ import MenuBar from '@/components/MenuBar.vue';
 import ViewRegion from '@/components/ViewRegion.vue';
 import addRegion_icon from '../assets/pic/addRegion_icon.png'
 import addRegion_icon_blue from '../assets/pic/addRegion_icon_blue.png'
+import crumb from '../assets/pic/crumb.png'
 
 export default {
   setup() {
@@ -79,7 +82,7 @@ export default {
       icon1: addRegion_icon,
       addRegion_icon: addRegion_icon,
       addRegion_icon_blue: addRegion_icon_blue,
-
+      crumb: crumb
     };
   },
   methods: {
@@ -95,7 +98,6 @@ export default {
 
       //尋訪/table/Map中之指定場館中所有區域 ( 包括已經無裝置的區域 )
       for (const key in tempmaps) {
-        // console.log(key, maps[key]);
         if (tempmaps[key].Venue == this.$store.state.currentvenue) {
           this.maps.push(tempmaps[key])
           this.mapFlag = true

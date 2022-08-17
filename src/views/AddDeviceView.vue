@@ -5,13 +5,13 @@
       :class="(locating && no_cursor) ? notlocateCursor : ''">
 
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
-        /
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
         {{
             $store.state.currentvenue
         }}
-        館 /
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
         {{ $store.state.regionAddName }}
-        區 /
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
         新增裝置
       </div>
       <div class="d-flex justify-content-center align-items-center w-100 mt-2">
@@ -32,13 +32,6 @@
           }} 區
         </div>
       </div>
-      <!-- <n-select v-if="$store.state.currvenue" @change="onChangeMethod($event)" size="large" class="region"
-        :consistent-menu-width="true" v-model:show="show" v-model:value="areavalue" filterable placeholder="請選擇欲新增裝置之區域"
-        :options="options">
-        <template v-if="show" #arrow>
-          <md-search />
-        </template>
-      </n-select> -->
       <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
         <n-tooltip placement="right" trigger="hover">
           <template #trigger>
@@ -55,7 +48,14 @@
           :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域"
           @mousedown="getCursorValue($event)" ref="Canvas">
         <div v-for="item in currentdevice" :key="item">
-          <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
+            </template>
+            地點 : {{ item.place }}
+            <br>
+            電量 : {{ item.battery }}
+          </n-tooltip>
         </div>
       </div>
       <div id="draggable">
@@ -75,7 +75,6 @@ import $ from 'jquery'
 import 'jquery-ui-dist/jquery-ui.js'
 import 'jquery-ui-dist/jquery-ui.css'
 import axios from 'axios'
-// import MdSearch from '@vicons/ionicons4/MdSearch'
 import { defineComponent, ref, reactive } from 'vue'
 import MenuBar from '@/components/MenuBar.vue';
 import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
@@ -85,6 +84,7 @@ import locatePic_change from '../assets/pic/location_change.png'
 import already_locate from '../assets/pic/already_locate.png'
 import arrowback from '../assets/pic/arrowback.jpg'
 import arrowback_hover from '../assets/pic/arrowback_hover.jpg'
+import crumb from '../assets/pic/crumb.png'
 
 export default defineComponent({
   setup() {
@@ -108,12 +108,12 @@ export default defineComponent({
     }
   },
   components: {
-    // MdSearch,
     MenuBar,
     AddDeviceInfo,
   },
   data() {
     return {
+      crumb: crumb,
       icon: locatePic_change,
       locatePic: locatePic,
       locatePic_change: locatePic_change,
@@ -129,6 +129,7 @@ export default defineComponent({
       arrowback: arrowback,
       arrowback_hover: arrowback_hover,
       already_locate: already_locate,
+
       no_cursor: true,
       mouse: {
         'x': 0,
@@ -138,22 +139,11 @@ export default defineComponent({
         'x': 0,
         'y': 0,
       },
-      // areavalue: this.$store.state.regionAddName,
-      areavalue: null,
       areapic: '',
       currentdevice: [],
     };
   },
   methods: {
-    onChangeMethod(event) {
-      this.currentdevice = []
-      this.areavalue = event
-      if (this.areavalue != null) {
-        this.areapic = this.$store.state.currentvenue.toString() + "_" + this.areavalue.toString()
-        console.log(this.areapic)
-        this.fetchPicInfo()
-      }
-    },
     AddSuccessFunc(value) {
       this.frame_status = false;
       this.add_device = false;
@@ -215,11 +205,10 @@ export default defineComponent({
 
 
       for (let i = 0; i < Object.values(devices).length; i++) {
-        if (devices[i].Area === this.areavalue) {
-          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis })
+        if (devices[i].Area === this.$store.state.regionAddName) {
+          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'place': devices[i].Place })
         }
       }
-      // console.log(this.currentdevice)
     },
   },
   mounted() {

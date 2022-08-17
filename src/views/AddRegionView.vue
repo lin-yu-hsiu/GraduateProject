@@ -3,11 +3,12 @@
     <MenuBar></MenuBar>
     <div class="d-flex flex-column p-5 w-100 mx-auto" style="max-height: 100vh">
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%);">
-        /
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
         {{
             this.$store.state.currentvenue
         }}
-        / 新增區域
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        新增區域
       </div>
       <div class="d-flex justify-content-center align-items-center w-100 mt-2">
         <div style="margin-right:auto">
@@ -40,7 +41,7 @@
           {{ pic }}
         </button>
         <input id="upload" type="file" accept="image/*" style="display: none;" ref="regionimage"
-          @change.prevent.stop="UploadImage">
+          @change.prevent="UploadImage">
       </div>
       <button v-if="$store.state.currvenue" class="clickToStore" @click="UploadData">
         <img :src="store_black" style="width: 45px; height: 55px">
@@ -51,7 +52,6 @@
 
 <script>
 import axios from 'axios'
-// import { defineComponent } from "vue";
 import { defineComponent, inject } from "vue";
 import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
@@ -59,7 +59,7 @@ import loadpic from '../assets/pic/loadpic.png'
 import store_black from '../assets/pic/store_black.png'
 import arrowback from '../assets/pic/arrowback.jpg'
 import arrowback_hover from '../assets/pic/arrowback_hover.jpg'
-
+import crumb from '../assets/pic/crumb.png'
 
 export default defineComponent({
   setup() {
@@ -85,11 +85,15 @@ export default defineComponent({
         { duration: 1000 }
       reload()
     }
+    const overname = () => {
+      message.error('區域名稱不得超過五個字')
+    }
     return {
       update,
       mistake,
       already,
       noname,
+      overname
     }
   },
   components: {
@@ -97,6 +101,7 @@ export default defineComponent({
   },
   data() {
     return {
+      crumb: crumb,
       icon: arrowback,
       arrowback: arrowback,
       arrowback_hover: arrowback_hover,
@@ -111,12 +116,14 @@ export default defineComponent({
   },
   methods: {
     async UploadImage(event) {
-      // event.preventDefault();
-      // event.stopPropagation();
       if (this.regionName == '') {
         this.noname()
       }
       else {
+        if (this.regionName.length > 5) {
+          this.overname()
+          return
+        }
         let res1 = []
         await axios({
           method: 'get',
@@ -168,9 +175,6 @@ export default defineComponent({
         this.sendFlag = true
       }
       if (this.sendFlag === false && this.selectedFile != null) {
-        if (this.regionName[this.regionName.length - 1] == '區') {
-          this.regionName = this.regionName.slice(0, this.regionName.length - 1)
-        }
         let body = {
           'Venue': this.$store.state.currentvenue,
           'Area': this.regionName,

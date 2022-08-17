@@ -1,5 +1,5 @@
 <template>
-  <n-card hoverable closable style="background-color: #ffffff; border-radius: 30px;
+  <n-card hoverable closable style="background-color: #ffffff; border-radius: 20px;
   height: 600px; width: 900px; margin: 0 auto;">
     <n-scrollbar style="max-height: 500px; background-color: #ffffff;">
       <div style="position: relative;">

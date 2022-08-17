@@ -1,5 +1,4 @@
 import shutil
-from traceback import print_tb
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from flask_cors import CORS
 import DB,json
@@ -108,6 +107,16 @@ def deleteBLE():
 def createVenue():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    targetdir = os.path.join(basedir,'public\\images')      # 建立 image 資料夾
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
+    venueName = temp['Venue']
+    targetdir = os.path.join(targetdir,venueName)
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
     result = DB.create_venue(temp['Venue'])
     if(result['success']):
         return jsonify(result)
@@ -227,25 +236,17 @@ def insertBLE():
 @app.route("/uploadPic",methods=["POST"])
 def uploadPic():
     try:
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        targetdir = os.path.join(basedir,'public\\images')
-        exist = os.path.exists(targetdir)
-        if(exist == False):
-            os.mkdir(targetdir)
         img = request.files.get('file')
         format = img.filename[img.filename.index('.'):]
+        basedir = os.path.abspath(os.path.dirname(__file__))
         venueName = img.filename.split('_')[0]
-        targetdir = os.path.join(targetdir,venueName)
-        exist = os.path.exists(targetdir)
-        if(exist == False):
-            os.mkdir(targetdir)
+        targetdir = os.path.join(basedir,'public\\images\\' + venueName)
         if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
             dir = targetdir + '\\' + img.filename.replace(format,'.jpg')
             img.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
             result = {'success': 0, 'result': 'Type Wrong'}
-
     except Exception as e:
         print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}

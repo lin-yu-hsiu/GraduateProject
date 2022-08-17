@@ -141,6 +141,8 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
             else:
                 if(type(content[i]) == str):
                     ins += "{} = '{}',".format(i,content[i])
+                elif(content[i] == None):
+                    ins += "{} = 'Null',".format(i)
                 else:
                     ins += "{} = {},".format(i,content[i])
         ins = ins[:-1]

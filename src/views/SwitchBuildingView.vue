@@ -3,10 +3,10 @@
     <MenuBar></MenuBar>
     <div class="p-5 h-100 w-100 mx-auto">
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
-        /
+        <img :src="crumb" alt="" style="width:30px; height: 30px">
         {{
             $store.state.currentvenue
-        }}<div style="display: inline;" v-if="this.$store.state.currvenue"> 館</div>
+        }}
       </div>
       <div v-if="!this.$store.state.currvenue"
         style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 70%); text-align: center;">
@@ -17,7 +17,7 @@
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
           {{
               $store.state.currentvenue
-          }} 館
+          }}
         </div>
       </div>
       <div class="w-100 d-flex justify-content-end mt-2">
@@ -55,21 +55,28 @@
 <script>
 import axios from 'axios';
 import { defineComponent, inject } from "vue";
+import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
 import SwitchBuilding from '@/components/SwitchBuilding.vue';
 import add from '../assets/pic/add.png'
 import add_hover from '../assets/pic/add_hover.png'
+import crumb from '../assets/pic/crumb.png'
 
 
 
 export default defineComponent({
   setup() {
     const reload = inject('reload')
+    const message = useMessage()
     const update = () => {
       reload()
     }
+    const mistake = () => {
+      message.error('區域名稱不得超過五個字')
+    }
     return {
       update,
+      mistake
     }
   },
   components: {
@@ -83,10 +90,10 @@ export default defineComponent({
         name: ''
       },
       removingflag: false,
-
       icon: add,
       add: add,
       add_hover: add_hover,
+      crumb: crumb
     };
   },
   methods: {
@@ -97,7 +104,7 @@ export default defineComponent({
     listItemStyle: function (index) {
       var style = {};
       if (index === this.$store.state.currentvenue) {
-        style.background = 'rgba(0, 0, 0, 0.2) 100%';
+        style.background = 'rgba(142, 142, 142, 100%)';
         style.color = 'rgba(255, 255, 255, 1)';
       }
       return style;
@@ -134,11 +141,7 @@ export default defineComponent({
       this.update()
     },
     async sendToAddVenue() {
-      if (this.venuedata.name != '') {
-        // console.log(typeof (this.venuedata.name))
-        if (this.venuedata.name[this.venuedata.name.length - 1] == '館') {
-          this.venuedata.name = this.venuedata.name.slice(0, this.venuedata.name.length - 1)
-        }
+      if (this.venuedata.name != '' && this.venuedata.name.length < 6) {
         let body = {
           'Venue': this.venuedata.name,
         }
@@ -154,6 +157,9 @@ export default defineComponent({
         this.venuedata.name = ''  //清空輸入格
         this.fetchAllVenues()
         this.update()
+      }
+      else {
+        this.mistake()
       }
     },
   },

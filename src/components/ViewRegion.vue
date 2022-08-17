@@ -1,8 +1,18 @@
 <template>
   <div class="regionList m-3"
     :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
-    <div class="d-flex justify-content-around align-items-center w-100 mb-1">
-      <div style="font-weight: bold; align-self: start; font-size: 26px;">{{ region.Area }} 區</div>
+    <div class="d-flex justify-content-around align-items-center w-100 mb-2">
+      <div style="font-weight: bold; align-self: start; font-size: 24px;">{{ region.Area }}</div>
+      <button class="viewMap" v-if="!this.$store.state.deviceEditMode" @click="openMap = true">
+        閱覽地圖
+      </button>
+      <ViewMap :passdata="this.regions" v-if="openMap" @close="openMap = false" style="position: absolute; 
+        top: 0;             
+        bottom: 0;           
+        left: 0;        
+        right: 0;
+        margin: auto;">
+      </ViewMap>
       <button class="detailBtn p-0" v-if="this.$store.state.deviceEditMode" @click="showModal = true"
         @mouseover="icon = remove_hover" @mouseleave="icon = remove">
         <n-tooltip trigger="hover">
@@ -30,7 +40,7 @@
       此區域無裝置
     </button>
     <router-link :to="{ name: 'adddevice' }" style="text-decoration: none">
-      <button v-if="this.$store.state.deviceEditMode" class="AddDevice my-1"
+      <button v-if="this.$store.state.deviceEditMode" class="AddDevice mb-1"
         @click="this.$store.state.regionAddName = region.Area" @mouseover="icon2 = addDevice_icon_blue"
         @mouseleave="icon2 = addDevice_icon">
         <img :src="icon2" alt="" style="width: 35px; height: 35px">
@@ -56,6 +66,7 @@
 <script>
 import axios from 'axios'
 import DeviceRegion from './DeviceRegion.vue'
+import ViewMap from './ViewMap.vue'
 import { inject, ref } from "vue";
 import detail from '../assets/pic/fordetail_red.png'
 import good from '../assets/pic/good_green.png'
@@ -77,13 +88,15 @@ export default {
     }
   },
   components: {
-    DeviceRegion
+    DeviceRegion,
+    ViewMap
   },
   props: {
     region: {
       required: true
     }
   },
+
   watch: {
     region(newVal) {
       this.regions = newVal
@@ -103,11 +116,10 @@ export default {
       fordetail: detail,
       devicegood: good,
       none: none,
-
-      // removeTitle: '確認刪除' + this.regions.Area + '此區域',
       regions: this.region,
       shutdown: '',
       open: false,
+      openMap: false,
       regionStatus: 'good',
     }
   },
@@ -175,13 +187,16 @@ export default {
         'MapNum': this.regions.Number,
       }
       const json = JSON.stringify(body)
+      console.log(json)
+      let res = []
       await axios({
         method: 'post',
         url: this.$store.state.api + '/deleteArea',
         headers: { 'Content-Type': 'application/json' },
         data: json
-      }).then((response) => response = response.data)
+      }).then((response) => res = response.data)
         .catch((err) => { console.error(err) })
+      console.log(res)
       this.$emit('_reDisplay')
     }
   },
@@ -195,7 +210,7 @@ export default {
 .regionList {
   width: 270px;
   height: 150px;
-  background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
+  background: rgb(221, 221, 221);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
   flex-direction: column;
@@ -264,6 +279,24 @@ export default {
 .closeBtn:hover {
   color: #fd2d2d;
   background-color: rgba(255, 255, 255, 1);
+}
+
+.viewMap {
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  background-color: rgb(221, 221, 221, 1);
+  width: 100px;
+  padding: 5px 5px;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.viewMap:hover {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .detailBtn {

@@ -1,7 +1,7 @@
 <template>
   <div class="regionList" @click="switchVenue">
-    <div style=" font-weight: bold; font-size: 26px;">{{ venueInfo.name }} 館</div>
-    <button class="detailBtn p-0" v-if="this.$store.state.venueEditMode" @click="showModal = true"
+    <div style=" font-weight: bold; font-size: 24px;">{{ venueInfo.name }}</div>
+    <button class="detailBtn p-0" v-if="this.$store.state.venueEditMode" @click="showModal = true; switchflag = true"
       @mouseover="icon = remove_hover" @mouseleave="icon = remove">
       <img :src="icon" style="width: 30; height: 35px; z-index: 10;">
     </button>
@@ -52,7 +52,7 @@ export default defineComponent({
       remove_hover: remove_hover,
       venueInfo: this.venue,
       removeflag: false,
-      switchflag: true  //解決remove & switch同時發生
+      switchflag: false  //解決remove & switch同時發生
     }
   },
   methods: {
@@ -62,7 +62,7 @@ export default defineComponent({
         this.success()
       }
       else {
-        if (this.switchflag != true) {
+        if (this.switchflag == false) {
           this.mistake()
         }
       }
@@ -73,15 +73,16 @@ export default defineComponent({
       }
       const json = JSON.stringify(body);
 
+      let res = []
       await axios({
         method: 'post',
         baseURL: this.$store.state.api + '/deleteVenue',
         headers: { 'Content-Type': 'application/json' },
         data: json
       })
-        .then((response) => response = response.data)
+        .then((response) => res = response.data)
         .catch((error) => console.log(error))
-
+      console.log(res)
       this.removeflag = true
       this.$emit('removeDisplay', this.venueInfo.name, this.removeflag) //刪除此場館並回傳到父元件以更新畫面
       if (this.$store.state.currentvenue == this.venueInfo.name) {
@@ -103,7 +104,8 @@ export default defineComponent({
 .regionList {
   width: 300px;
   height: 180px;
-  background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%);
+  /* background: linear-gradient(to bottom, #ffffff 0%, rgba(142, 142, 142, 50%) 100%); */
+  background-color: rgb(221, 221, 221);
   box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 25%);
   display: flex;
   align-items: center;
