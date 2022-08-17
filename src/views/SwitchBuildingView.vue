@@ -3,7 +3,7 @@
     <MenuBar></MenuBar>
     <div class="p-5 h-100 w-100 mx-auto">
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
             $store.state.currentvenue
         }}

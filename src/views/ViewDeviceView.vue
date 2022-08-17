@@ -4,11 +4,11 @@
     <div class="d-flex flex-column p-5 mx-auto w-100">
       <div
         style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start; align-items: center;">
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
             $store.state.currentvenue
         }}
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         查看區域
       </div>
       <div class="d-flex align-items-center justify-content-center mx-auto">
@@ -21,7 +21,7 @@
       </div>
       <div class="w-100 d-flex justify-content-end mt-2">
         <div class="editRegion">
-          <div class="editMode">
+          <div class="editMode" v-if="!this.$store.state.openMapFlag">
             編輯模式
             <n-switch v-model:value="this.$store.state.deviceEditMode" style="margin-left: 10px;" />
           </div>
@@ -29,7 +29,8 @@
         </div>
       </div>
       <div v-if="$store.state.currvenue" class="d-flex justify-content-center flex-wrap" @ifEmpty="ifEmpty_ViewDevice">
-        <ViewRegion v-for="item in maps" :key="item.id" :region="item" @_reDisplay="reDisplay"></ViewRegion>
+        <ViewRegion v-for="item in maps" :key="item.id" :region="item" @_reDisplay="reDisplay">
+        </ViewRegion>
         <div v-if="this.$store.state.deviceEditMode" class="AddRegion m-3">
           <router-link :to="{ name: 'addregion' }" style="text-decoration: none">
             <button class="AddRegionBtn" @mouseover="icon1 = addRegion_icon_blue" @mouseleave="icon1 = addRegion_icon">
@@ -55,6 +56,7 @@
 <script>
 import axios from 'axios';
 import { inject } from "vue";
+import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
 import ViewRegion from '@/components/ViewRegion.vue';
 import addRegion_icon from '../assets/pic/addRegion_icon.png'
@@ -64,11 +66,16 @@ import crumb from '../assets/pic/crumb.png'
 export default {
   setup() {
     const reload = inject('reload')
+    const message = useMessage()
     const update = () => {
       reload()
     }
+    const mistake = () => {
+      message.error('請先關閉地圖')
+    }
     return {
-      update
+      update,
+      mistake
     }
   },
   components: {
@@ -82,10 +89,16 @@ export default {
       icon1: addRegion_icon,
       addRegion_icon: addRegion_icon,
       addRegion_icon_blue: addRegion_icon_blue,
-      crumb: crumb
+      crumb: crumb,
+      mapOpening: 'mapOpening'
     };
   },
   methods: {
+    mustCloseMap() {
+      if (this.$store.state.openMapFlag) {
+        this.mistake()
+      }
+    },
     async fetchTableMap() {
       let tempmaps = []
       await axios({

@@ -3,11 +3,11 @@
     <MenuBar></MenuBar>
     <div class="d-flex flex-column p-5 w-100 mx-auto" style="max-height: 100vh">
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%);">
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
             this.$store.state.currentvenue
         }}
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         新增區域
       </div>
       <div class="d-flex justify-content-center align-items-center w-100 mt-2">

@@ -3,15 +3,14 @@
     <MenuBar></MenuBar>
     <div class="d-flex flex-column align-items-center p-5" style="width: 100%; position: relative;"
       :class="(locating && no_cursor) ? notlocateCursor : ''">
-
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
             $store.state.currentvenue
         }}
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{ $store.state.regionAddName }}
-        <img :src="crumb" alt="" style="width:30px; height: 30px">
+        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         新增裝置
       </div>
       <div class="d-flex justify-content-center align-items-center w-100 mt-2">
@@ -29,7 +28,7 @@
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;margin-right:auto">
           {{
               $store.state.regionAddName
-          }} 區
+          }}
         </div>
       </div>
       <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
@@ -41,7 +40,8 @@
         </n-tooltip>
       </button>
 
-      <div v-if="$store.state.currvenue" id="Canvas" class="frame" :class="(locating) ? notlocateCursor : normalCursor"
+      <div v-if="$store.state.currvenue" id="Canvas" class="frame"
+        :class="[locating ? notlocateCursor : normalCursor][frame_status ? '' : normalCursor]"
         @click="add_device = true; no_cursor = false; ">
         <img v-if="areapic != ''"
           :src="'../../images/' + this.$store.state.currentvenue.toString() + '/' + areapic + '.jpg'"

@@ -3,10 +3,11 @@
     :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
     <div class="d-flex justify-content-around align-items-center w-100 mb-2">
       <div style="font-weight: bold; align-self: start; font-size: 24px;">{{ region.Area }}</div>
-      <button class="viewMap" v-if="!this.$store.state.deviceEditMode" @click="openMap = true">
+      <button class="viewMap" v-if="!this.$store.state.deviceEditMode"
+        @click="this.$store.state.openMapFlag = true; this.$store.state.openMapName = region.Area;">
         閱覽地圖
       </button>
-      <ViewMap :passdata="this.regions" v-if="openMap" @close="openMap = false" style="position: absolute; 
+      <ViewMap v-if="this.$store.state.openMapFlag" @close="this.$store.state.openMapFlag = false" style="position: absolute; 
         top: 0;             
         bottom: 0;           
         left: 0;        
@@ -68,6 +69,7 @@ import axios from 'axios'
 import DeviceRegion from './DeviceRegion.vue'
 import ViewMap from './ViewMap.vue'
 import { inject, ref } from "vue";
+import { useMessage } from 'naive-ui'
 import detail from '../assets/pic/fordetail_red.png'
 import good from '../assets/pic/good_green.png'
 import none from '../assets/pic/eyes_none.png'
@@ -79,11 +81,16 @@ import addDevice_icon_blue from '../assets/pic/addDevice_icon_blue.png'
 export default {
   setup() {
     const reload = inject('reload')
+    const message = useMessage()
     const update = () => {
       reload()
     }
+    const mistake = () => {
+      message.error('請先關閉地圖')
+    }
     return {
       update,
+      mistake,
       showModal: ref(false),
     }
   },
@@ -119,8 +126,8 @@ export default {
       regions: this.region,
       shutdown: '',
       open: false,
-      openMap: false,
       regionStatus: 'good',
+      mapOpening: 'mapOpening',
     }
   },
   methods: {
@@ -154,7 +161,6 @@ export default {
       })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
-
       // 如果此區域已無裝置
       if (this.devices.length == 0) {
         this.regionStatus = 'normal'

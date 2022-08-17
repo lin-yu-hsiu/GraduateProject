@@ -10,7 +10,9 @@ export default createStore({
     venueEditMode: false,
     allvenues: [],
     deviceEditMode: false,
-    regionAddName: ''
+    regionAddName: '',
+    openMapFlag: false,
+    openMapName: '',
   },
   getters: {
   },

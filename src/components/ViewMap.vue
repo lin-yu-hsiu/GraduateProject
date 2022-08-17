@@ -3,7 +3,8 @@
   height: 700px; width: 700px; margin: 0 auto;">
     <div style="margin: 0 auto;position: relative;height: 600px; width: 600px;">
       <img style="border-radius: 5px; width: 100%; height: 100%;"
-        :src="'../../images/' + region.Venue + '/' + region.Venue + '_' + region.Area + '.jpg'" alt="">
+        :src="'../../images/' + this.$store.state.currentvenue + '/' + this.$store.state.currentvenue + '_' + this.$store.state.openMapName + '.jpg'"
+        alt="">
       <div v-for="item in currentdevice" :key="item">
         <n-tooltip trigger="hover">
           <template #trigger>
@@ -43,16 +44,8 @@ export default {
   },
   data() {
     return {
-      region: this.passdata,
       currentdevice: [],
-      regionImage: '',
       already_locate: already_locate,
-    }
-  },
-  props: {
-    passdata: {
-      type: Object,
-      required: true
     }
   },
   methods: {
@@ -67,7 +60,7 @@ export default {
         .catch((err) => { console.error(err) })
 
       for (let i = 0; i < Object.values(devices).length; i++) {
-        if (devices[i].Area === this.region.Area) {
+        if (devices[i].Area === this.$store.state.openMapName) {
           this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'place': devices[i].Place })
         }
       }

@@ -14,7 +14,7 @@
         @mouseover="icon3 = yes_hover" @mouseleave="icon3 = yes">
         <img :src="icon3" style="width: 45px; height: 45px">
       </button>
-      <button v-if="isEditing" class="detailBtn p-0" @click="isEditing = false" @mouseover="icon4 = no_hover"
+      <button v-if="isEditing" class="detailBtn p-0" @click="isEditing = false;" @mouseover="icon4 = no_hover"
         @mouseleave="icon4 = no">
         <img :src="icon4" style="width: 45px; height: 45px">
       </button>
@@ -142,7 +142,7 @@ export default defineComponent({
         'Note': this.deviceInfo.Note,
       }
       const json = JSON.stringify(body);
-      console.log(json)
+      // console.log(json)
       let res = []
       await axios({
         method: 'post',
