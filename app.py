@@ -136,6 +136,12 @@ def deleteVenue():
         for i in data:
             if(data[i]['Venue'] == temp['Venue']):
                 result = DB.delete_data('Map',data[i]['Number'])    # 刪除 Map 內部資料
+                device = DB.show_data('BLE')
+                for j in device:
+                    if(device[j]['MapNum'] == data[i]['Number']):
+                        result = DB.delete_data('BLE',device[j]['UUID'])
+                        if (not result['success']):
+                            return jsonify({'success': 0, 'result': 'Fail to Delete BLE Data'})
                 if(not result['success']):
                     return jsonify({'success': 0, 'result': 'Fail to Delete Map Content.'})
         return jsonify({'success': 1, 'result': 'Success to Delete Content.'})
@@ -173,11 +179,17 @@ def deleteArea():
     basedir = os.path.abspath(os.path.dirname(__file__))
     fileName = str(venue) + '_' + str(area) + '.jpg'
     targetdir = os.path.join(basedir,'public\\images\\' + venue + '\\' + fileName )
-    os.remove(targetdir)                                # 刪除檔案夾內部圖片
-    result = DB.delete_data("Map",temp["MapNum"])       # 刪除 Map 內部資料
+    os.remove(targetdir)                                        # 刪除檔案夾內部圖片
+    result = DB.delete_data("Map",temp["MapNum"])               # 刪除 Map 內部資料
     if(result['success']):
-        result = DB.delete_data(venue,area)             # 刪除 Venue 內部資料
+        result = DB.delete_data(venue,area)                     # 刪除 Venue 內部資料
         if(result['success']):
+            device = DB.show_data('BLE')
+            for i in device:
+                if(device[i]['MapNum'] == temp['MapNum']):
+                    result = DB.delete_data('BLE',device[i]['UUID'])    # 刪除 BLE 內部資料
+                    if(not result['success']):
+                        return jsonify({'success':0, 'result': 'Fail to Delete BLE Data'})
             return jsonify({'success': 1, 'result':'Success to Delete Data'})
         else:
             return jsonify({'success': 0, 'result':'Fail to Delete Venue Data'})
