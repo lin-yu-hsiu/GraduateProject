@@ -1,3 +1,4 @@
+import uuid
 import shutil
 from flask import Flask, redirect,render_template, url_for,request,jsonify
 from flask_cors import CORS
@@ -263,6 +264,35 @@ def uploadPic():
         print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
+
+@app.route("/device/<UUID>")
+def deviceContent(UUID):
+    data = DB.show_data("BLE")
+    for i in data:
+        if data[i]['UUID'] == UUID:
+            return jsonify(data[i])
+    return "There's no specific device data in the database!!"
+
+@app.route("/distribute/<id>")
+def distributeUUID(id):
+    tx = str(uuid.uuid1())
+    rx = str(uuid.uuid1())
+    content = {"UUID": id,'tx':tx,'rx':rx}
+    result = DB.modify_BLE(content)
+    if(result['success']):
+        return jsonify(content)
+    else:
+        return jsonify(result)
+
+@app.route("/renewBattery",methods=['POST'])
+def renewBattery():
+    data = str(request.data,encoding="UTF-8")
+    content = json.loads(data)
+    result = DB.modify_BLE(content)
+    if(result['success']):
+        return jsonify(content)
+    else:
+        return jsonify(result)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)

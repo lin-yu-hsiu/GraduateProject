@@ -2,6 +2,8 @@
 注意事項:
     1. 資料中請不要使用 ' 會影響 sql 語法
     2. 之後記得部分改成 POST (鈺修進度)
+    3. 新增圖片後會儲存在 public/images/<場館名稱>/ 底下並命名為 <場館名稱_區域名稱.jpg>
+    4. 裝置配對訊息之後會在 
 
 路由內容:
     ★ /table/<表格名稱> => 查看目標表格內容 => GET 
@@ -20,6 +22,10 @@
     ★ /showVenue => 顯示所有場館 => GET
     ★ /insertBLE => 設定裝置所配對到的資料 => POST (備註9)
     ★ /uploadPic => 上傳圖片 => POST (備註10)
+    ★ /device/<UUID> => 回傳該UUID裝置之資訊 => get (裝置取得開關 + app端取得資料)
+    ★ /distribute/<UUID> => 回傳該UUID硬體裝置分配到的TX、RX => get
+    ★ /renewBattery/<UUID> => 硬體裝置更新電量 => POST (備註11)
+
 
 備註:
     1. 前端以 json 來 POST, 傳入場館名稱
@@ -30,14 +36,15 @@
     5. 前端以 json 來 POST, 傳入 UUID
     6. 前端以 json 來 POST, 傳入 fileName, Venue, Area
     7. 前端以 json 來 POST, 傳入 MapNum
-    8. 裝置透過字串方式傳送欲配對裝置之 UUID 到後端，並讓前端配對
+    8. 裝置以 json 來 POST, 傳入 UUID
     9. 前端以 json 來 POST, 傳入 UUID, Message, Venue, Area, Xaxis, Yaxis, Place
     10. 前端以 form 的方法來傳圖片
+    11. 裝置以 json 來 POST, 傳入 UUID, Battery 欄位
 """
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place','Audio','Video','Tx','Rx'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{
@@ -130,7 +137,7 @@ def delete_all(table_name):
         conn.close()
         return {"success": 0, "Result": str(e)}
 
-def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以及狀態將在其他路由處理)
+def modify_BLE(content):        #修正 BLE 資料
     conn = sqlite3.connect('test.db', check_same_thread=False)
     cursor = conn.cursor()
     try:
@@ -147,22 +154,6 @@ def modify_BLE(content):        #修正表格資料 (BLE 資訊中的電量以�
                     ins += "{} = {},".format(i,content[i])
         ins = ins[:-1]
         ins += " where UUID = '{}';".format(content['UUID'])
-        cursor.execute(ins)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return {"success": 1,'Result': '修改成功'}
-    except sqlite3.OperationalError as e:
-        cursor.close()
-        conn.close()
-        return {"success": 0, "Result": str(e)}
-
-def modify_battery(content):            #針對 BLE 之中的電量進行修正
-    conn = sqlite3.connect('test.db', check_same_thread=False)
-    cursor = conn.cursor()
-    try:
-        ins = 'Update BLE set '
-        ins += 'Battery = {} where UUID = "{}";'.format(content['Status'],content['UUID'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()
