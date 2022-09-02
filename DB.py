@@ -6,7 +6,7 @@
     4. 裝置配對訊息之後會在 
 
 路由內容:
-    ★ /table/<表格名稱> => 查看目標表格內容 => GET 
+    ★ /table/<表格名稱> => 查看目標表格內容 => GET
     ★ /deviceInfo => 查看所有裝置狀態 => GET
     ★ /deviceInfo/<館>
     ★ /createVenue => 新增場館 => POST (備註1)
@@ -44,7 +44,7 @@
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place','Audio','Video','Tx','Rx'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place','Audio','Video','Tx','Rx','Nux'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{

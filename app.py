@@ -206,7 +206,7 @@ def showVenue():
 @app.route("/newDevice",methods=["POST","GET"])
 def newDevice():
     data = {}
-    if (request.method == 'POST'):
+    if (request.method == 'POST'):        
         data = str(request.data,encoding="UTF-8")
         temp = json.loads(data)
         data = { "UUID": temp['UUID'] }
@@ -277,7 +277,8 @@ def deviceContent(UUID):
 def distributeUUID(id):
     tx = str(uuid.uuid1())
     rx = str(uuid.uuid1())
-    content = {"UUID": id,'tx':tx,'rx':rx}
+    nux = str(uuid.uuid1())
+    content = {"UUID": id,'tx':tx,'rx':rx,'nux':nux}
     result = DB.modify_BLE(content)
     if(result['success']):
         return jsonify(content)
