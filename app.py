@@ -243,6 +243,9 @@ def insertBLE():
         if (data[i]['Venue'] == temp['Venue'] and data[i]['Area'] == temp['Area']):
             MapNum = data[i]['Number']
             break
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    targetdir = os.path.join(basedir,'public\\images\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+    temp['Audio'] = targetdir
     del temp['Venue']
     del temp['Area']
     temp['MapNum'] = MapNum
