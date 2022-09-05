@@ -1,3 +1,4 @@
+from socket import SHUT_RD
 import uuid
 import shutil
 from flask import Flask, redirect,render_template, url_for,request,jsonify
@@ -18,24 +19,6 @@ def table(name):
         return jsonify(content)
     except TypeError as e:
         return str(e)
-
-@app.route("/create/<name>")
-def insert(name):
-    data = {
-        "UUID": "Test9",
-        "Message": "目前所在位置為 B-2",
-        "MapNum": 4,
-        "Xaxis": 100,  
-        "Yaxis": 100,
-        "Battery": "100%",
-        "Note": "none",
-        "Place": '地點8'
-    }
-    result = DB.insert_data(name,data)
-    if(result['success']):
-        return jsonify(result)
-    else:
-        return jsonify(result)
 
 @app.route("/deleteAll/<name>")
 def deleteAll(name):
@@ -108,16 +91,28 @@ def deleteBLE():
 def createVenue():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
+    venueName = temp['Venue']
+
     basedir = os.path.abspath(os.path.dirname(__file__))
-    targetdir = os.path.join(basedir,'public\\images')      # 建立 image 資料夾
+    targetdir = os.path.join(basedir,'public\\audios')      # 建立 audios 資料夾
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
-    venueName = temp['Venue']
+
     targetdir = os.path.join(targetdir,venueName)
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
+
+    targetdir = os.path.join(basedir,'public\\images')      # 建立 image 資料夾
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
+    targetdir = os.path.join(targetdir,venueName)
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
+
     result = DB.create_venue(temp['Venue'])
     if(result['success']):
         return jsonify(result)
@@ -129,8 +124,10 @@ def deleteVenue():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
     basedir = os.path.abspath(os.path.dirname(__file__))
-    targetdir = os.path.join(basedir,'public\\images\\' + temp['Venue'])
-    shutil.rmtree(targetdir)                                        # 刪除場館檔案夾
+    
+    shutil.rmtree(basedir + '\\public\\images\\' + temp['Venue'])   # 刪除 //images//場館 檔案夾
+    shutil.rmtree(basedir + '\\public\\audios\\' + temp['Venue'])   # 刪除 //audios//場館 檔案夾
+
     result = DB.delete_venue(temp['Venue'])                         # 刪除 Venue 的 table
     if(result['success']):
         data = DB.show_data('Map')
@@ -154,6 +151,12 @@ def insertArea():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
     basedir = os.path.abspath(os.path.dirname(__file__))
+
+    targetdir = os.path.join(basedir,'public\\audios\\' + str(temp['Venue']) + '\\' + str(temp['Area']))   #建立 audios 資料夾
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
+
     temp['Route'] = basedir + "\\" + temp['fileName']
     del temp['fileName']
     result = DB.insert_data(temp['Venue'],temp) 
@@ -177,13 +180,16 @@ def deleteArea():
         if (content[i]['Number'] == temp['MapNum']):
             venue = content[i]['Venue']
             area = content[i]['Area']
+    
     basedir = os.path.abspath(os.path.dirname(__file__))
     fileName = str(venue) + '_' + str(area) + '.jpg'
-    targetdir = os.path.join(basedir,'public\\images\\' + venue + '\\' + fileName )
-    os.remove(targetdir)                                        # 刪除檔案夾內部圖片
-    result = DB.delete_data("Map",temp["MapNum"])               # 刪除 Map 內部資料
+    targetdir = os.path.join(basedir,'public\\images\\' + str(venue) + '\\' + fileName )
+    os.remove(targetdir)                                                # 刪除 images 檔案夾內部圖片
+    shutil.rmtree(basedir + '\\public\\audios\\'+ str(venue) + '\\' + str(area))    # 刪除 audios\\venue\\區域 資料夾
+
+    result = DB.delete_data("Map",temp["MapNum"])                       # 刪除 Map 內部資料
     if(result['success']):
-        result = DB.delete_data(venue,area)                     # 刪除 Venue 內部資料
+        result = DB.delete_data(venue,area)                             # 刪除 Venue 內部資料
         if(result['success']):
             device = DB.show_data('BLE')
             for i in device:
@@ -265,6 +271,26 @@ def uploadPic():
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 
+@app.route("/uploadAud",methods=["POST"])
+def uploadPic():
+    try:
+        aud = request.files.get('file')
+        format = aud.filename[aud.filename.index('.'):]
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        venueName = aud.filename.split('_')[0]
+        areaName = aud.filename.split('_')[1]
+        targetdir = os.path.join(basedir,'public\\audios\\' + venueName + '\\' + areaName)
+        if format in ('.mp3'):
+            dir = targetdir + '\\' + aud.filename.split('_')[2] + '.mp3'
+            aud.save(dir)
+            result = {'success': 1, 'result': 'Upload Successfully'}
+        else:
+            result = {'success': 0, 'result': 'Type Wrong'}
+    except Exception as e:
+        print(str(e))
+        result = {'success': 0, 'result': 'Upload Failed'}
+    return jsonify(result)
+
 @app.route("/device/<UUID>")
 def deviceContent(UUID):
     data = DB.show_data("BLE")
@@ -277,8 +303,8 @@ def deviceContent(UUID):
 def distributeUUID(id):
     tx = str(uuid.uuid1())
     rx = str(uuid.uuid1())
-    nux = str(uuid.uuid1())
-    content = {"UUID": id,'tx':tx,'rx':rx,'nux':nux}
+    nus = str(uuid.uuid1())
+    content = {"UUID": id,'tx':tx,'rx':rx,'nus':nus}
     result = DB.modify_BLE(content)
     if(result['success']):
         return jsonify(content)
@@ -294,6 +320,8 @@ def renewBattery():
         return jsonify(content)
     else:
         return jsonify(result)
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
