@@ -6,7 +6,7 @@
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
-            $store.state.currentvenue
+        $store.state.currentvenue
         }}
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{ $store.state.regionAddName }}
@@ -27,7 +27,7 @@
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在區域為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;margin-right:auto">
           {{
-              $store.state.regionAddName
+          $store.state.regionAddName
           }}
         </div>
       </div>
@@ -43,8 +43,7 @@
       <div v-if="$store.state.currvenue" id="Canvas" class="frame"
         :class="[locating ? notlocateCursor : normalCursor][frame_status ? '' : normalCursor]"
         @click="add_device = true; no_cursor = false; ">
-        <img v-if="areapic != ''"
-          :src="'../../images/' + this.$store.state.currentvenue.toString() + '/' + areapic + '.jpg'"
+        <img v-if="areapic != ''" :src="'../../images/' + this.$store.state.currentvenue + '/' + areapic + '.jpg'"
           :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域"
           @mousedown="getCursorValue($event)" ref="Canvas">
         <div v-for="item in currentdevice" :key="item">
@@ -152,7 +151,7 @@ export default defineComponent({
       this.propdata = [];
       this.clickBtnStatus = false
       this.areavalue = value
-      this.areapic = this.$store.state.currentvenue.toString() + "_" + this.$store.state.regionAddName
+      this.areapic = this.$store.state.currentvenue + "_" + this.$store.state.regionAddName
       this.fetchPicInfo()
     },
     getCursorValue(event) {

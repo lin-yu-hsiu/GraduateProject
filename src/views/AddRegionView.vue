@@ -44,7 +44,7 @@
           @change.prevent="UploadImage">
       </div>
       <button v-if="$store.state.currvenue" class="clickToStore" @click="UploadData">
-        <img :src="store_black" style="width: 45px; height: 55px">
+        <div>Save</div>
       </button>
     </div>
   </div>
@@ -56,7 +56,6 @@ import { defineComponent, inject } from "vue";
 import { useMessage } from 'naive-ui'
 import MenuBar from '@/components/MenuBar.vue';
 import loadpic from '../assets/pic/loadpic.png'
-import store_black from '../assets/pic/store_black.png'
 import arrowback from '../assets/pic/arrowback.jpg'
 import arrowback_hover from '../assets/pic/arrowback_hover.jpg'
 import crumb from '../assets/pic/crumb.png'
@@ -105,7 +104,6 @@ export default defineComponent({
       icon: arrowback,
       arrowback: arrowback,
       arrowback_hover: arrowback_hover,
-      store_black: store_black,
       loadpic: loadpic,
       selectedFile: null,
       regionName: '',
@@ -262,16 +260,21 @@ export default defineComponent({
 }
 
 .clickToStore {
-  background-color: transparent;
-  border: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 0.5px solid rgb(185, 185, 185);
+  display: block;
   margin: 30px auto;
-  padding: 4px 8px;
+  padding: 5px 35px;
   transition: all 100ms ease;
-  border-radius: 15px;
+  border-radius: 5px;
+  color: rgba(0, 0, 0, 1);
+  font-size: 18px;
+  font-weight: 600;
+  background-color: rgba(201, 201, 201, 100%);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 15%);
 }
 
 .clickToStore:hover {
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 15%) inset,
-    0 -2px 4px 0 rgba(0, 0, 0, 15%) inset;
+  background-color: rgba(201, 201, 201, 80%)
 }
 </style>

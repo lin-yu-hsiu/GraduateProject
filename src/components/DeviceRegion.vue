@@ -5,7 +5,7 @@
       <div style="position: relative;">
         <div v-if="!emptyflag" class="detailFrameTitle d-flex justify-content-evenly align-items-center mx-3 pb-4">
           <div style="width: 100px; background-color: #ffffff; height: 35px;"></div>
-          <div class="subtitle">地點</div>
+          <div class="subtitle">標題</div>
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 150px">訊息</div>
           <div class="subtitle">狀態</div>
@@ -73,7 +73,7 @@ export default defineComponent({
       })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
-
+      
       if (this.devices.length == 0) {
         this.emptyflag = true   // 一開始此區域即無裝置
         this.$emit('emptyregion', this.emptyflag)

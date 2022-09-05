@@ -272,7 +272,7 @@ def uploadPic():
     return jsonify(result)
 
 @app.route("/uploadAud",methods=["POST"])
-def uploadPic():
+def uploadAud():
     try:
         aud = request.files.get('file')
         format = aud.filename[aud.filename.index('.'):]
@@ -281,7 +281,7 @@ def uploadPic():
         areaName = aud.filename.split('_')[1]
         targetdir = os.path.join(basedir,'public\\audios\\' + venueName + '\\' + areaName)
         if format in ('.mp3'):
-            dir = targetdir + '\\' + aud.filename.split('_')[2] + '.mp3'
+            dir = targetdir + '\\' + aud.filename.split('_')[2]
             aud.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:

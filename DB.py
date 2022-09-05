@@ -37,14 +37,14 @@
     6. 前端以 json 來 POST, 傳入 fileName, Venue, Area
     7. 前端以 json 來 POST, 傳入 MapNum
     8. 裝置以 json 來 POST, 傳入 UUID
-    9. 前端以 json 來 POST, 傳入 UUID, Message, Venue, Area, Xaxis, Yaxis, Place
+    9. 前端以 json 來 POST, 傳入 UUID, Message, Venue, Area, Xaxis, Yaxis, Title
     10. 前端以 form 的方法來傳圖片
     11. 裝置以 json 來 POST, 傳入 UUID, Battery 欄位
 """
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Place','Audio','Video','Tx','Rx','Nux'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{
@@ -187,10 +187,10 @@ def show_device_info(number):
             temp['Battery'] = records[row][5]
             temp['Status'] = bool(records[row][6])
             temp['Note'] = records[row][7]
-            temp['Place'] = records[row][8]
-            temp['Route'] = records[row][10]
-            temp['Venue'] = records[row][11]
-            temp['Area'] = records[row][12]
+            temp['Title'] = records[row][8]
+            temp['Route'] = records[row][15]
+            temp['Venue'] = records[row][16]
+            temp['Area'] = records[row][17]
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:

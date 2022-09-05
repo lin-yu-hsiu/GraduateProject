@@ -34,7 +34,7 @@
     </div>
 
     <div class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px; color: #000000;">
-      {{ deviceInfo.Place }}</div>
+      {{ deviceInfo.Title }}</div>
 
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
       <img v-if="deviceInfo.Battery"
@@ -48,6 +48,7 @@
     <textarea v-else name="" disabled id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']"
       cols="10" rows="2" style="width: 150px" v-model="deviceInfo.Message"></textarea>
 
+    <!-- TODO:要做音檔跟超連結的修改 -->
 
     <n-switch size="large" v-if="isEditing" v-model:value="deviceInfo.Status" :class="[isRemoving ? removeHidden : '']"
       style="width: 100px;">
@@ -80,7 +81,6 @@ import no_hover from '../assets/pic/no_hover.png'
 import battery100 from '../assets/pic/battery100.png'
 import battery50 from '../assets/pic/battery50.png'
 import battery0 from '../assets/pic/battery0.png'
-
 
 export default defineComponent({
   setup() {
@@ -142,7 +142,6 @@ export default defineComponent({
         'Note': this.deviceInfo.Note,
       }
       const json = JSON.stringify(body);
-      // console.log(json)
       let res = []
       await axios({
         method: 'post',
@@ -159,6 +158,8 @@ export default defineComponent({
     async removeChange() {
       const body = {
         'UUID': this.deviceInfo.UUID,
+        'Area': this.deviceInfo.Area,
+        'Venue': this.deviceInfo.Venue,
       }
       const json = JSON.stringify(body);
       await axios({
@@ -173,7 +174,13 @@ export default defineComponent({
       this.isRemoving = false
       this.$emit('ifEmpty') //如果此區域已無裝置回傳到父元件以更新畫面
     },
+    t(){
+      console.log(this.deviceInfo)
+    }
   },
+  mounted(){
+    this.t()
+  }
 })
 </script>
 

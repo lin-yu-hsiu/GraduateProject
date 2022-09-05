@@ -19,16 +19,32 @@
   background-color: rgba(0, 0, 0, 0.5);" v-else>尚未選取區域</div>
     </div>
     <div class="d-flex justify-content-between mx-auto" style="width: 300px">
-      <div class="subTitle">裝置地點</div>
-      <input v-model="placevalue" class="edit" type="text">
+      <div class="subTitle">標題</div>
+      <input v-model="titlevalue" class="edit" type="text">
     </div>
-    <div class="d-flex flex-column mx-auto align-items-center" style="width: 300px;height: 200px">
+    <div class="d-flex justify-content-between align-items-center mx-auto" style="width: 300px;">
       <div class="subTitle my-4" style="align-self: flex-start">訊息內容</div>
-      <textarea v-model="messagecontent" class="message scroll p-3"></textarea>
+      <div class="d-flex justify-content-around align-items-center"
+        style="background-color: rgba(217, 217, 217, 40%); width: 180px; padding: 2px; border-radius: 5px;">
+        <img :src="icon1" @mouseover="icon1 = txt_hover" @mouseleave="icon1 = txt" @click="messageContent = 'text'">
+        <img :src="icon2" @mouseover="icon2 = voice_hover" @mouseleave="icon2 = voice"
+          @click="this.$refs.messagevoice.click();">
+        <img :src="icon3" @mouseover="icon3 = link_hover" @mouseleave="icon3 = link" @click="messageContent = 'link'">
+      </div>
+    </div>
+    <div class="mx-auto" style="width: 300px;">
+      <textarea v-if="messageContent == 'text'" v-model="messagetext" class="message scroll p-3"
+        placeholder="請輸入文字內容"></textarea>
+      <textarea v-if="messageContent == 'link'" v-model="messagelink" class="message scroll p-3"
+        placeholder="請輸入網址"></textarea>
+      <input type="file" accept="audio/*" style="display: none;" ref="messagevoice" @change="UploadMessageVoice">
+      <div v-if="messageContent == 'voice'" style=" background-color: rgba(217, 217, 217, 50%); padding: 4px 8px; margin: 0 auto; text-align:center;
+         font-weight: 800;">
+        {{ voicename }}
+      </div>
     </div>
     <button @click="sendToAddDevice();" class="addBtn mt-5">
-      <img v-if="disableBtn" :src="store_black" style="width: 45px; height: 55px">
-      <img v-if="!disableBtn && !connectSuccess" :src="store_red" style="width: 45px; height: 55px">
+      <div>Save</div>
     </button>
   </n-card>
 </template>
@@ -39,9 +55,12 @@ import { defineComponent, inject, ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import MdSearch from '@vicons/ionicons4/MdSearch'
 import ok from '../assets/pic/ok.png'
-import store_black from '../assets/pic/store_black.png'
-import store_green from '../assets/pic/store_green.png'
-import store_red from '../assets/pic/store_red.png'
+import txt from '../assets/pic/txt.png'
+import txt_hover from '../assets/pic/txt_hover.png'
+import voice from '../assets/pic/voice.png'
+import voice_hover from '../assets/pic/voice_hover.png'
+import link from '../assets/pic/link.png'
+import link_hover from '../assets/pic/link_hover.png'
 
 
 export default defineComponent({
@@ -76,18 +95,39 @@ export default defineComponent({
     return {
       BLEUUID: null,
       device: this.info,
-      placevalue: '',
-      messagecontent: '',
+      titlevalue: '',
+      messagetext: '',
+      messagelink: '',
+      messageContent: '',
       connectSuccess: true,
       disableBtn: true,
+      selectedVoice: null,
+      voicename: '',
       //
       ok: ok,
-      store_black: store_black,
-      store_green: store_green,
-      store_red: store_red,
+      txt: txt,
+      txt_hover: txt_hover,
+      voice: voice,
+      voice_hover: voice_hover,
+      link: link,
+      link_hover: link_hover,
+      icon1: txt,
+      icon2: voice,
+      icon3: link,
     }
   },
   methods: {
+    UploadMessageVoice(event) {
+      if (this.titlevalue == '' || this.BLEUUID == null) {
+        this.mistake()
+        return 
+      }
+      else{
+        this.selectedVoice = event.target.files[0]
+        this.voicename = this.selectedVoice.name
+        this.messageContent = 'voice'
+      }
+    },
     onChangeMethod(event) {
       this.BLEUUID = event
     },
@@ -111,34 +151,110 @@ export default defineComponent({
       }
     },
     async sendToAddDevice() {
-      if (this.placevalue == '' || this.messagecontent == '') {
-        this.mistake()
+      if (this.messageContent == 'voice') {
+          let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.mp3'
+          let uploadFile = this.selectedVoice      
+          let formData = new FormData()
+          formData.append('file', uploadFile, fileName)
+          // console.log(formData.get('file').name)
+          let res = []
+          await axios({
+            method: 'post',
+            url: this.$store.state.api + '/uploadAud',
+            headers: { "Content-Type": "multipart/form-data" },
+            data: formData,
+          }).then((response) => res = response.data)
+            .catch((err) => { console.error(err) })
+          if (res.success == 1) {
+              let body = {
+                'UUID': this.BLEUUID,
+                'Title': this.titlevalue,
+                'Audio': fileName
+              }
+              let temp = Object.assign({}, this.device[0], body) //合併兩個物件
+              const json = JSON.stringify(temp);
+              let res1 = []
+              await axios({
+                method: 'post',
+                baseURL: this.$store.state.api + '/insertBLE',
+                headers: { 'Content-Type': 'application/json' },
+                data: json
+              })
+                .then((response) => res1 = response.data)
+                .catch((error) => console.log(error))
+              console.log(res1)
+              if (res1.success == 1) {
+                this.update()
+                this.$emit('AddSuccess', this.device[0].Area)
+              }
+              else {
+                this.mistake()
+              }
+          }
+          else {
+            this.mistake()
+          }    
       }
-      else {
-        let body = {
-          'UUID': this.BLEUUID,
-          'Place': this.placevalue,
-          'Message': this.messagecontent
-        }
-        let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-        const json = JSON.stringify(temp);
-
-        let res
-        await axios({
-          method: 'post',
-          baseURL: this.$store.state.api + '/insertBLE',
-          headers: { 'Content-Type': 'application/json' },
-          data: json
-        })
-          .then((response) => res = response.data)
-          .catch((error) => console.log(error))
-        // console.log(res)
-        if (res.success == 1) {
-          this.update()
-          this.$emit('AddSuccess', this.device[0].Area)
+      else if (this.messageContent == 'text') {
+        if (this.titlevalue == '' || this.messagetext == '' || this.BLEUUID == null) {
+          this.mistake()
         }
         else {
+          let body = {
+            'UUID': this.BLEUUID,
+            'Title': this.titlevalue,
+            'Message': this.messagetext
+          }
+          let temp = Object.assign({}, this.device[0], body) //合併兩個物件
+          const json = JSON.stringify(temp);
+          let res
+          await axios({
+            method: 'post',
+            baseURL: this.$store.state.api + '/insertBLE',
+            headers: { 'Content-Type': 'application/json' },
+            data: json
+          })
+            .then((response) => res = response.data)
+            .catch((error) => console.log(error))
+          // console.log(res)
+          if (res.success == 1) {
+            this.update()
+            this.$emit('AddSuccess', this.device[0].Area)
+          }
+          else {
+            this.mistake()
+          }
+        }
+      }
+      else if (this.messageContent == 'link' ) {
+        if (this.titlevalue == '' || this.messagelink == '' || this.BLEUUID == null) {
           this.mistake()
+        }
+        else {
+          let body = {
+            'UUID': this.BLEUUID,
+            'Title': this.titlevalue,
+            'Message': this.messagelink
+          }
+          let temp = Object.assign({}, this.device[0], body) //合併兩個物件
+          const json = JSON.stringify(temp);
+          let res
+          await axios({
+            method: 'post',
+            baseURL: this.$store.state.api + '/insertBLE',
+            headers: { 'Content-Type': 'application/json' },
+            data: json
+          })
+            .then((response) => res = response.data)
+            .catch((error) => console.log(error))
+          // console.log(res)
+          if (res.success == 1) {
+            this.update()
+            this.$emit('AddSuccess', this.device[0].Area)
+          }
+          else {
+            this.mistake()
+          }
         }
       }
     }
@@ -158,7 +274,6 @@ export default defineComponent({
 
 .checkDevice {
   width: 500px;
-  /* height: 600px; */
   background-color: #ffffff;
   border-radius: 15px;
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 25%),
@@ -182,7 +297,7 @@ export default defineComponent({
 .message {
   background-color: rgba(217, 217, 217, 50%);
   width: 300px;
-  height: 100px;
+  height: 80px;
   border: none;
   outline: none;
   padding: 8px;
@@ -207,18 +322,22 @@ export default defineComponent({
 }
 
 .addBtn {
-  background-color: transparent;
-  border: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 0.5px solid rgb(185, 185, 185);
   display: block;
   margin: 0 auto;
-  padding: 4px 8px;
+  padding: 4px 30px;
   transition: all 100ms ease;
-  border-radius: 15px;
+  border-radius: 5px;
+  color: rgba(0, 0, 0, 1);
+  font-size: 18px;
+  font-weight: 600;
+  background-color: rgba(201, 201, 201, 100%);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 15%);
 }
 
 .addBtn:hover {
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 10%) inset,
-    0 -2px 4px 0 rgba(0, 0, 0, 10%) inset;
+  background-color: rgba(201, 201, 201, 80%)
 }
 
 .scroll {

@@ -29,15 +29,9 @@
             </div>
 
             <button class="submit" type="submit">LOGIN</button>
-
-            <!-- <p class="exception">If you forget Username / Password, call us</p>
-            <div class="createAccount">
-              <p class="exception">Create your Account</p>
-              <i class="bi bi-arrow-right"></i>
-            </div> -->
           </form>
           <div v-if="loginStatus == 'Failed'" class="d-flex justify-content-center align-items-center"
-            style="font-weight: 800">
+            style="font-weight: 600">
             <img :src="errorSrc" style="width: 40px; height: 40px">
             帳號或密碼不存在
           </div>
