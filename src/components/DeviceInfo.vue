@@ -1,6 +1,6 @@
 <template>
   <div class="detailFrameInfo d-flex justify-content-evenly align-items-center mt-1 mx-3"
-    :class="[isRemoving ? removeClass : '', isEditing ? editClass : '', deviceStatus ? '' : error]">
+    :class="[isRemoving ? removeClass : '', isEditing ? editClass : '', deviceStatus ? normal : error]">
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
       <button class="detailBtn p-0" v-if="!isEditing && !isRemoving" @click="isEditing = true"
         @mouseover="icon1 = edit_hover" @mouseleave="icon1 = edit">
@@ -42,13 +42,56 @@
         :class="[isRemoving ? removeHidden : '']" style="width: 60px;">
     </div>
 
-    <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
-      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
-      v-model="deviceInfo.Message"></textarea>
-    <textarea v-else name="" disabled id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']"
-      cols="10" rows="2" style="width: 150px" v-model="deviceInfo.Message"></textarea>
+    <div class="scroll" v-if="isRemoving == false" style="width: 280px; max-height: 125px; padding: 5px 0;">
+      <div class="d-flex align-items-center mb-1">
+        <img :src="txt" alt="">
+        <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
+          :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 100%"
+          v-model="deviceInfo.Message"></textarea>
+        <textarea v-else name="" disabled id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']"
+          cols="10" rows="2" style="width: 100%; background-color: rgba(255, 255, 255, 65%); font-weight: 600;"
+          v-model="deviceInfo.Message"></textarea>
+      </div>
+      <div class="d-flex align-items-center mb-1" v-if="deviceInfo.Audio != null">
+        <img :src="voice" alt="">
+        <div v-if="isEditing" style="cursor: not-allowed; background-color: rgba(217, 217, 217, 50%); padding: 4px 8px; text-align:center;
+         font-weight: 800; font-size: 16px; width: 100%; color: rgba(0, 0, 0, 1)">
+          <n-tooltip placement="right" trigger="hover">
+            <template #trigger>
+              {{ deviceInfo.Title }}.mp3
+            </template>
+            欲修改音檔，請直接刪除此裝置
+          </n-tooltip>
+        </div>
+        <div v-if="!isEditing"
+          style="background-color: rgba(255, 255, 255, 65%); padding: 4px;border: solid .5px rgba(0, 0, 0, 15%);
+         font-weight: 800; font-size: 16px; width: 100%; display: flex; justify-content: center; align-items: center; border-radius: 5px;">
+          <img v-if="!mp3playstatus" :src="icon5" @mouseover="icon5 = play_hover" @mouseleave="icon5 = play"
+            @click="mp3Play()">
+          <div v-if="!mp3playstatus"
+            style="text-overflow: ellipsis; width: 190px; white-space: nowrap; overflow: hidden;">
+            {{ deviceInfo.Title }}.mp3
+          </div>
 
-    <!-- TODO:要做音檔跟超連結的修改 -->
+          <audio v-if="mp3playstatus" controls style="width: 220px">
+            <source :src="'../../audios/' + deviceInfo.Venue + '/' + deviceInfo.Area + '/' + deviceInfo.Title + '.mp3'"
+              type="audio/mp3">
+          </audio>
+        </div>
+      </div>
+      <div class="d-flex align-items-center" v-if="deviceInfo.Href != ''">
+        <img :src="link" alt="">
+        <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
+          :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 100%; font-size: 14px;"
+          v-model="deviceInfo.Href"></textarea>
+        <textarea v-else name="" disabled id="messageContent" class="scroll" :class="[isRemoving ? removeHidden : '']"
+          cols="10" rows="2" style="width: 100%; font-weight: 600;background-color: rgba(255, 255, 255, 65%);"
+          v-model="deviceInfo.Href"></textarea>
+      </div>
+    </div>
+
+
+
 
     <n-switch size="large" v-if="isEditing" v-model:value="deviceInfo.Status" :class="[isRemoving ? removeHidden : '']"
       style="width: 100px;">
@@ -59,10 +102,10 @@
 
 
     <textarea v-if="isEditing" name="" id="psEditing" class="scroll edit scroll_white"
-      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 150px"
+      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 100px"
       v-model="deviceInfo.Note"></textarea>
     <textarea v-else name="" disabled id="psContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10"
-      rows="2" style="width: 150px" v-model="deviceInfo.Note"></textarea>
+      style="width: 100px;background-color: rgba(255, 255, 255, 65%);" v-model="deviceInfo.Note"></textarea>
   </div>
 </template>
 
@@ -78,9 +121,11 @@ import yes from '../assets/pic/yes.png'
 import yes_hover from '../assets/pic/yes_hover.png'
 import no from '../assets/pic/no.png'
 import no_hover from '../assets/pic/no_hover.png'
-import battery100 from '../assets/pic/battery100.png'
-import battery50 from '../assets/pic/battery50.png'
-import battery0 from '../assets/pic/battery0.png'
+import play from '../assets/pic/play.png'
+import play_hover from '../assets/pic/play_hover.png'
+import txt from '../assets/pic/txt.png'
+import voice from '../assets/pic/voice.png'
+import link from '../assets/pic/link.png'
 
 export default defineComponent({
   setup() {
@@ -107,19 +152,22 @@ export default defineComponent({
       // 以下為props ----------------------------------
       deviceInfo: this.device,
       // 以下為variables ------------------------------
+      mp3playstatus: false,
       emptyflag: false,
       isEditing: false,
       editClass: 'editClass',
       isRemoving: false,
       removeClass: 'removeClass',
       removeHidden: 'removehidden',
-      deviceStatus: false,
+      deviceStatus: true,
       error: 'error',
+      normal: 'normal',
       // 以下為icons ----------------------------------
       icon1: edit,
       icon2: remove,
       icon3: yes,
       icon4: no,
+      icon5: play,
       edit: edit,
       edit_hover: edit_hover,
       remove: remove,
@@ -128,9 +176,11 @@ export default defineComponent({
       yes_hover: yes_hover,
       no: no,
       no_hover: no_hover,
-      battery100: battery100,
-      battery50: battery50,
-      battery0: battery0,
+      play: play,
+      play_hover: play_hover,
+      txt: txt,
+      voice: voice,
+      link: link,
     }
   },
   methods: {
@@ -140,6 +190,7 @@ export default defineComponent({
         'Status': this.deviceInfo.Status,
         'Message': this.deviceInfo.Message,
         'Note': this.deviceInfo.Note,
+        'Href': this.deviceInfo.Href,
       }
       const json = JSON.stringify(body);
       let res = []
@@ -160,6 +211,7 @@ export default defineComponent({
         'UUID': this.deviceInfo.UUID,
         'Area': this.deviceInfo.Area,
         'Venue': this.deviceInfo.Venue,
+        'Title': this.deviceInfo.Title,
       }
       const json = JSON.stringify(body);
       await axios({
@@ -174,12 +226,14 @@ export default defineComponent({
       this.isRemoving = false
       this.$emit('ifEmpty') //如果此區域已無裝置回傳到父元件以更新畫面
     },
-    t(){
-      console.log(this.deviceInfo)
+    mp3Play() {
+      this.mp3playstatus = true
     }
   },
-  mounted(){
-    this.t()
+  mounted() {
+    if (this.deviceInfo.Battery == '0%') {
+      this.deviceStatus = false
+    }
   }
 })
 </script>
@@ -215,7 +269,12 @@ export default defineComponent({
 }
 
 .error {
-  background-color: rgba(255, 0, 0, 15%);
+  background: rgba(255, 0, 0, 8%);
+  border-radius: 5px;
+}
+
+.normal {
+  background-color: rgba(228, 228, 228, 0.7);
   border-radius: 5px;
 }
 

@@ -189,6 +189,7 @@ def show_device_info(number):
             temp['Note'] = records[row][7]
             temp['Title'] = records[row][8]
             temp['Audio'] = records[row][9]
+            temp['Href'] = records[row][10]
             temp['Route'] = records[row][15]
             temp['Venue'] = records[row][16]
             temp['Area'] = records[row][17]

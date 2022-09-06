@@ -81,6 +81,8 @@ def switchBLE():
 def deleteBLE():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    os.remove(basedir + '\\public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
     result = DB.delete_data("BLE",temp['UUID'])
     if(result['success']):
         return jsonify(result)
@@ -243,9 +245,12 @@ def insertBLE():
         if (data[i]['Venue'] == temp['Venue'] and data[i]['Area'] == temp['Area']):
             MapNum = data[i]['Number']
             break
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    targetdir = os.path.join(basedir,'public\\images\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
-    temp['Audio'] = targetdir
+    if (temp['Audio'] == 1):
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        targetdir = os.path.join(basedir,'public\\images\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+        temp['Audio'] = targetdir
+    else:
+        del temp['Audio']
     del temp['Venue']
     del temp['Area']
     temp['MapNum'] = MapNum

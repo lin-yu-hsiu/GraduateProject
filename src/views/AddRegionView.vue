@@ -5,7 +5,7 @@
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%);">
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
-            this.$store.state.currentvenue
+        this.$store.state.currentvenue
         }}
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         新增區域
@@ -24,7 +24,7 @@
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%);margin-left: 10px;margin-right:auto">
           {{
-              $store.state.currentvenue
+          $store.state.currentvenue
           }}
         </div>
       </div>
@@ -114,82 +114,69 @@ export default defineComponent({
   },
   methods: {
     async UploadImage(event) {
+      this.selectedFile = event.target.files[0]
+      this.pic = this.selectedFile.name
+      this.previewImage = URL.createObjectURL(this.selectedFile);
+    },
+    async UploadData() {
       if (this.regionName == '') {
         this.noname()
+        return
+      }
+      else if (this.regionName.length > 5) {
+        this.overname()
+        return
       }
       else {
-        if (this.regionName.length > 5) {
-          this.overname()
-          return
-        }
-        let res1 = []
+        let res = []
         await axios({
           method: 'get',
           url: this.$store.state.api + '/table/' + this.$store.state.currentvenue,
           headers: { "Content-Type": 'application/json' },
-        }).then((response) => res1 = response.data)
+        }).then((response) => res = response.data)
           .catch((err) => { console.error(err) })
-
-        let continueFlag = true
-        if (this.regionName != '') {
-          for (let i = 0; i < Object.values(res1).length; i++) {
-            if (this.regionName == res1[i].Area) {
-              this.already()
-              this.sendFlag = true
-              continueFlag = false
-            }
+        for (let i = 0; i < Object.values(res).length; i++) {
+          if (this.regionName == res[i].Area) {
+            this.already()
+            this.sendFlag = true
           }
         }
+      }
+      if (this.sendFlag === false && this.selectedFile != null) {
+        let formData = new FormData()
+        let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
+        formData.append('file', this.selectedFile, imgName)
 
-        if (continueFlag == true) {
-          this.selectedFile = event.target.files[0]
-          this.pic = this.selectedFile.name
-          this.previewImage = URL.createObjectURL(this.selectedFile);
-
-          let formData = new FormData()
-          let imgName = this.$store.state.currentvenue + "_" + this.regionName + '.jpg'
-          formData.append('file', this.selectedFile, imgName)
-
+        let res1 = []
+        await axios({
+          method: 'post',
+          url: this.$store.state.api + '/uploadPic',
+          headers: { "Content-Type": "image/png" },
+          data: formData,
+        }).then((response) => res1 = response.data)
+          .catch((err) => { console.error(err) })
+        // console.log(res1)
+        if (res1.success == 1) {
+          let body = {
+            'Venue': this.$store.state.currentvenue,
+            'Area': this.regionName,
+            'fileName': this.$store.state.currentvenue + '_' + this.regionName + '.jpg'
+          }
           let res = []
           await axios({
             method: 'post',
-            url: this.$store.state.api + '/uploadPic',
-            headers: { "Content-Type": "image/png" },
-            data: formData,
+            url: this.$store.state.api + '/insertArea',
+            headers: { "Content-Type": 'application/json' },
+            data: JSON.stringify(body)
           }).then((response) => res = response.data)
             .catch((err) => { console.error(err) })
-          console.log(res)
-
-        }
-      }
-    },
-    async UploadData() {
-      if (this.selectedFile == null) {
-        this.mistake()
-      }
-
-      if (this.regionName == '') {
-        this.mistake()
-        this.sendFlag = true
-      }
-      if (this.sendFlag === false && this.selectedFile != null) {
-        let body = {
-          'Venue': this.$store.state.currentvenue,
-          'Area': this.regionName,
-          'fileName': this.$store.state.currentvenue + '_' + this.regionName + '.jpg'
-        }
-        let res = []
-        await axios({
-          method: 'post',
-          url: this.$store.state.api + '/insertArea',
-          headers: { "Content-Type": 'application/json' },
-          data: JSON.stringify(body)
-        }).then((response) => res = response.data)
-          .catch((err) => { console.error(err) })
-        // console.log(res)
-        console.log(this.$store.state.currentvenue)
-        if (res.success == 1) {
-          this.update()
+          // console.log(res)
+          console.log(this.$store.state.currentvenue)
+          if (res.success == 1) {
+            this.update()
+          } else {
+            this.mistake()
+          }
         } else {
           this.mistake()
         }
@@ -207,8 +194,8 @@ export default defineComponent({
 
 <style scoped>
 .picRegion {
-  width: 70vw;
-  height: 60%;
+  width: 650px;
+  height: 650px;
   max-width: 1500px;
   background-color: #D9D9D9;
   box-shadow: 0 0 30px 0 rgba(0, 0, 0, 25%) inset;

@@ -7,9 +7,9 @@
           <div style="width: 100px; background-color: #ffffff; height: 35px;"></div>
           <div class="subtitle">標題</div>
           <div class="subtitle">電量</div>
-          <div class="subtitle" style="width: 150px">訊息</div>
+          <div class="subtitle" style="width: 280px">訊息</div>
           <div class="subtitle">狀態</div>
-          <div class="subtitle" style="width: 150px">備註</div>
+          <div class="subtitle" style="width: 100px">備註</div>
         </div>
         <div v-else class="text-center m-auto"
           style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 20%); margin: auto;">
@@ -73,7 +73,7 @@ export default defineComponent({
       })
         .then((response) => this.devices = response.data)
         .catch((error) => console.log(error))
-      
+
       if (this.devices.length == 0) {
         this.emptyflag = true   // 一開始此區域即無裝置
         this.$emit('emptyregion', this.emptyflag)

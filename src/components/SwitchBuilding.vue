@@ -88,6 +88,7 @@ export default defineComponent({
       if (this.$store.state.currentvenue == this.venueInfo.name) {
         this.$store.state.currentvenue = '(需先切換場館)'
         this.$store.state.currvenue = false
+        this.$store.state.deviceEditMode = false
       }
     },
     te() {

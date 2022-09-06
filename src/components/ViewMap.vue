@@ -10,7 +10,7 @@
           <template #trigger>
             <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
           </template>
-          地點 : {{ item.place }}
+          標題 : {{ item.title }}
           <br>
           電量 : {{ item.battery }}
         </n-tooltip>
@@ -61,7 +61,7 @@ export default {
 
       for (let i = 0; i < Object.values(devices).length; i++) {
         if (devices[i].Area === this.$store.state.openMapName) {
-          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'place': devices[i].Place })
+          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'title': devices[i].Title })
         }
       }
       // console.log(this.currentdevice)

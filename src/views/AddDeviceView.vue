@@ -6,7 +6,7 @@
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
-        $store.state.currentvenue
+            $store.state.currentvenue
         }}
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{ $store.state.regionAddName }}
@@ -27,7 +27,7 @@
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在區域為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;margin-right:auto">
           {{
-          $store.state.regionAddName
+              $store.state.regionAddName
           }}
         </div>
       </div>
@@ -51,7 +51,7 @@
             <template #trigger>
               <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
             </template>
-            地點 : {{ item.place }}
+            標題 : {{ item.title }}
             <br>
             電量 : {{ item.battery }}
           </n-tooltip>
@@ -205,7 +205,7 @@ export default defineComponent({
 
       for (let i = 0; i < Object.values(devices).length; i++) {
         if (devices[i].Area === this.$store.state.regionAddName) {
-          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'place': devices[i].Place })
+          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'title': devices[i].Title })
         }
       }
     },

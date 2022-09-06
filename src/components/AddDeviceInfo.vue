@@ -13,10 +13,10 @@
     </div>
     <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置區域</div>
-      <div class="edit" disabled style="color: #FFFFFF;
-  background-color: rgba(0, 0, 0, 0.5);cursor: not-allowed" v-if="info[0].Area != null">{{ info[0].Area }}</div>
-      <div class="edit" style="color: rgba(255, 255, 255, 0.65);
-  background-color: rgba(0, 0, 0, 0.5);" v-else>尚未選取區域</div>
+      <div class="edit" disabled style="color: #FFFFFF; background-color: rgba(0, 0, 0, 0.5);cursor: not-allowed"
+        v-if="info[0].Area != null">{{ info[0].Area }}</div>
+      <div class="edit" style="color: rgba(255, 255, 255, 0.65); background-color: rgba(0, 0, 0, 0.5);" v-else>尚未選取區域
+      </div>
     </div>
     <div class="d-flex justify-content-between mx-auto" style="width: 300px">
       <div class="subTitle">標題</div>
@@ -26,21 +26,40 @@
       <div class="subTitle my-4" style="align-self: flex-start">訊息內容</div>
       <div class="d-flex justify-content-around align-items-center"
         style="background-color: rgba(217, 217, 217, 40%); width: 180px; padding: 2px; border-radius: 5px;">
-        <img :src="icon1" @mouseover="icon1 = txt_hover" @mouseleave="icon1 = txt" @click="messageContent = 'text'">
-        <img :src="icon2" @mouseover="icon2 = voice_hover" @mouseleave="icon2 = voice"
-          @click="this.$refs.messagevoice.click();">
-        <img :src="icon3" @mouseover="icon3 = link_hover" @mouseleave="icon3 = link" @click="messageContent = 'link'">
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <img :src="icon1" @mouseover="icon1 = txt_hover" @mouseleave="icon1 = txt"
+              @click="messageTextStatus = !messageTextStatus">
+          </template>
+          文字
+        </n-tooltip>
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <img :src="icon2" @mouseover="icon2 = voice_hover" @mouseleave="icon2 = voice"
+              @click="messageAudioStatus = !messageAudioStatus; this.$refs.messagevoice.click(); ">
+          </template>
+          音檔
+        </n-tooltip>
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <img :src="icon3" @mouseover="icon3 = link_hover" @mouseleave="icon3 = link"
+              @click="messageLinkStatus = !messageLinkStatus">
+          </template>
+          連結
+        </n-tooltip>
       </div>
     </div>
     <div class="mx-auto" style="width: 300px;">
-      <textarea v-if="messageContent == 'text'" v-model="messagetext" class="message scroll p-3"
+      <textarea v-if="messageTextStatus == true" v-model="BLEMessage" class="message scroll p-3"
         placeholder="請輸入文字內容"></textarea>
-      <textarea v-if="messageContent == 'link'" v-model="messagelink" class="message scroll p-3"
+      <div v-if="messageAudioStatus == true" style=" background-color: rgba(217, 217, 217, 50%); padding: 4px 8px; margin: 0 auto; text-align:center;
+         font-weight: 800; font-size: 16px;margin-bottom: 8px;">
+        檔案名稱 : {{ voicename }}
+      </div>
+      <textarea v-if="messageLinkStatus == true" v-model="BLEHref" class="message scroll p-3"
         placeholder="請輸入網址"></textarea>
-      <input type="file" accept="audio/*" style="display: none;" ref="messagevoice" @change="UploadMessageVoice">
-      <div v-if="messageContent == 'voice'" style=" background-color: rgba(217, 217, 217, 50%); padding: 4px 8px; margin: 0 auto; text-align:center;
-         font-weight: 800;">
-        {{ voicename }}
+      <div v-if="messageAudioStatus == false">
+        <input type="file" accept="audio/*" style="display: none;" ref="messagevoice" @change="UploadMessageVoice">
       </div>
     </div>
     <button @click="sendToAddDevice();" class="addBtn mt-5">
@@ -69,17 +88,22 @@ export default defineComponent({
     const message = useMessage()
     const update = () => {
       message.success('新增成功'),
-        { duration: 1000 }
+        { duration: 500 }
     }
     const mistake = () => {
       message.error('新增失敗\n資料尚未填齊'),
-        { duration: 1000 }
+        { duration: 500 }
+    }
+    const uploadAudioFail = () => {
+      message.error('音檔上傳失敗'),
+        { duration: 500 }
     }
     return {
       show: ref(false),
       options: [],
       update,
       mistake,
+      uploadAudioFail,
       reload
     }
   },
@@ -96,8 +120,11 @@ export default defineComponent({
       BLEUUID: null,
       device: this.info,
       titlevalue: '',
-      messagetext: '',
-      messagelink: '',
+      BLEMessage: '',
+      BLEHref: '',
+      messageLinkStatus: false,
+      messageTextStatus: false,
+      messageAudioStatus: false,
       messageContent: '',
       connectSuccess: true,
       disableBtn: true,
@@ -118,15 +145,9 @@ export default defineComponent({
   },
   methods: {
     UploadMessageVoice(event) {
-      if (this.titlevalue == '' || this.BLEUUID == null) {
-        this.mistake()
-        return 
-      }
-      else{
-        this.selectedVoice = event.target.files[0]
-        this.voicename = this.selectedVoice.name
-        this.messageContent = 'voice'
-      }
+      this.selectedVoice = event.target.files[0]
+      this.voicename = this.selectedVoice.name
+      this.messageContent = 'voice'
     },
     onChangeMethod(event) {
       this.BLEUUID = event
@@ -151,12 +172,17 @@ export default defineComponent({
       }
     },
     async sendToAddDevice() {
-      if (this.messageContent == 'voice') {
+      if (this.titlevalue == '' || this.BLEUUID == null) {
+        this.mistake()
+        return
+      }
+      else {
+        let audioFlag = 0
+        if (this.selectedVoice != null) {
           let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.mp3'
-          let uploadFile = this.selectedVoice      
+          let uploadFile = this.selectedVoice
           let formData = new FormData()
           formData.append('file', uploadFile, fileName)
-          // console.log(formData.get('file').name)
           let res = []
           await axios({
             method: 'post',
@@ -165,96 +191,40 @@ export default defineComponent({
             data: formData,
           }).then((response) => res = response.data)
             .catch((err) => { console.error(err) })
-          if (res.success == 1) {
-              let body = {
-                'UUID': this.BLEUUID,
-                'Title': this.titlevalue,
-                'Audio': fileName
-              }
-              let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-              const json = JSON.stringify(temp);
-              let res1 = []
-              await axios({
-                method: 'post',
-                baseURL: this.$store.state.api + '/insertBLE',
-                headers: { 'Content-Type': 'application/json' },
-                data: json
-              })
-                .then((response) => res1 = response.data)
-                .catch((error) => console.log(error))
-              console.log(res1)
-              if (res1.success == 1) {
-                this.update()
-                this.$emit('AddSuccess', this.device[0].Area)
-              }
-              else {
-                this.mistake()
-              }
+          console.log(res)
+          if (res.success == 0) {
+            audioFlag = 0
+            this.uploadAudioFail()
           }
           else {
-            this.mistake()
-          }    
-      }
-      else if (this.messageContent == 'text') {
-        if (this.titlevalue == '' || this.messagetext == '' || this.BLEUUID == null) {
-          this.mistake()
+            audioFlag = 1
+          }
+        }
+        let body = {
+          'UUID': this.BLEUUID,
+          'Title': this.titlevalue,
+          'Message': this.BLEMessage,
+          'Href': this.BLEHref,
+          'Audio': audioFlag
+        }
+        let temp = Object.assign({}, this.device[0], body) //合併兩個物件
+        const json = JSON.stringify(temp);
+        let res
+        await axios({
+          method: 'post',
+          baseURL: this.$store.state.api + '/insertBLE',
+          headers: { 'Content-Type': 'application/json' },
+          data: json
+        })
+          .then((response) => res = response.data)
+          .catch((error) => console.log(error))
+        // console.log(res)
+        if (res.success == 1) {
+          this.update()
+          this.$emit('AddSuccess', this.device[0].Area)
         }
         else {
-          let body = {
-            'UUID': this.BLEUUID,
-            'Title': this.titlevalue,
-            'Message': this.messagetext
-          }
-          let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-          const json = JSON.stringify(temp);
-          let res
-          await axios({
-            method: 'post',
-            baseURL: this.$store.state.api + '/insertBLE',
-            headers: { 'Content-Type': 'application/json' },
-            data: json
-          })
-            .then((response) => res = response.data)
-            .catch((error) => console.log(error))
-          // console.log(res)
-          if (res.success == 1) {
-            this.update()
-            this.$emit('AddSuccess', this.device[0].Area)
-          }
-          else {
-            this.mistake()
-          }
-        }
-      }
-      else if (this.messageContent == 'link' ) {
-        if (this.titlevalue == '' || this.messagelink == '' || this.BLEUUID == null) {
           this.mistake()
-        }
-        else {
-          let body = {
-            'UUID': this.BLEUUID,
-            'Title': this.titlevalue,
-            'Message': this.messagelink
-          }
-          let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-          const json = JSON.stringify(temp);
-          let res
-          await axios({
-            method: 'post',
-            baseURL: this.$store.state.api + '/insertBLE',
-            headers: { 'Content-Type': 'application/json' },
-            data: json
-          })
-            .then((response) => res = response.data)
-            .catch((error) => console.log(error))
-          // console.log(res)
-          if (res.success == 1) {
-            this.update()
-            this.$emit('AddSuccess', this.device[0].Area)
-          }
-          else {
-            this.mistake()
-          }
         }
       }
     }
