@@ -43,7 +43,7 @@
     </div>
 
     <div class="scroll" v-if="isRemoving == false" style="width: 280px; max-height: 125px; padding: 5px 0;">
-      <div class="d-flex align-items-center mb-1">
+      <div class="d-flex align-items-center mb-1" v-if="deviceInfo.Message != ''">
         <img :src="txt" alt="">
         <textarea v-if="isEditing" name="" id="messageContentEditing" class="scroll edit scroll_white"
           :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 100%"

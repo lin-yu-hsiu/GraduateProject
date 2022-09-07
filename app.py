@@ -81,8 +81,11 @@ def switchBLE():
 def deleteBLE():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    os.remove(basedir + '\\public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+    try:
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        os.remove(basedir + '\\public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+    except:
+        pass
     result = DB.delete_data("BLE",temp['UUID'])
     if(result['success']):
         return jsonify(result)
