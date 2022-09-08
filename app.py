@@ -211,9 +211,6 @@ def deleteArea():
     targetdir = os.path.join(basedir,'public\\images\\' + str(venue) + '\\' + fileName )
     os.remove(targetdir)                                                # 刪除 images 檔案夾內部圖片
     shutil.rmtree(basedir + '\\public\\audios\\'+ str(venue) + '\\' + str(area))    # 刪除 audios\\venue\\區域 資料夾
-
-    targetdir = os.path.join(basedir,'public\\pics\\' + str(venue) + '\\' + fileName )
-    os.remove(targetdir)                                                # 刪除 images 檔案夾內部圖片
     shutil.rmtree(basedir + '\\public\\pics\\'+ str(venue) + '\\' + str(area))    # 刪除 pics\\venue\\區域 資料夾
 
     result = DB.delete_data("Map",temp["MapNum"])                       # 刪除 Map 內部資料

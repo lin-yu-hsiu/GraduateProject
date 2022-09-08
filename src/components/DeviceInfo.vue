@@ -97,7 +97,7 @@
       style="width: 80px;">
     </n-switch>
 
-    <button style="width: 80px;border: none; background-color: transparent;">
+    <button v-if="!isRemoving" style="width: 80px;border: none; background-color: transparent;">
       <img :src="icon6" @mouseover="icon6 = uploadpic_hover" 
         @mouseleave="icon6 = uploadpic" style="width: 30px; height: 30px;" 
         @click="this.$store.state.openPicFlag = true; this.$store.state.openPicName = deviceInfo.Title; this.$store.state.openPicRegionName = deviceInfo.Area">
