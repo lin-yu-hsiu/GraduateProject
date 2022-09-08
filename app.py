@@ -86,6 +86,11 @@ def deleteBLE():
         os.remove(basedir + '\\public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
     except:
         pass
+    try:
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        os.remove(basedir + '\\public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
+    except:
+        pass
     result = DB.delete_data("BLE",temp['UUID'])
     if(result['success']):
         return jsonify(result)
@@ -104,6 +109,15 @@ def createVenue():
     if(exist == False):
         os.mkdir(targetdir)
 
+    targetdir = os.path.join(targetdir,venueName)
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
+    
+    targetdir = os.path.join(basedir,'public\\pics')      # 建立 pics 資料夾
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
     targetdir = os.path.join(targetdir,venueName)
     exist = os.path.exists(targetdir)
     if(exist == False):
@@ -132,6 +146,7 @@ def deleteVenue():
     
     shutil.rmtree(basedir + '\\public\\images\\' + temp['Venue'])   # 刪除 //images//場館 檔案夾
     shutil.rmtree(basedir + '\\public\\audios\\' + temp['Venue'])   # 刪除 //audios//場館 檔案夾
+    shutil.rmtree(basedir + '\\public\\pics\\' + temp['Venue'])   # 刪除 //pics//場館 檔案夾
 
     result = DB.delete_venue(temp['Venue'])                         # 刪除 Venue 的 table
     if(result['success']):
@@ -157,7 +172,12 @@ def insertArea():
     temp = json.loads(data)
     basedir = os.path.abspath(os.path.dirname(__file__))
 
-    targetdir = os.path.join(basedir,'public\\audios\\' + str(temp['Venue']) + '\\' + str(temp['Area']))   #建立 audios 資料夾
+    targetdir = os.path.join(basedir,'public\\audios\\' + str(temp['Venue']) + '\\' + str(temp['Area']))
+    exist = os.path.exists(targetdir)
+    if(exist == False):
+        os.mkdir(targetdir)
+    
+    targetdir = os.path.join(basedir,'public\\pics\\' + str(temp['Venue']) + '\\' + str(temp['Area']))
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
@@ -191,6 +211,10 @@ def deleteArea():
     targetdir = os.path.join(basedir,'public\\images\\' + str(venue) + '\\' + fileName )
     os.remove(targetdir)                                                # 刪除 images 檔案夾內部圖片
     shutil.rmtree(basedir + '\\public\\audios\\'+ str(venue) + '\\' + str(area))    # 刪除 audios\\venue\\區域 資料夾
+
+    targetdir = os.path.join(basedir,'public\\pics\\' + str(venue) + '\\' + fileName )
+    os.remove(targetdir)                                                # 刪除 images 檔案夾內部圖片
+    shutil.rmtree(basedir + '\\public\\pics\\'+ str(venue) + '\\' + str(area))    # 刪除 pics\\venue\\區域 資料夾
 
     result = DB.delete_data("Map",temp["MapNum"])                       # 刪除 Map 內部資料
     if(result['success']):
@@ -250,10 +274,19 @@ def insertBLE():
             break
     if (temp['Audio'] == 1):
         basedir = os.path.abspath(os.path.dirname(__file__))
-        targetdir = os.path.join(basedir,'public\\images\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+        targetdir = os.path.join(basedir,'public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
         temp['Audio'] = targetdir
     else:
         del temp['Audio']
+    
+    if (temp['Pic'] == 1):
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        targetdir = os.path.join(basedir,'public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
+        temp['Pic'] = targetdir
+    else:
+        del temp['Pic']
+    
+    
     del temp['Venue']
     del temp['Area']
     temp['MapNum'] = MapNum
@@ -294,6 +327,26 @@ def uploadAud():
         if format in ('.mp3'):
             dir = targetdir + '\\' + aud.filename.split('_')[2]
             aud.save(dir)
+            result = {'success': 1, 'result': 'Upload Successfully'}
+        else:
+            result = {'success': 0, 'result': 'Type Wrong'}
+    except Exception as e:
+        print(str(e))
+        result = {'success': 0, 'result': 'Upload Failed'}
+    return jsonify(result)
+
+@app.route("/uploadDevicePic",methods=["POST"])
+def uploadDevicePic():
+    try:
+        pic = request.files.get('file')
+        format = pic.filename[pic.filename.index('.'):]
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        venueName = pic.filename.split('_')[0]
+        areaName = pic.filename.split('_')[1]
+        targetdir = os.path.join(basedir,'public\\pics\\' + venueName + '\\' + areaName)
+        if format in ('.mp3'):
+            dir = targetdir + '\\' + pic.filename.split('_')[2]
+            pic.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
             result = {'success': 0, 'result': 'Type Wrong'}

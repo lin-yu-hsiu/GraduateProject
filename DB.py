@@ -44,7 +44,7 @@
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{
