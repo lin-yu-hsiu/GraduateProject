@@ -33,10 +33,10 @@
       <div v-if="isRemoving">確定刪除此裝置 ?</div>
     </div>
 
-    <div class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px; color: #000000;">
+    <div class="text-center" :class="[isRemoving ? removeHidden : '']" style="width: 80px; color: #000000;">
       {{ deviceInfo.Title }}</div>
 
-    <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 100px">
+    <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 80px">
       <img v-if="deviceInfo.Battery"
         :src="require('../assets/pic/' + 'battery' + (deviceInfo.Battery.substr(0, deviceInfo.Battery.length - 1)).toString() + '.png')"
         :class="[isRemoving ? removeHidden : '']" style="width: 60px;">
@@ -90,29 +90,41 @@
       </div>
     </div>
 
-
-
-
     <n-switch size="large" v-if="isEditing" v-model:value="deviceInfo.Status" :class="[isRemoving ? removeHidden : '']"
-      style="width: 100px;">
+      style="width: 80px;">
     </n-switch>
     <n-switch size="large" v-else disabled v-model:value="deviceInfo.Status" :class="[isRemoving ? removeHidden : '']"
-      style="width: 100px;">
+      style="width: 80px;">
     </n-switch>
 
+    <button style="width: 80px;border: none; background-color: transparent;">
+      <img :src="icon6" @mouseover="icon6 = uploadpic_hover" 
+        @mouseleave="icon6 = uploadpic" style="width: 30px; height: 30px;" 
+        @click="this.$store.state.openPicFlag = true; this.$store.state.openPicName = deviceInfo.Title; this.$store.state.openPicRegionName = deviceInfo.Area">
+    </button>
+    <ViewPic v-if="this.$store.state.openPicFlag" @close="this.$store.state.openPicFlag = false;this.$store.state.openPicName = ''; this.$store.state.openPicRegionName = ''"
+     style="position: absolute; 
+        top: 30vh;             
+        bottom: 0;           
+        left: 0;        
+        right: 0;
+        margin: auto;
+        z-index: 1;">
+    </ViewPic>
 
     <textarea v-if="isEditing" name="" id="psEditing" class="scroll edit scroll_white"
-      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 100px"
+      :class="[isRemoving ? removeHidden : '']" cols="10" rows="2" style="width: 80px"
       v-model="deviceInfo.Note"></textarea>
     <textarea v-else name="" disabled id="psContent" class="scroll" :class="[isRemoving ? removeHidden : '']" cols="10"
-      style="width: 100px;background-color: rgba(255, 255, 255, 65%);" v-model="deviceInfo.Note"></textarea>
+      style="width: 80px;background-color: rgba(255, 255, 255, 65%);" v-model="deviceInfo.Note"></textarea>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { defineComponent, inject } from "vue";
-
+import ViewPic from './ViewPic.vue'
+import { defineComponent } from "vue";
+import { useMessage } from 'naive-ui'
 import edit from '../assets/pic/edit_green.png'
 import edit_hover from '../assets/pic/edit_green_hover.png'
 import remove from '../assets/pic/trash.png'
@@ -126,12 +138,19 @@ import play_hover from '../assets/pic/play_hover.png'
 import txt from '../assets/pic/txt.png'
 import voice from '../assets/pic/voice.png'
 import link from '../assets/pic/link.png'
+import uploadpic from '../assets/pic/uploadpic.png'
+import uploadpic_hover from '../assets/pic/uploadpic_hover.png'
 
 export default defineComponent({
+  components:{
+    ViewPic
+  },
   setup() {
-    const reload = inject('reload')
+    // const reload = inject('reload')
+    const message = useMessage()
     const update = () => {
-      reload()
+      message.success('修改成功'),
+        { duration: 500 }
     }
     return {
       update,
@@ -168,6 +187,7 @@ export default defineComponent({
       icon3: yes,
       icon4: no,
       icon5: play,
+      icon6: uploadpic,
       edit: edit,
       edit_hover: edit_hover,
       remove: remove,
@@ -178,6 +198,8 @@ export default defineComponent({
       no_hover: no_hover,
       play: play,
       play_hover: play_hover,
+      uploadpic: uploadpic,
+      uploadpic_hover: uploadpic_hover,
       txt: txt,
       voice: voice,
       link: link,
@@ -202,7 +224,10 @@ export default defineComponent({
       })
         .then((response) => res = response.data)
         .catch((error) => console.log(error))
-      console.log(res)
+
+      if (res.success == 1){
+        this.update()
+      }
 
       this.isEditing = false
     },
@@ -214,14 +239,18 @@ export default defineComponent({
         'Title': this.deviceInfo.Title,
       }
       const json = JSON.stringify(body);
+      let res = []
       await axios({
         method: 'post',
         baseURL: this.$store.state.api + '/deleteBLE',
         headers: { 'Content-Type': 'application/json' },
         data: json
       })
-        .then((response) => response = response.data)
+        .then((response) => res = response.data)
         .catch((error) => console.log(error))
+      if (res.success == 1){
+        this.update()
+      }
 
       this.isRemoving = false
       this.$emit('ifEmpty') //如果此區域已無裝置回傳到父元件以更新畫面

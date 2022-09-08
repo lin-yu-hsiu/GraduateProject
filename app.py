@@ -344,7 +344,7 @@ def uploadDevicePic():
         venueName = pic.filename.split('_')[0]
         areaName = pic.filename.split('_')[1]
         targetdir = os.path.join(basedir,'public\\pics\\' + venueName + '\\' + areaName)
-        if format in ('.mp3'):
+        if format in ('.jpg'):
             dir = targetdir + '\\' + pic.filename.split('_')[2]
             pic.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}

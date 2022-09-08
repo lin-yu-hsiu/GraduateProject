@@ -190,9 +190,10 @@ def show_device_info(number):
             temp['Title'] = records[row][8]
             temp['Audio'] = records[row][9]
             temp['Href'] = records[row][10]
-            temp['Route'] = records[row][15]
-            temp['Venue'] = records[row][16]
-            temp['Area'] = records[row][17]
+            temp['Pic'] = records[row][14]
+            temp['Route'] = records[row][16]
+            temp['Venue'] = records[row][17]
+            temp['Area'] = records[row][18]
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:

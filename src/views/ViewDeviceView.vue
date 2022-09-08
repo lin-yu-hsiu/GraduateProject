@@ -116,7 +116,6 @@ export default {
           this.mapFlag = true
         }
       }
-      console.log(this.maps)
     },
     ifEmpty_ViewDevice() {
       this.fetchTableMap()

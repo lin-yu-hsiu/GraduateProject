@@ -155,7 +155,6 @@ export default defineComponent({
           data: formData,
         }).then((response) => res1 = response.data)
           .catch((err) => { console.error(err) })
-        // console.log(res1)
         if (res1.success == 1) {
           let body = {
             'Venue': this.$store.state.currentvenue,
@@ -170,8 +169,6 @@ export default defineComponent({
             data: JSON.stringify(body)
           }).then((response) => res = response.data)
             .catch((err) => { console.error(err) })
-          // console.log(res)
-          console.log(this.$store.state.currentvenue)
           if (res.success == 1) {
             this.update()
           } else {
@@ -185,7 +182,6 @@ export default defineComponent({
   },
   mounted() {
     if (this.$store.state.currvenue == false) {
-      console.log(this.$store.state.currentvenue)
       this.$router.push('/')
     }
   }

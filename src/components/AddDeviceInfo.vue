@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px">
       <div class="subTitle">裝置編號</div>
       <n-select @change="onChangeMethod($event)" size="medium" :consistent-menu-width="true" v-model:show="show"
-        v-model:value="BLEUUID" filterable placeholder="選擇欲配對之裝置" :options="options" id="selectBar">
+        v-model:value="BLEUUID" filterable placeholder="選擇欲配對之裝置" :options="options" id="selectBar" style="font-weight: 600;">
         <template v-if="show" #arrow>
           <md-search />
         </template>
@@ -18,9 +18,25 @@
       <div class="edit" style="color: rgba(255, 255, 255, 0.65); background-color: rgba(0, 0, 0, 0.5);" v-else>尚未選取區域
       </div>
     </div>
-    <div class="d-flex justify-content-between mx-auto" style="width: 300px">
+    <div class="d-flex justify-content-between mx-auto mb-2" style="width: 300px;font-weight: 600;">
       <div class="subTitle">標題</div>
       <input v-model="titlevalue" class="edit" type="text">
+    </div>
+    <div class="d-flex justify-content-between mx-auto align-items-center" style="width: 300px">
+      <div class="subTitle">
+        圖片
+      </div>
+      <div class="d-flex align-items-center" 
+      style="background-color: rgba(217, 217, 217, 40%); border-radius: 5px; width: 180px; padding: 4px 8px 4px 16px;
+      font-weight: 600;">
+        <img :src="icon4" @mouseover="icon4 = uploadpic_hover" 
+        @mouseleave="icon4 = uploadpic" style="width: 30px; height: 30px;"
+        @click="this.$refs.BLEImage.click();">
+        <input type="file" accept="image/*" style="display: none;" ref="BLEImage" @change="UploadBLEImage">
+        <div v-if="this.blename != ''" style="margin-left: 5px; width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{ blename }}
+        </div>
+      </div>
     </div>
     <div class="d-flex justify-content-between align-items-center mx-auto" style="width: 300px;">
       <div class="subTitle my-4" style="align-self: flex-start">訊息內容</div>
@@ -36,14 +52,14 @@
         <n-tooltip trigger="hover">
           <template #trigger>
             <img :src="icon2" @mouseover="icon2 = voice_hover" @mouseleave="icon2 = voice"
-              @click="messageAudioStatus = !messageAudioStatus; this.$refs.messagevoice.click(); ">
+              @click="messageAudioStatus = !messageAudioStatus; ">
           </template>
           音檔
         </n-tooltip>
         <n-tooltip trigger="hover">
           <template #trigger>
             <img :src="icon3" @mouseover="icon3 = link_hover" @mouseleave="icon3 = link"
-              @click="messageLinkStatus = !messageLinkStatus">
+              @click="messageLinkStatus = !messageLinkStatus;">
           </template>
           連結
         </n-tooltip>
@@ -52,22 +68,25 @@
     <div class="mx-auto" style="width: 300px;">
       <textarea v-if="messageTextStatus == true" v-model="BLEMessage" class="message scroll p-3"
         placeholder="請輸入文字內容"></textarea>
-      <div v-if="messageAudioStatus == true" style=" background-color: rgba(217, 217, 217, 50%); padding: 4px 8px; margin: 0 auto; text-align:center;
-         font-weight: 800; font-size: 16px;margin-bottom: 8px;">
-        檔案名稱 : {{ voicename }}
+      <div v-if="messageAudioStatus == true" class="p-3 d-flex align-items-center" style="background-color: rgba(217, 217, 217, 50%); padding: 4px 8px; margin: 0 auto; text-align:center;
+            font-size: 16px;margin-bottom: 8px; text-align: left;">
+        <img :src="icon5" @mouseover="icon5 = mp3folder_hover" @mouseleave="icon5 = mp3folder"
+              @click="this.$refs.messagevoice.click();">
+        <div style="margin-left: 10px; width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;">
+          {{ voicename }}
+        </div>
       </div>
       <textarea v-if="messageLinkStatus == true" v-model="BLEHref" class="message scroll p-3"
         placeholder="請輸入網址"></textarea>
-      <div v-if="messageAudioStatus == false">
-        <input type="file" accept="audio/*" style="display: none;" ref="messagevoice" @change="UploadMessageVoice">
-      </div>
+   
+      <input type="file" accept="audio/*" style="display: none;" ref="messagevoice" @change="UploadMessageVoice">
+
     </div>
     <button @click="sendToAddDevice();" class="addBtn mt-5">
       <div>Save</div>
     </button>
   </n-card>
 </template>
-
 <script>
 import axios from 'axios'
 import { defineComponent, inject, ref } from 'vue'
@@ -80,7 +99,12 @@ import voice from '../assets/pic/voice.png'
 import voice_hover from '../assets/pic/voice_hover.png'
 import link from '../assets/pic/link.png'
 import link_hover from '../assets/pic/link_hover.png'
+import uploadpic from '../assets/pic/uploadpic.png'
+import uploadpic_hover from '../assets/pic/uploadpic_hover.png'
+import mp3folder from '../assets/pic/mp3folder.png'
+import mp3folder_hover from '../assets/pic/mp3folder_hover.png'
 
+// import { db } from '@/firebase'
 
 export default defineComponent({
   setup() {
@@ -98,12 +122,17 @@ export default defineComponent({
       message.error('音檔上傳失敗'),
         { duration: 500 }
     }
+    const uploadImageFail = () => {
+      message.error('圖片上傳失敗'),
+        { duration: 500 }
+    }
     return {
       show: ref(false),
       options: [],
       update,
       mistake,
       uploadAudioFail,
+      uploadImageFail,
       reload
     }
   },
@@ -125,11 +154,12 @@ export default defineComponent({
       messageLinkStatus: false,
       messageTextStatus: false,
       messageAudioStatus: false,
-      messageContent: '',
-      connectSuccess: true,
-      disableBtn: true,
       selectedVoice: null,
+      selectedImage: null,
       voicename: '',
+      blename: '',
+      audioFlag: 0,
+      imageFlag: 0,
       //
       ok: ok,
       txt: txt,
@@ -138,16 +168,25 @@ export default defineComponent({
       voice_hover: voice_hover,
       link: link,
       link_hover: link_hover,
+      uploadpic: uploadpic,
+      uploadpic_hover: uploadpic_hover,
+      mp3folder: mp3folder,
+      mp3folder_hover: mp3folder_hover,
       icon1: txt,
       icon2: voice,
       icon3: link,
+      icon4: uploadpic,
+      icon5: mp3folder,
     }
   },
   methods: {
     UploadMessageVoice(event) {
       this.selectedVoice = event.target.files[0]
       this.voicename = this.selectedVoice.name
-      this.messageContent = 'voice'
+    },
+    UploadBLEImage(event) {
+      this.selectedImage = event.target.files[0]
+      this.blename = this.selectedImage.name 
     },
     onChangeMethod(event) {
       this.BLEUUID = event
@@ -176,8 +215,7 @@ export default defineComponent({
         this.mistake()
         return
       }
-      else {
-        let audioFlag = 0
+      else {      
         if (this.selectedVoice != null) {
           let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.mp3'
           let uploadFile = this.selectedVoice
@@ -191,21 +229,41 @@ export default defineComponent({
             data: formData,
           }).then((response) => res = response.data)
             .catch((err) => { console.error(err) })
-          console.log(res)
           if (res.success == 0) {
-            audioFlag = 0
             this.uploadAudioFail()
           }
           else {
-            audioFlag = 1
+            this.audioFlag = 1
           }
         }
+        if (this.selectedImage != null) {
+          let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.jpg'
+          let uploadFile = this.selectedImage
+          let formData = new FormData()
+          formData.append('file', uploadFile, fileName)
+          let res = []
+          await axios({
+            method: 'post',
+            url: this.$store.state.api + '/uploadDevicePic',
+            headers: { "Content-Type": "multipart/form-data" },
+            data: formData,
+          }).then((response) => res = response.data)
+            .catch((err) => { console.error(err) })
+          if (res.success == 0) {
+            this.uploadImageFail()
+          }
+          else {
+            this.imageFlag = 1
+          }
+        }
+        // 內網
         let body = {
           'UUID': this.BLEUUID,
           'Title': this.titlevalue,
           'Message': this.BLEMessage,
           'Href': this.BLEHref,
-          'Audio': audioFlag
+          'Audio': this.audioFlag,
+          'Pic': this.imageFlag,
         }
         let temp = Object.assign({}, this.device[0], body) //合併兩個物件
         const json = JSON.stringify(temp);
@@ -226,6 +284,12 @@ export default defineComponent({
         else {
           this.mistake()
         }
+
+        // 外網
+        // const BLE = ref(db, 'BLEs')
+        // const BLEimage = this.selectedImage
+        // const BLEaudio = this.selectedVoice
+
       }
     }
   },
@@ -274,6 +338,7 @@ export default defineComponent({
   resize: none;
   font-size: 16px;
   cursor: auto;
+  font-weight: 600;
 }
 
 .edit {

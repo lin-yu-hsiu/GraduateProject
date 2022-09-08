@@ -132,14 +132,12 @@ export default {
   },
   methods: {
     async alldevicestatusChange() {
-      console.log(this.shutdown)
       const body = {
         // 傳其中一個device的MapNum跟Status就好
         'MapNum': this.devices[0].MapNum,
         'Status': this.shutdown
       }
       const json = JSON.stringify(body);
-      console.log(json)
       let res = []
       await axios.post(this.$store.state.api + '/switchBLE', json, {
         headers: {
@@ -193,7 +191,6 @@ export default {
         'MapNum': this.regions.Number,
       }
       const json = JSON.stringify(body)
-      console.log(json)
       let res = []
       await axios({
         method: 'post',

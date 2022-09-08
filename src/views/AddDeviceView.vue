@@ -63,9 +63,7 @@
           @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.clickBtnStatus = false">
         </AddDeviceInfo>
       </div>
-
     </div>
-
   </div>
 </template>
 

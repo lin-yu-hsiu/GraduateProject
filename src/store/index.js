@@ -13,6 +13,9 @@ export default createStore({
     regionAddName: '',
     openMapFlag: false,
     openMapName: '',
+    openPicFlag: false,
+    openPicName: '',
+    openPicRegionName: ''
   },
   getters: {
   },

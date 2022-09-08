@@ -9,7 +9,8 @@
           <div class="subtitle">電量</div>
           <div class="subtitle" style="width: 280px">訊息</div>
           <div class="subtitle">狀態</div>
-          <div class="subtitle" style="width: 100px">備註</div>
+          <div class="subtitle">圖片</div>
+          <div class="subtitle">備註</div>
         </div>
         <div v-else class="text-center m-auto"
           style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 20%); margin: auto;">
@@ -103,7 +104,7 @@ export default defineComponent({
 }
 
 .subtitle {
-  width: 100px;
+  width: 80px;
   height: 35px;
   background-color: rgba(201, 201, 201, 80%);
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 25%);

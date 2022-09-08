@@ -5,7 +5,7 @@
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{
-            $store.state.currentvenue
+        $store.state.currentvenue
         }}
       </div>
       <div v-if="!this.$store.state.currvenue"
@@ -16,7 +16,7 @@
         <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在場館為 </div>
         <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;">
           {{
-              $store.state.currentvenue
+          $store.state.currentvenue
           }}
         </div>
       </div>
@@ -37,7 +37,7 @@
           </div>
           <div class="d-flex justify-content-around">
             <input type="text" name="" id="AddVenueInput" v-model="venuedata.name">
-            <button class="detailBtn p-0" @click="sendToAddVenue" @mouseover="icon = add_hover"
+            <button class="detailBtn p-0" @click="sendToAddVenue()" @mouseover="icon = add_hover"
               @mouseleave="icon = add">
               <img :src="icon" style="width: 50px; height: 50px">
             </button>
@@ -61,7 +61,6 @@ import SwitchBuilding from '@/components/SwitchBuilding.vue';
 import add from '../assets/pic/add.png'
 import add_hover from '../assets/pic/add_hover.png'
 import crumb from '../assets/pic/crumb.png'
-
 
 
 export default defineComponent({
