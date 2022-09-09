@@ -82,7 +82,6 @@ export default defineComponent({
     },
     ifEmpty_DeviceRegion() {
       this.handleAPI(this.mapNum)
-      console.log(this.devices.length)
       if (this.devices.length == 1) {
         this.emptyflag = true   // 刪除裝置後此區域無裝置
         this.$emit('ifEmpty', this.emptyflag)

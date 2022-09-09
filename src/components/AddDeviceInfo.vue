@@ -82,12 +82,29 @@
       <input type="file" accept="audio/*" style="display: none;" ref="messagevoice" @change="UploadMessageVoice">
 
     </div>
+    <div v-if="uploadFlag" class="d-flex justify-content-center align-items-center mx-auto py-1" 
+    style="border-radius: 5px; width: 300px; font-weight: 600; font-size: 16px;
+    color: #FFFFFF; background-color: rgba(0, 0, 0, 0.5);">
+      上傳進度
+      <n-progress
+        type="line"
+        :percentage="uploadProgress"
+        :height="18"
+        :indicator-placement="'inside'"
+        :color="uploadStatusFlag ? progressSuccessColor : progressFailColor"
+        processing
+        style="width: 200px; margin-left: 10px;"
+      />
+    </div>
     <button @click="sendToAddDevice();" class="addBtn mt-5">
-      <div>Save</div>
+      <div>
+        Save     
+      </div>     
     </button>
   </n-card>
 </template>
 <script>
+
 import axios from 'axios'
 import { defineComponent, inject, ref } from 'vue'
 import { useMessage } from 'naive-ui'
@@ -104,7 +121,10 @@ import uploadpic_hover from '../assets/pic/uploadpic_hover.png'
 import mp3folder from '../assets/pic/mp3folder.png'
 import mp3folder_hover from '../assets/pic/mp3folder_hover.png'
 
-// import { db } from '@/firebase'
+
+import { storage } from '@/firebase'
+// import { ref as dbRef, getDownloadURL, uploadBytesResumable  } from "firebase/storage"
+import { ref as dbRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default defineComponent({
   setup() {
@@ -126,6 +146,15 @@ export default defineComponent({
       message.error('圖片上傳失敗'),
         { duration: 500 }
     }
+    const uploadFail = () => {
+      message.error('上傳失敗'),
+        { duration: 500 }
+    }
+    const uploading = () => {
+      message.info('正在上傳，請勿進行任何操作'),
+        { duration: 15000 }
+    }
+    
     return {
       show: ref(false),
       options: [],
@@ -133,7 +162,9 @@ export default defineComponent({
       mistake,
       uploadAudioFail,
       uploadImageFail,
-      reload
+      uploadFail,
+      reload,
+      uploading,
     }
   },
   components: {
@@ -177,6 +208,17 @@ export default defineComponent({
       icon3: link,
       icon4: uploadpic,
       icon5: mp3folder,
+      // 外網
+      uploadFlag: false,
+      uploadProgress: 0,
+      uploadImageLink: '',    
+      uploadAudioLink: '',
+      uploadJsonLink: '',
+      progressSuccessColor: '#304352',
+      progressFailColor: '#d50000',
+      uploadStatusFlag: true,
+      // #22E1FF #625EB1 
+      // #DFFFCD  #90F9C4 #39F3BB
     }
   },
   methods: {
@@ -215,20 +257,21 @@ export default defineComponent({
         this.mistake()
         return
       }
-      else {      
+      else {    
+        this.uploadFlag = true
+        this.uploading()
+        // 內網 音檔上傳      
         if (this.selectedVoice != null) {
           let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.mp3'
           let uploadFile = this.selectedVoice
           let formData = new FormData()
           formData.append('file', uploadFile, fileName)
-          let res = []
-          await axios({
+          let res = (await axios({
             method: 'post',
             url: this.$store.state.api + '/uploadAud',
             headers: { "Content-Type": "multipart/form-data" },
             data: formData,
-          }).then((response) => res = response.data)
-            .catch((err) => { console.error(err) })
+          })).data
           if (res.success == 0) {
             this.uploadAudioFail()
           }
@@ -236,19 +279,19 @@ export default defineComponent({
             this.audioFlag = 1
           }
         }
+        this.uploadProgress+=20
+        // 內網 圖片上傳    
         if (this.selectedImage != null) {
           let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.jpg'
           let uploadFile = this.selectedImage
           let formData = new FormData()
           formData.append('file', uploadFile, fileName)
-          let res = []
-          await axios({
+          let res = (await axios({
             method: 'post',
             url: this.$store.state.api + '/uploadDevicePic',
             headers: { "Content-Type": "multipart/form-data" },
             data: formData,
-          }).then((response) => res = response.data)
-            .catch((err) => { console.error(err) })
+          })).data        
           if (res.success == 0) {
             this.uploadImageFail()
           }
@@ -256,7 +299,22 @@ export default defineComponent({
             this.imageFlag = 1
           }
         }
-        // 內網
+        this.uploadProgress+=20
+        // 外網 圖片上傳     
+        if (this.selectedImage != null){          
+          let storageImage = dbRef(storage, ('BLEs/' + this.BLEUUID + '/') + 'photo.jpg');  
+          await uploadBytes(storageImage, this.selectedImage);
+          this.uploadImageLink = await getDownloadURL(storageImage)
+        }  
+        this.uploadProgress+=20
+        // 外網 音檔上傳     
+        if (this.selectedVoice != null){                  
+          let storageAudio = dbRef(storage, ('BLEs/' + this.BLEUUID + '/') + 'audio.mp3');
+          await uploadBytes(storageAudio, this.selectedVoice);
+          this.uploadAudioLink = await getDownloadURL(storageAudio)
+        }
+        this.uploadProgress+=20
+        // 外網 JSON上傳     
         let body = {
           'UUID': this.BLEUUID,
           'Title': this.titlevalue,
@@ -264,34 +322,59 @@ export default defineComponent({
           'Href': this.BLEHref,
           'Audio': this.audioFlag,
           'Pic': this.imageFlag,
+        }      
+        let body_OutNet = {
+          'ImageLink': this.uploadImageLink,
+          'AudioLink': this.uploadAudioLink
         }
         let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-        const json = JSON.stringify(temp);
-        let res
-        await axios({
+        let temp1 = Object.assign({}, temp, body_OutNet) //合併兩個物件
+        const json = JSON.stringify(temp)
+        const json_OutNet = JSON.stringify(temp1)
+        let blob = new Blob([json_OutNet], {type: "application/json"})
+        let storageJson = dbRef(storage, ('BLEs/' + this.BLEUUID + '/') + 'config.json');
+        // 外網 JSON上傳
+        await uploadBytes(storageJson, blob);
+        this.uploadJsonLink = await getDownloadURL(storageJson)       
+        this.uploadProgress+=10
+        // 內網 JSON上傳       
+        let res = (await axios({
           method: 'post',
-          baseURL: this.$store.state.api + '/insertBLE',
-          headers: { 'Content-Type': 'application/json' },
-          data: json
-        })
-          .then((response) => res = response.data)
-          .catch((error) => console.log(error))
-        // console.log(res)
+          baseURL: this.$store.state.api + '/fetchDownloadURL',
+          data: {
+              'UUID': this.BLEUUID,
+              'Json Download': this.uploadJsonLink
+          }
+        })).data
         if (res.success == 1) {
-          this.update()
-          this.$emit('AddSuccess', this.device[0].Area)
+          let res1 = (await axios({
+            method: 'post',
+            baseURL: this.$store.state.api + '/insertBLE',
+            headers: { 'Content-Type': 'application/json' },
+            data: json
+          })).data
+          if (res1.success == 1){     
+            this.uploadProgress += 5   
+            this.update()
+            this.$emit('AddSuccess', this.device[0].Area)
+          }
+          else {
+            this.uploadProgress += 9   
+            this.uploadStatusFlag = false
+            this.uploadFail()
+          }
         }
-        else {
-          this.mistake()
+        else{  
+          this.uploadProgress += 9   
+          this.uploadStatusFlag = false
+          this.uploadFail()         
         }
-
-        // 外網
-        // const BLE = ref(db, 'BLEs')
-        // const BLEimage = this.selectedImage
-        // const BLEaudio = this.selectedVoice
-
+        setTimeout(() => {
+          this.reload()
+        }, "2000")
+        
       }
-    }
+    },   
   },
   mounted() {
     this.fetchUUID()

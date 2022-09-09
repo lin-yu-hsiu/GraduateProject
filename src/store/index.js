@@ -1,11 +1,13 @@
-import { createStore } from 'vuex'
+import {
+  createStore
+} from 'vuex'
 
 export default createStore({
   state: {
     step: '',
     currvenue: false,
     currentvenue: '(需先切換場館)',
-    api: 'http://192.168.50.236:5000',
+    api: 'http://192.168.1.113:5000',
     currentUser: '',
     venueEditMode: false,
     allvenues: [],
@@ -17,8 +19,7 @@ export default createStore({
     openPicName: '',
     openPicRegionName: ''
   },
-  getters: {
-  },
+  getters: {},
   mutations: {
     switchRegion(state, curr) {
       state.currentvenue = curr;
@@ -40,8 +41,6 @@ export default createStore({
       state.deviceEditMode = false
     },
   },
-  actions: {
-  },
-  modules: {
-  }
+  actions: {},
+  modules: {}
 })
