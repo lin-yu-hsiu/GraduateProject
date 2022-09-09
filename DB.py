@@ -44,7 +44,7 @@
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic','Json Download','Pic Download', 'Aud Download'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{
@@ -191,9 +191,9 @@ def show_device_info(number):
             temp['Audio'] = records[row][9]
             temp['Href'] = records[row][10]
             temp['Pic'] = records[row][14]
-            temp['Route'] = records[row][16]
-            temp['Venue'] = records[row][17]
-            temp['Area'] = records[row][18]
+            temp['Route'] = records[row][len(records[row])-3]
+            temp['Venue'] = records[row][len(records[row])-2]
+            temp['Area'] = records[row][len(records[row])-1]
             result.append(temp)
         return result
     except sqlite3.OperationalError as e:

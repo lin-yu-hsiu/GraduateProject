@@ -382,7 +382,15 @@ def renewBattery():
     else:
         return jsonify(result)
 
-
+@app.route("/fetchDownloadURL",methods=["POST"])
+def fetchDownloadURL():
+    data = str(request.data,encoding="UTF-8")
+    content = json.loads(data)
+    result = DB.modify_BLE(content)
+    if(result['success']):
+        return jsonify(content)
+    else:
+        return jsonify(result)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
