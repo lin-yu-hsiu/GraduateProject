@@ -273,6 +273,7 @@ def insertBLE():
         basedir = os.path.abspath(os.path.dirname(__file__))
         targetdir = os.path.join(basedir,'public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
         temp['Audio'] = targetdir
+        # 新增temp['Aud Download']
     else:
         del temp['Audio']
     
@@ -280,6 +281,7 @@ def insertBLE():
         basedir = os.path.abspath(os.path.dirname(__file__))
         targetdir = os.path.join(basedir,'public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
         temp['Pic'] = targetdir
+        # 新增temp['Pic Download']
     else:
         del temp['Pic']
     

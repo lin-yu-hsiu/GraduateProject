@@ -44,7 +44,7 @@
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic','Json Download','Pic Download', 'Aud Download'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic','JsonLink','PicLink', 'AudLink'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{
@@ -154,6 +154,7 @@ def modify_BLE(content):        #修正 BLE 資料
                     ins += "{} = {},".format(i,content[i])
         ins = ins[:-1]
         ins += " where UUID = '{}';".format(content['UUID'])
+        print(ins)
         cursor.execute(ins)
         conn.commit()
         cursor.close()
