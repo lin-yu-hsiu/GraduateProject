@@ -4,6 +4,7 @@
     2. 之後記得部分改成 POST (鈺修進度)
     3. 新增圖片後會儲存在 public/images/<場館名稱>/ 底下並命名為 <場館名稱_區域名稱.jpg>
     4. 裝置配對訊息之後會在 
+    5. 場館名稱跟區域名稱不要全數字
 
 路由內容:
     ★ /table/<表格名稱> => 查看目標表格內容 => GET
@@ -94,11 +95,11 @@ def insert_data(table_name, content):
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '新增成功'}
+        return {"success": 1,'result': '新增成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}
 
 def delete_data(table_name, pk):        #刪除一筆資料
     conn = sqlite3.connect('test.db', check_same_thread=False)
@@ -116,11 +117,11 @@ def delete_data(table_name, pk):        #刪除一筆資料
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '刪除成功'}
+        return {"success": 1,'result': '刪除成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}
 
 def delete_all(table_name):
     conn = sqlite3.connect('test.db', check_same_thread=False)
@@ -131,11 +132,11 @@ def delete_all(table_name):
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '刪除成功'}
+        return {"success": 1,'result': '刪除成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}
 
 def modify_BLE(content):        #修正 BLE 資料
     conn = sqlite3.connect('test.db', check_same_thread=False)
@@ -154,16 +155,15 @@ def modify_BLE(content):        #修正 BLE 資料
                     ins += "{} = {},".format(i,content[i])
         ins = ins[:-1]
         ins += " where UUID = '{}';".format(content['UUID'])
-        print(ins)
         cursor.execute(ins)
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '修改成功'}
+        return {"success": 1,'result': '修改成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}
 
 def show_device_info(number):
     conn = sqlite3.connect('test.db', check_same_thread=False)
@@ -212,11 +212,11 @@ def switch_BLE(content):
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '修改成功'}
+        return {"success": 1,'result': '修改成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}
 
 def show_venue():
     conn = sqlite3.connect('test.db', check_same_thread=False)
@@ -249,11 +249,11 @@ def create_venue(name):
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '新增成功'}
+        return {"success": 1,'result': '新增成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}
 
 def delete_venue(name):
     conn = sqlite3.connect('test.db', check_same_thread=False)
@@ -264,8 +264,8 @@ def delete_venue(name):
         conn.commit()
         cursor.close()
         conn.close()
-        return {"success": 1,'Result': '刪除成功'}
+        return {"success": 1,'result': '刪除成功'}
     except sqlite3.OperationalError as e:
         cursor.close()
         conn.close()
-        return {"success": 0, "Result": str(e)}
+        return {"success": 0, "result": str(e)}

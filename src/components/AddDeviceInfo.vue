@@ -262,6 +262,7 @@ export default defineComponent({
         this.uploading()
         // 內網 音檔上傳      
         if (this.selectedVoice != null) {
+          this.audioFlag = 1
           let fileName = this.$store.state.currentvenue + '_' + this.info[0].Area + '_' + this.titlevalue + '.mp3'
           let uploadFile = this.selectedVoice
           let formData = new FormData()
@@ -274,10 +275,7 @@ export default defineComponent({
           })).data
           if (res.success == 0) {
             this.uploadAudioFail()
-          }
-          else {
-            this.audioFlag = 1
-          }
+          }       
         }
         this.uploadProgress+=20
         // 內網 圖片上傳    
@@ -291,7 +289,7 @@ export default defineComponent({
             url: this.$store.state.api + '/uploadDevicePic',
             headers: { "Content-Type": "multipart/form-data" },
             data: formData,
-          })).data        
+          })).data
           if (res.success == 0) {
             this.uploadImageFail()
           }
@@ -343,7 +341,7 @@ export default defineComponent({
           baseURL: this.$store.state.api + '/fetchDownloadURL',
           data: {
               'UUID': this.BLEUUID,
-              'Json Download': this.uploadJsonLink
+              'JsonLink': this.uploadJsonLink
           }
         })).data
         if (res.success == 1) {

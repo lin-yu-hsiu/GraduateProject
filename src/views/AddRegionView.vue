@@ -157,9 +157,9 @@ export default defineComponent({
           .catch((err) => { console.error(err) })
         if (res1.success == 1) {
           let body = {
-            'Venue': this.$store.state.currentvenue,
-            'Area': this.regionName,
-            'fileName': this.$store.state.currentvenue + '_' + this.regionName + '.jpg'
+            'Venue': this.$store.state.currentvenue.toString(),
+            'Area': this.regionName.toString(),
+            'fileName': this.$store.state.currentvenue + '_' + this.regionName.toString() + '.jpg'
           }
           let res = []
           await axios({

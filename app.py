@@ -390,7 +390,7 @@ def fetchDownloadURL():
     content = json.loads(data)
     result = DB.modify_BLE(content)
     if(result['success']):
-        return jsonify(content)
+        return jsonify(result)
     else:
         return jsonify(result)
 
