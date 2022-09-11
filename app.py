@@ -1,7 +1,9 @@
+from importlib.resources import path
+from logging import exception
 from socket import SHUT_RD
 import uuid
 import shutil
-from flask import Flask, redirect,render_template, url_for,request,jsonify
+from flask import Flask, redirect,render_template, url_for,request,jsonify,send_file
 from flask_cors import CORS
 import DB,json
 import os
@@ -263,6 +265,7 @@ def newDevice():
 def insertBLE():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
+    print(temp)
     data = DB.show_data('Map')
     MapNum = -1
     for i in data:
@@ -273,6 +276,7 @@ def insertBLE():
         basedir = os.path.abspath(os.path.dirname(__file__))
         targetdir = os.path.join(basedir,'public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
         temp['Audio'] = targetdir
+        temp['AudLink'] = '/downloadAud/' + temp['UUID']
         # 新增temp['Aud Download']
     else:
         del temp['Audio']
@@ -281,6 +285,7 @@ def insertBLE():
         basedir = os.path.abspath(os.path.dirname(__file__))
         targetdir = os.path.join(basedir,'public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
         temp['Pic'] = targetdir
+        temp['PicLink'] = '/downloadPic/' + temp['UUID']
         # 新增temp['Pic Download']
     else:
         del temp['Pic']
@@ -393,6 +398,32 @@ def fetchDownloadURL():
         return jsonify(result)
     else:
         return jsonify(result)
+
+@app.route("/downloadPic/<uuid>")
+def downloadPic(uuid):
+    try:
+        data = DB.show_device_info(-1)
+        picRoute = ""
+        for i in data:
+            if(i['UUID'] == uuid):
+                picRoute = i['Pic']
+                break
+        return send_file(picRoute,as_attachment=False)
+    except exception as e:
+        return 'Failed to Download Pic.\nReason: ' + str(e)
+
+@app.route("/downloadAud/<uuid>")
+def downloadAud(uuid):
+    try:
+        data = DB.show_device_info(-1)
+        audRoute = ""
+        for i in data:
+            if(i['UUID'] == uuid):
+                audRoute = i['Audio']
+                break
+        return send_file(audRoute,as_attachment=False)
+    except exception as e:
+        return 'Failed to Download Pic.\nReason: ' + str(e)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
