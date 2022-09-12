@@ -8,6 +8,7 @@
 
 路由內容:
     ★ /table/<表格名稱> => 查看目標表格內容 => GET
+    ★ /table/BLE/<uuid> => 針對uuid 去查詢 BLE 裝置
     ★ /deviceInfo => 查看所有裝置狀態 => GET
     ★ /deviceInfo/<館>
     ★ /createVenue => 新增場館 => POST (備註1)
@@ -26,6 +27,8 @@
     ★ /device/<UUID> => 回傳該UUID裝置之資訊 => get (裝置取得開關 + app端取得資料)
     ★ /distribute/<UUID> => 回傳該UUID硬體裝置分配到的TX、RX => get
     ★ /renewBattery/<UUID> => 硬體裝置更新電量 => POST (備註11)
+    ★ /downloadPic/<uuid> => 下載該裝置上的照片 => GET
+    ★ /downloadAud/<uuid> => 下載該裝置上的音檔 => GET
 
 
 備註:

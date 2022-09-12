@@ -14,6 +14,17 @@ CORS(app)
 def Home():
     return "Home Page"
 
+@app.route("/table/BLE/<uuid>")
+def search(uuid):
+    content = DB.show_data('BLE')
+    for i in content:
+        if(content[i]['UUID'] == uuid):
+            content = content[i]
+    try:
+        return jsonify(content)
+    except TypeError as e:
+        return str(e)
+
 @app.route("/table/<name>")
 def table(name):
     content = DB.show_data(name)
@@ -359,12 +370,24 @@ def uploadDevicePic():
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 
-@app.route("/device/<UUID>")
+@app.route("/devices/<UUID>/config.js")
 def deviceContent(UUID):
     data = DB.show_data("BLE")
     for i in data:
         if data[i]['UUID'] == UUID:
-            return jsonify(data[i])
+            content = {
+                "type" : "A",
+                "uniqueid": data[i]['UUID'],
+                "service": data[i]['Nus'],
+                "tx": data[i]['Tx'],
+                "rx": data[i]['Rx'],
+                "photoRef": data[i]['PicLink'],
+                "audioRef": data[i]['AudLink'],
+                "title": data[i]['Title'],
+                "content": data[i]['Message'],
+                "href": data[i]['Href']
+            }
+            return jsonify(content)
     return "There's no specific device data in the database!!"
 
 @app.route("/distribute/<id>")
