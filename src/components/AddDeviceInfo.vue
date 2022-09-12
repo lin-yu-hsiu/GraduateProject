@@ -177,8 +177,9 @@ export default defineComponent({
   },
   data() {
     return {
-      BLEUUID: null,
       device: this.info,
+      server_info: [],
+      BLEUUID: null,
       titlevalue: '',
       BLEMessage: '',
       BLEHref: '',
@@ -216,9 +217,7 @@ export default defineComponent({
       uploadJsonLink: '',
       progressSuccessColor: '#304352',
       progressFailColor: '#d50000',
-      uploadStatusFlag: true,
-      // #22E1FF #625EB1 
-      // #DFFFCD  #90F9C4 #39F3BB
+      uploadStatusFlag: true,     
     }
   },
   methods: {
@@ -230,8 +229,17 @@ export default defineComponent({
       this.selectedImage = event.target.files[0]
       this.blename = this.selectedImage.name 
     },
-    onChangeMethod(event) {
+    async onChangeMethod(event) {
       this.BLEUUID = event
+      let device = (await axios({
+        method: 'get',
+        baseURL: this.$store.state.api + '/table/BLE/' + this.BLEUUID,
+        'Content-Type': 'application/json',
+      })).data    
+      this.server_info['uniqueId'] = device['UUID']
+      this.server_info['service'] = device['Nus']
+      this.server_info['tx'] = device['Tx']
+      this.server_info['rx'] = device['Rx']
     },
     async fetchUUID() {
       let UUIDs
@@ -300,20 +308,22 @@ export default defineComponent({
         this.uploadProgress+=20
         // 外網 圖片上傳     
         if (this.selectedImage != null){          
-          let storageImage = dbRef(storage, ('BLEs/' + this.BLEUUID + '/') + 'photo.jpg');  
+          let storageImage = dbRef(storage, ('devices/' +  this.BLEUUID + '/') + 'photo.jpg');  
           await uploadBytes(storageImage, this.selectedImage);
           this.uploadImageLink = await getDownloadURL(storageImage)
         }  
         this.uploadProgress+=20
         // 外網 音檔上傳     
         if (this.selectedVoice != null){                  
-          let storageAudio = dbRef(storage, ('BLEs/' + this.BLEUUID + '/') + 'audio.mp3');
+          let storageAudio = dbRef(storage, ('devices/' +  this.BLEUUID + '/') + 'audio.mp3');
           await uploadBytes(storageAudio, this.selectedVoice);
           this.uploadAudioLink = await getDownloadURL(storageAudio)
         }
+        // console.log(this.uploadImageLink)
+        // console.log(this.uploadAudioLink)
         this.uploadProgress+=20
         // 外網 JSON上傳     
-        let body = {
+        let body_innet = {                
           'UUID': this.BLEUUID,
           'Title': this.titlevalue,
           'Message': this.BLEMessage,
@@ -321,16 +331,22 @@ export default defineComponent({
           'Audio': this.audioFlag,
           'Pic': this.imageFlag,
         }      
-        let body_OutNet = {
-          'ImageLink': this.uploadImageLink,
-          'AudioLink': this.uploadAudioLink
+        let body_outNet = {
+          'type': 'A',
+          'title': this.titlevalue,
+          'content': this.BLEMessage,
+          'href': this.BLEHref,
+          'photoRef': this.uploadImageLink,
+          'audioRef': this.uploadAudioLink
         }
-        let temp = Object.assign({}, this.device[0], body) //合併兩個物件
-        let temp1 = Object.assign({}, temp, body_OutNet) //合併兩個物件
-        const json = JSON.stringify(temp)
-        const json_OutNet = JSON.stringify(temp1)
-        let blob = new Blob([json_OutNet], {type: "application/json"})
-        let storageJson = dbRef(storage, ('BLEs/' + this.BLEUUID + '/') + 'config.json');
+        let temp = Object.assign({}, body_innet, this.device[0]) 
+        let temp1 = Object.assign({}, body_outNet, this.server_info) 
+        const json_innet = JSON.stringify(temp)
+        const json_outNet = JSON.stringify(temp1)
+        console.log(json_innet)
+        console.log(json_outNet)
+        let blob = new Blob([json_outNet], {type: "application/json"})
+        let storageJson = dbRef(storage, ('devices/' +  this.BLEUUID + '/') + 'config.json');
         // 外網 JSON上傳
         await uploadBytes(storageJson, blob);
         this.uploadJsonLink = await getDownloadURL(storageJson)       
@@ -349,10 +365,11 @@ export default defineComponent({
             method: 'post',
             baseURL: this.$store.state.api + '/insertBLE',
             headers: { 'Content-Type': 'application/json' },
-            data: json
+            data: json_innet
           })).data
           if (res1.success == 1){     
-            this.uploadProgress += 5   
+            this.uploadProgress += 5  
+            setTimeout(() => {}, "1000") 
             this.update()
             this.$emit('AddSuccess', this.device[0].Area)
           }
@@ -368,7 +385,7 @@ export default defineComponent({
           this.uploadFail()         
         }
         setTimeout(() => {
-          this.reload()
+          // this.reload()
         }, "2000")
         
       }

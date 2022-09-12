@@ -102,7 +102,7 @@
         @mouseleave="icon6 = uploadpic" style="width: 30px; height: 30px;" 
         @click="this.$store.state.openPicFlag = true; this.$store.state.openPicName = deviceInfo.Title; this.$store.state.openPicRegionName = deviceInfo.Area">
     </button>
-    <ViewPic v-if="this.$store.state.openPicFlag" @close="this.$store.state.openPicFlag = false;this.$store.state.openPicName = ''; this.$store.state.openPicRegionName = ''"
+    <ViewPic v-if="this.$store.state.openPicFlag" @close="this.$store.state.openPicFlag = false; this.$store.state.openPicName = ''; this.$store.state.openPicRegionName = ''"
      style="position: absolute; 
         top: 30vh;             
         bottom: 0;           

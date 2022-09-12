@@ -18,10 +18,10 @@ def Home():
 def search(uuid):
     content = DB.show_data('BLE')
     for i in content:
-        if(content[i]['UUID'] == uuid):
-            content = content[i]
+        if(content[i]['UUID'] == str(uuid)):
+            data = content[i]       
     try:
-        return jsonify(content)
+        return jsonify(data)
     except TypeError as e:
         return str(e)
 
@@ -377,7 +377,7 @@ def deviceContent(UUID):
         if data[i]['UUID'] == UUID:
             content = {
                 "type" : "A",
-                "uniqueid": data[i]['UUID'],
+                "uniqueId": data[i]['UUID'],
                 "service": data[i]['Nus'],
                 "tx": data[i]['Tx'],
                 "rx": data[i]['Rx'],
@@ -387,6 +387,9 @@ def deviceContent(UUID):
                 "content": data[i]['Message'],
                 "href": data[i]['Href']
             }
+            for j in content:
+                if(content[j] == None):
+                    content[j] = ""
             return jsonify(content)
     return "There's no specific device data in the database!!"
 

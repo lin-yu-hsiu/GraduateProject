@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column p-5 w-100 mx-auto" style="max-height: 100vh">
+    <div class="d-flex flex-column p-5 w-100 mx-auto">
       <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%);">
         <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
         {{

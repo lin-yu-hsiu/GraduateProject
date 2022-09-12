@@ -2,7 +2,7 @@
   <n-notification-provider>
     <n-message-provider>
       <n-scrollbar x-scrollable style="max-height: 100vh;">
-        <div style="background-color: #F8F4E7">
+        <div style="background-color: #F8F4E7;">
           <router-view v-if="isRouterActive" />
         </div>
       </n-scrollbar>
