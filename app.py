@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app)
 @app.route("/")             #切換 URL
 def Home():
-    return "Home Page"
+    return 'Home Page'
 
 @app.route("/table/BLE/<uuid>")
 def search(uuid):
@@ -276,7 +276,6 @@ def newDevice():
 def insertBLE():
     data = str(request.data,encoding="UTF-8")
     temp = json.loads(data)
-    print(temp)
     data = DB.show_data('Map')
     MapNum = -1
     for i in data:
@@ -287,7 +286,7 @@ def insertBLE():
         basedir = os.path.abspath(os.path.dirname(__file__))
         targetdir = os.path.join(basedir,'public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
         temp['Audio'] = targetdir
-        temp['AudLink'] = '/downloadAud/' + temp['UUID']
+        temp['AudLink'] = request.base_url[0:-10] + '/downloadAud/' + temp['UUID']
         # 新增temp['Aud Download']
     else:
         del temp['Audio']
@@ -296,7 +295,7 @@ def insertBLE():
         basedir = os.path.abspath(os.path.dirname(__file__))
         targetdir = os.path.join(basedir,'public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
         temp['Pic'] = targetdir
-        temp['PicLink'] = '/downloadPic/' + temp['UUID']
+        temp['PicLink'] = request.base_url[0:-10] + '/downloadPic/' + temp['UUID']
         # 新增temp['Pic Download']
     else:
         del temp['Pic']
@@ -326,7 +325,6 @@ def uploadPic():
         else:
             result = {'success': 0, 'result': 'Type Wrong'}
     except Exception as e:
-        print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 
@@ -346,7 +344,6 @@ def uploadAud():
         else:
             result = {'success': 0, 'result': 'Type Wrong'}
     except Exception as e:
-        print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 
@@ -366,11 +363,10 @@ def uploadDevicePic():
         else:
             result = {'success': 0, 'result': 'Type Wrong'}
     except Exception as e:
-        print(str(e))
         result = {'success': 0, 'result': 'Upload Failed'}
     return jsonify(result)
 
-@app.route("/devices/<UUID>/config.js")
+@app.route("/devices/<UUID>/config.json")
 def deviceContent(UUID):
     data = DB.show_data("BLE")
     for i in data:
