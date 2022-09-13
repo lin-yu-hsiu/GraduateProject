@@ -240,6 +240,11 @@ export default defineComponent({
       this.server_info['service'] = device['Nus']
       this.server_info['tx'] = device['Tx']
       this.server_info['rx'] = device['Rx']
+      for (const index in this.server_info){
+        if (this.server_info[index] == null){
+          this.server_info[index] = ''
+        }
+      }
     },
     async fetchUUID() {
       let UUIDs
@@ -349,7 +354,8 @@ export default defineComponent({
         let storageJson = dbRef(storage, ('devices/' +  this.BLEUUID + '/') + 'config.json');
         // 外網 JSON上傳
         await uploadBytes(storageJson, blob);
-        this.uploadJsonLink = await getDownloadURL(storageJson)       
+        this.uploadJsonLink = await getDownloadURL(storageJson)  
+        console.log(this.uploadJsonLink)     
         this.uploadProgress+=10
         // 內網 JSON上傳       
         let res = (await axios({
