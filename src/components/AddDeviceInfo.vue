@@ -355,7 +355,7 @@ export default defineComponent({
         // 外網 JSON上傳
         await uploadBytes(storageJson, blob);
         this.uploadJsonLink = await getDownloadURL(storageJson)  
-        console.log(this.uploadJsonLink)     
+        this.$store.state.QRcodeURL = this.uploadJsonLink
         this.uploadProgress+=10
         // 內網 JSON上傳       
         let res = (await axios({
