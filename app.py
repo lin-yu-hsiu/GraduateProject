@@ -447,5 +447,10 @@ def downloadAud(uuid):
     except exception as e:
         return 'Failed to Download Pic.\nReason: ' + str(e)
 
+@app.route("/localURL")
+def loacalURL():
+    url = request.base_url
+    return url[0:-9]
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='5000',debug=True)
