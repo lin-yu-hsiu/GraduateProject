@@ -93,7 +93,7 @@ def insert_data(table_name, content):
                 ins += 'Route,Venue,Area) values ("{}","{}","{}"'.format(content['Route'],content['Venue'],content['Area'])
             ins += ');'
         else:
-            ins = "Insert into BLE ('UUID','Tx','Rx','Nus') Values ('{},{},{},{}');".format(content['UUID'],content['Tx'],content['Rx'],content['Nus'])
+            ins = "Insert into BLE ('UUID','Tx','Rx','Nus') Values ('{}','{}','{}','{}');".format(content['UUID'],content['Tx'],content['Rx'],content['Nus'])
         cursor.execute(ins)
         conn.commit()
         cursor.close()

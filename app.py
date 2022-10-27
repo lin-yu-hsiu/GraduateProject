@@ -96,12 +96,12 @@ def deleteBLE():
     temp = json.loads(data)
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))
-        os.remove(basedir + '\\public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+        os.remove(basedir + '/public/audios/' + temp['Venue'] + '/' + temp['Area'] + '/' + temp['Title'] + '.mp3')
     except:
         pass
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))
-        os.remove(basedir + '\\public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
+        os.remove(basedir + '/public/pics/' + temp['Venue'] + '/' + temp['Area'] + '/' + temp['Title'] + '.jpg')
     except:
         pass
     result = DB.delete_data("BLE",temp['UUID'])
@@ -117,7 +117,7 @@ def createVenue():
     venueName = temp['Venue']
 
     basedir = os.path.abspath(os.path.dirname(__file__))
-    targetdir = os.path.join(basedir,'public\\audios')      # 建立 audios 資料夾
+    targetdir = os.path.join(basedir,'public/audios')      # 建立 audios 資料夾
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
@@ -127,7 +127,7 @@ def createVenue():
     if(exist == False):
         os.mkdir(targetdir)
     
-    targetdir = os.path.join(basedir,'public\\pics')      # 建立 pics 資料夾
+    targetdir = os.path.join(basedir,'public/pics')      # 建立 pics 資料夾
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
@@ -136,7 +136,7 @@ def createVenue():
     if(exist == False):
         os.mkdir(targetdir)
 
-    targetdir = os.path.join(basedir,'public\\images')      # 建立 image 資料夾
+    targetdir = os.path.join(basedir,'public/images')      # 建立 image 資料夾
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
@@ -157,9 +157,9 @@ def deleteVenue():
     temp = json.loads(data)
     basedir = os.path.abspath(os.path.dirname(__file__))
     
-    shutil.rmtree(basedir + '\\public\\images\\' + temp['Venue'])   # 刪除 //images//場館 檔案夾
-    shutil.rmtree(basedir + '\\public\\audios\\' + temp['Venue'])   # 刪除 //audios//場館 檔案夾
-    shutil.rmtree(basedir + '\\public\\pics\\' + temp['Venue'])   # 刪除 //pics//場館 檔案夾
+    shutil.rmtree(basedir + '/public/images/' + temp['Venue'])   # 刪除 //images//場館 檔案夾
+    shutil.rmtree(basedir + '/public/audios/' + temp['Venue'])   # 刪除 //audios//場館 檔案夾
+    shutil.rmtree(basedir + '/public/pics/' + temp['Venue'])   # 刪除 //pics//場館 檔案夾
 
     result = DB.delete_venue(temp['Venue'])                         # 刪除 Venue 的 table
     if(result['success']):
@@ -185,17 +185,17 @@ def insertArea():
     temp = json.loads(data)
     basedir = os.path.abspath(os.path.dirname(__file__))
 
-    targetdir = os.path.join(basedir,'public\\audios\\' + str(temp['Venue']) + '\\' + str(temp['Area']))
+    targetdir = os.path.join(basedir,'public/audios/' + str(temp['Venue']) + '/' + str(temp['Area']))
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
     
-    targetdir = os.path.join(basedir,'public\\pics\\' + str(temp['Venue']) + '\\' + str(temp['Area']))
+    targetdir = os.path.join(basedir,'public/pics/' + str(temp['Venue']) + '/' + str(temp['Area']))
     exist = os.path.exists(targetdir)
     if(exist == False):
         os.mkdir(targetdir)
 
-    temp['Route'] = basedir + "\\" + temp['fileName']
+    temp['Route'] = basedir + "/" + temp['fileName']
     del temp['fileName']
     result = DB.insert_data(temp['Venue'],temp) 
     if(result['success']):
@@ -221,10 +221,10 @@ def deleteArea():
     
     basedir = os.path.abspath(os.path.dirname(__file__))
     fileName = str(venue) + '_' + str(area) + '.jpg'
-    targetdir = os.path.join(basedir,'public\\images\\' + str(venue) + '\\' + fileName )
+    targetdir = os.path.join(basedir,'public/images/' + str(venue) + '/' + fileName )
     os.remove(targetdir)                                                # 刪除 images 檔案夾內部圖片
-    shutil.rmtree(basedir + '\\public\\audios\\'+ str(venue) + '\\' + str(area))    # 刪除 audios\\venue\\區域 資料夾
-    shutil.rmtree(basedir + '\\public\\pics\\'+ str(venue) + '\\' + str(area))    # 刪除 pics\\venue\\區域 資料夾
+    shutil.rmtree(basedir + '/public/audios/'+ str(venue) + '/' + str(area))    # 刪除 audios/venue/區域 資料夾
+    shutil.rmtree(basedir + '/public/pics/'+ str(venue) + '/' + str(area))    # 刪除 pics/venue/區域 資料夾
 
     result = DB.delete_data("Map",temp["MapNum"])                       # 刪除 Map 內部資料
     if(result['success']):
@@ -255,7 +255,9 @@ def newDevice():
         data = str(request.data,encoding="UTF-8")
         temp = json.loads(data)
         data = { "UUID": temp['UUID'],'Tx':temp['tx'],'Rx':temp['rx'],'Nus':temp['nus'] }
+        print(data)        
         result = DB.insert_data("BLE", data)
+        print(result)
         #content = {"UUID": id,'tx':tx,'rx':rx,'nus':nus}
         if(result['success']):
             return jsonify(result)
@@ -285,7 +287,7 @@ def insertBLE():
             break
     if (temp['Audio'] == 1):
         basedir = os.path.abspath(os.path.dirname(__file__))
-        targetdir = os.path.join(basedir,'public\\audios\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.mp3')
+        targetdir = os.path.join(basedir,'public/audios/' + temp['Venue'] + '/' + temp['Area'] + '/' + temp['Title'] + '.mp3')
         temp['Audio'] = targetdir
         temp['AudLink'] = request.base_url[0:-10] + '/downloadAud/' + temp['UUID']
         # 新增temp['Aud Download']
@@ -294,7 +296,7 @@ def insertBLE():
     
     if (temp['Pic'] == 1):
         basedir = os.path.abspath(os.path.dirname(__file__))
-        targetdir = os.path.join(basedir,'public\\pics\\' + temp['Venue'] + '\\' + temp['Area'] + '\\' + temp['Title'] + '.jpg')
+        targetdir = os.path.join(basedir,'public/pics/' + temp['Venue'] + '/' + temp['Area'] + '/' + temp['Title'] + '.jpg')
         temp['Pic'] = targetdir
         temp['PicLink'] = request.base_url[0:-10] + '/downloadPic/' + temp['UUID']
         # 新增temp['Pic Download']
@@ -318,9 +320,9 @@ def uploadPic():
         format = img.filename[img.filename.index('.'):]
         basedir = os.path.abspath(os.path.dirname(__file__))
         venueName = img.filename.split('_')[0]
-        targetdir = os.path.join(basedir,'public\\images\\' + venueName)
+        targetdir = os.path.join(basedir,'public/images/' + venueName)
         if format in ('.jpg','.png','.jpeg','.HEIC','.jfif','.gif'):
-            dir = targetdir + '\\' + img.filename.replace(format,'.jpg')
+            dir = targetdir + '/' + img.filename.replace(format,'.jpg')
             img.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
@@ -337,9 +339,9 @@ def uploadAud():
         basedir = os.path.abspath(os.path.dirname(__file__))
         venueName = aud.filename.split('_')[0]
         areaName = aud.filename.split('_')[1]
-        targetdir = os.path.join(basedir,'public\\audios\\' + venueName + '\\' + areaName)
+        targetdir = os.path.join(basedir,'public/audios/' + venueName + '/' + areaName)
         if format in ('.mp3'):
-            dir = targetdir + '\\' + aud.filename.split('_')[2]
+            dir = targetdir + '/' + aud.filename.split('_')[2]
             aud.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
@@ -356,9 +358,9 @@ def uploadDevicePic():
         basedir = os.path.abspath(os.path.dirname(__file__))
         venueName = pic.filename.split('_')[0]
         areaName = pic.filename.split('_')[1]
-        targetdir = os.path.join(basedir,'public\\pics\\' + venueName + '\\' + areaName)
+        targetdir = os.path.join(basedir,'public/pics/' + venueName + '/' + areaName)
         if format in ('.jpg'):
-            dir = targetdir + '\\' + pic.filename.split('_')[2]
+            dir = targetdir + '/' + pic.filename.split('_')[2]
             pic.save(dir)
             result = {'success': 1, 'result': 'Upload Successfully'}
         else:
