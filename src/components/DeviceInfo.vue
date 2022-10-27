@@ -38,7 +38,7 @@
 
     <div class="d-flex justify-content-center" :class="[isRemoving ? removeHidden : '']" style="width: 80px">
       <img v-if="deviceInfo.Battery"
-        :src="require('../assets/pic/' + 'battery' + (deviceInfo.Battery.substr(0, deviceInfo.Battery.length - 1)).toString() + '.png')"
+        :src="require('../assets/pic/' + 'battery' + (parseInt(deviceInfo.Battery)*20).toString() + '.png')"
         :class="[isRemoving ? removeHidden : '']" style="width: 60px;">
     </div>
 
@@ -257,10 +257,11 @@ export default defineComponent({
     },
     mp3Play() {
       this.mp3playstatus = true
-    }
+    },
+   
   },
   mounted() {
-    if (this.deviceInfo.Battery == '0%') {
+    if (this.deviceInfo.Battery == '0') {
       this.deviceStatus = false
     }
   }
