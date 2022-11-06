@@ -48,7 +48,7 @@
 import sqlite3
 dbContent = {
     'People': ['Email','Account','Password'],
-    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic','JsonLink','PicLink', 'AudLink'],
+    'BLE':['UUID','Message','MapNum','Xaxis','Yaxis','Battery','Status','Note','Title','Audio','Href','Tx','Rx','Nus','Pic','JsonLink','PicLink', 'AudLink','Visitor'],
     'Map':['Number','Route','Venue','Area'],
     '場館內容':['Route','Venue','Area'],
     'PK':{
@@ -272,3 +272,12 @@ def delete_venue(name):
         cursor.close()
         conn.close()
         return {"success": 0, "result": str(e)}
+
+def deviceVisitor(UUID):
+    number = 0
+    temp = show_data('BLE')
+    for i in temp:
+        if UUID == temp[i]['UUID']:
+            number = temp[i]['Visitor']
+            break
+    return number

@@ -371,6 +371,11 @@ def uploadDevicePic():
 
 @app.route("/devices/<UUID>/config.json")
 def deviceContent(UUID):
+    people = DB.deviceVisitor(UUID)
+    people = people + 1
+    result = DB.modify_BLE({'UUID':UUID, 'Visitor':people})
+    if result['success'] == 0:
+        return result['result']
     data = DB.show_data("BLE")
     for i in data:
         if data[i]['UUID'] == UUID:
@@ -384,7 +389,8 @@ def deviceContent(UUID):
                 "audioRef": data[i]['AudLink'],
                 "title": data[i]['Title'],
                 "content": data[i]['Message'],
-                "href": data[i]['Href']
+                "href": data[i]['Href'],
+                "visitor": data[i]['Visitor']
             }
             for j in content:
                 if(content[j] == None):
