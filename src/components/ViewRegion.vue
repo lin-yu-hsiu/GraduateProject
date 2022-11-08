@@ -1,116 +1,185 @@
 <template>
-  <div class="regionList m-3"
-    :class="[{ 'mistake': regionStatus == 'error' }, { 'no_mistake': regionStatus == 'good' }, { 'normal': regionStatus == 'normal' }]">
+  <div
+    class="regionList m-3"
+    :class="[
+      { mistake: regionStatus == 'error' },
+      { no_mistake: regionStatus == 'good' },
+      { normal: regionStatus == 'normal' },
+    ]"
+  >
     <div class="d-flex justify-content-around align-items-center w-100 mb-2">
-      <div style="font-weight: bold; align-self: start; font-size: 24px;">{{ region.Area }}</div>
-      <button class="viewMap" v-if="!this.$store.state.deviceEditMode"
-        @click="this.$store.state.openMapFlag = true; this.$store.state.openMapName = region.Area;">
+      <div style="font-weight: bold; align-self: start; font-size: 24px">
+        {{ region.Area }}
+      </div>
+      <button
+        class="viewMap"
+        v-if="!this.$store.state.deviceEditMode"
+        @click="
+          this.$store.state.openMapFlag = true;
+          this.$store.state.openMapNum = this.regions.Number;
+          this.$store.state.openMapName = regions.Area;
+        "
+      >
         閱覽地圖
       </button>
-      <ViewMap v-if="this.$store.state.openMapFlag" @close="this.$store.state.openMapFlag = false" style="position: absolute; 
-        top: 0;             
-        bottom: 0;           
-        left: 0;        
-        right: 0;
-        margin: auto;">
+      <ViewMap
+        v-if="this.$store.state.openMapFlag"
+        @close="this.$store.state.openMapFlag = false"
+        style="
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          margin: auto;
+        "
+      >
       </ViewMap>
-      <button class="detailBtn p-0" v-if="this.$store.state.deviceEditMode" @click="showModal = true"
-        @mouseover="icon = remove_hover" @mouseleave="icon = remove">
+      <button
+        class="detailBtn p-0"
+        v-if="this.$store.state.deviceEditMode"
+        @click="showModal = true"
+        @mouseover="icon = remove_hover"
+        @mouseleave="icon = remove"
+      >
         <n-tooltip trigger="hover">
           <template #trigger>
-            <img :src="icon" style="width: 25px; height: 30px">
+            <img :src="icon" style="width: 25px; height: 30px" />
           </template>
           刪除此區域
         </n-tooltip>
       </button>
-      <n-modal v-model:show="showModal" type="warning" preset="dialog" title="確定刪除 ?"
-        :content="'確認刪除 ' + region.Area + ' 此區域'" positive-text="確定" negative-text="取消"
-        @positive-click="sendToRemoveRegion" style="font-weight: bold;" />
+      <n-modal
+        v-model:show="showModal"
+        type="warning"
+        preset="dialog"
+        title="確定刪除 ?"
+        :content="'確認刪除 ' + region.Area + ' 此區域'"
+        positive-text="確定"
+        negative-text="取消"
+        @positive-click="sendToRemoveRegion"
+        style="font-weight: bold"
+      />
     </div>
-    <button v-if="regionStatus == 'error' && !this.$store.state.deviceEditMode" class="viewDetail" @click="open = true">
-      <img :src="fordetail" style="width: 35px; height: 40px">
+    <button
+      v-if="regionStatus == 'error' && !this.$store.state.deviceEditMode"
+      class="viewDetail"
+      @click="open = true"
+    >
+      <img :src="fordetail" style="width: 35px; height: 40px" />
       查看裝置問題
     </button>
-    <button v-if="regionStatus == 'good' && !this.$store.state.deviceEditMode" class="viewDevice" @click="open = true">
-      <img :src="devicegood" style="width: 35px; height: 35px">
+    <button
+      v-if="regionStatus == 'good' && !this.$store.state.deviceEditMode"
+      class="viewDevice"
+      @click="open = true"
+    >
+      <img :src="devicegood" style="width: 35px; height: 35px" />
       裝置一切正常
     </button>
-    <button v-if="regionStatus == 'normal' && !this.$store.state.deviceEditMode" class="viewNone"
-      style="cursor: not-allowed;">
-      <img :src="none" style="width: 35px; height: 35px">
+    <button
+      v-if="regionStatus == 'normal' && !this.$store.state.deviceEditMode"
+      class="viewNone"
+      style="cursor: not-allowed"
+    >
+      <img :src="none" style="width: 35px; height: 35px" />
       此區域無裝置
     </button>
     <router-link :to="{ name: 'adddevice' }" style="text-decoration: none">
-      <button v-if="this.$store.state.deviceEditMode" class="AddDevice mb-1"
-        @click="this.$store.state.regionAddName = region.Area" @mouseover="icon2 = addDevice_icon_blue"
-        @mouseleave="icon2 = addDevice_icon">
-        <img :src="icon2" alt="" style="width: 35px; height: 35px">
+      <button
+        v-if="this.$store.state.deviceEditMode"
+        class="AddDevice mb-1"
+        @click="this.$store.state.regionAddName = region.Area"
+        @mouseover="icon2 = addDevice_icon_blue"
+        @mouseleave="icon2 = addDevice_icon"
+      >
+        <img :src="icon2" alt="" style="width: 35px; height: 35px" />
         新增裝置
       </button>
     </router-link>
     <div v-if="this.$store.state.deviceEditMode" class="mb-1">
-      <button class="openBtn" name="OpenAllDevice" v-if="this.shutdown && this.regionStatus != 'normal'"
-        @click="alldevicestatusChange">一鍵開機</button>
-      <button class="closeBtn" name="CloseAllDevice" v-if="!this.shutdown && this.regionStatus != 'normal'"
-        @click="alldevicestatusChange">一鍵關機</button>
+      <button
+        class="openBtn"
+        name="OpenAllDevice"
+        v-if="this.shutdown && this.regionStatus != 'normal'"
+        @click="alldevicestatusChange"
+      >
+        一鍵開機
+      </button>
+      <button
+        class="closeBtn"
+        name="CloseAllDevice"
+        v-if="!this.shutdown && this.regionStatus != 'normal'"
+        @click="alldevicestatusChange"
+      >
+        一鍵關機
+      </button>
     </div>
   </div>
-  <DeviceRegion @ifEmpty="ifEmpty_ViewRegion" :passMapNum="region.Number" v-if="open" @close="open = false" style="position: absolute; 
-        top: 0;             
-        bottom: 0;           
-        left: 0;        
-        right: 0;
-        margin: auto;  ">
+  <DeviceRegion
+    @ifEmpty="ifEmpty_ViewRegion"
+    :passMapNum="region.Number"
+    v-if="open"
+    @close="open = false"
+    style="
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+    "
+  >
   </DeviceRegion>
 </template>
 
 <script>
-import axios from 'axios'
-import DeviceRegion from './DeviceRegion.vue'
-import ViewMap from './ViewMap.vue'
+import axios from "axios";
+import DeviceRegion from "./DeviceRegion.vue";
+import ViewMap from "./ViewMap.vue";
 import { inject, ref } from "vue";
-import { useMessage } from 'naive-ui'
-import detail from '../assets/pic/fordetail_red.png'
-import good from '../assets/pic/good_green.png'
-import none from '../assets/pic/eyes_none.png'
-import remove from '../assets/pic/trash.png'
-import remove_hover from '../assets/pic/trash_hover.png'
-import addDevice_icon from '../assets/pic/addDevice_icon.png'
-import addDevice_icon_blue from '../assets/pic/addDevice_icon_blue.png'
+import { useMessage } from "naive-ui";
+import detail from "../assets/pic/fordetail_red.png";
+import good from "../assets/pic/good_green.png";
+import none from "../assets/pic/eyes_none.png";
+import remove from "../assets/pic/trash.png";
+import remove_hover from "../assets/pic/trash_hover.png";
+import addDevice_icon from "../assets/pic/addDevice_icon.png";
+import addDevice_icon_blue from "../assets/pic/addDevice_icon_blue.png";
 
 export default {
   setup() {
-    const reload = inject('reload')
-    const message = useMessage()
+    const reload = inject("reload");
+    const message = useMessage();
     const update = () => {
-      reload()
-    }
+      reload();
+    };
     const mistake = () => {
-      message.error('請先關閉地圖')
-    }
+      message.error("請先關閉地圖");
+    };
     return {
       update,
       mistake,
       showModal: ref(false),
-    }
+    };
   },
   components: {
     DeviceRegion,
-    ViewMap
+    ViewMap,
   },
   props: {
     region: {
-      required: true
-    }
+      required: true,
+    },
   },
 
   watch: {
     region(newVal) {
-      this.regions = newVal
+      this.regions = newVal;
     },
     regionStatus(newVal) {
-      this.regionStatus = newVal
-    }
+      this.regionStatus = newVal;
+    },
   },
   data() {
     return {
@@ -124,89 +193,91 @@ export default {
       devicegood: good,
       none: none,
       regions: this.region,
-      shutdown: '',
+      shutdown: "",
       open: false,
-      regionStatus: 'good',
-      mapOpening: 'mapOpening',
-    }
+      regionStatus: "good",
+      mapOpening: "mapOpening",
+    };
   },
   methods: {
     async alldevicestatusChange() {
       const body = {
         // 傳其中一個device的MapNum跟Status就好
-        'MapNum': this.devices[0].MapNum,
-        'Status': this.shutdown
-      }
+        MapNum: this.devices[0].MapNum,
+        Status: this.shutdown,
+      };
       const json = JSON.stringify(body);
-      let res = []
-      await axios.post(this.$store.state.api + '/switchBLE', json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then((response) => res = response.data)
-        .catch((err) => console.log(err))
-      console.log(res)
-      this.update()
+      let res = [];
+      await axios
+        .post(this.$store.state.api + "/switchBLE", json, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => (res = response.data))
+        .catch((err) => console.log(err));
+      console.log(res);
+      this.update();
     },
     async viewRegion(mapNum) {
-      const API = this.$store.state.api + '/deviceInfo/'
+      const API = this.$store.state.api + "/deviceInfo/";
       await axios({
-        method: 'get',
+        method: "get",
         baseURL: API,
         url: mapNum.toString(),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       })
-        .then((response) => this.devices = response.data)
-        .catch((error) => console.log(error))
+        .then((response) => (this.devices = response.data))
+        .catch((error) => console.log(error));
       // 如果此區域已無裝置
       if (this.devices.length == 0) {
-        this.regionStatus = 'normal'
+        this.regionStatus = "normal";
       }
 
       // 尋訪指定區域中是否有裝置狀態異常 (ex:電池沒電)
       for (let i = 0; i < this.devices.length; i++) {
-        if (this.devices[i].Battery == '0%') {
-          this.regionStatus = 'error'
+        if (this.devices[i].Battery == "0%") {
+          this.regionStatus = "error";
         }
       }
 
       // 偵測是否有裝置  一個裝置未開機便顯示"一鍵開機"
       for (let i = 0; i < this.devices.length; i++) {
         if (this.devices[i].Status == false) {
-          this.shutdown = true
-        }
-        else this.shutdown = false
+          this.shutdown = true;
+        } else this.shutdown = false;
       }
-
     },
     ifEmpty_ViewRegion(value) {
       if (value == true) {
-        this.regionStatus = 'normal'
+        this.regionStatus = "normal";
       }
-      this.$emit('ifEmpty')
+      this.$emit("ifEmpty");
     },
     async sendToRemoveRegion() {
       let body = {
-        'MapNum': this.regions.Number,
-      }
-      const json = JSON.stringify(body)
-      let res = []
+        MapNum: this.regions.Number,
+      };
+      const json = JSON.stringify(body);
+      let res = [];
       await axios({
-        method: 'post',
-        url: this.$store.state.api + '/deleteArea',
-        headers: { 'Content-Type': 'application/json' },
-        data: json
-      }).then((response) => res = response.data)
-        .catch((err) => { console.error(err) })
-      console.log(res)
-      this.$emit('_reDisplay')
-    }
+        method: "post",
+        url: this.$store.state.api + "/deleteArea",
+        headers: { "Content-Type": "application/json" },
+        data: json,
+      })
+        .then((response) => (res = response.data))
+        .catch((err) => {
+          console.error(err);
+        });
+      console.log(res);
+      this.$emit("_reDisplay");
+    },
   },
   mounted() {
-    this.viewRegion(this.regions.Number)
+    this.viewRegion(this.regions.Number);
   },
-}
+};
 </script>
 
 <style scoped>
@@ -321,7 +392,7 @@ export default {
 
 .viewDevice {
   background-color: #363636;
-  color: #0FA958;
+  color: #0fa958;
   font-weight: bold;
   font-size: 22px;
   width: 200px;
@@ -333,7 +404,7 @@ export default {
 
 .viewNone {
   background-color: #363636;
-  color: #D9D9D9;
+  color: #d9d9d9;
   font-weight: bold;
   font-size: 22px;
   width: 200px;
@@ -350,7 +421,7 @@ export default {
 }
 
 .no_mistake {
-  border: ridge 3px #0FA958;
+  border: ridge 3px #0fa958;
 }
 
 .mistake {

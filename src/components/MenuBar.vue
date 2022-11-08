@@ -1,15 +1,22 @@
 <template>
   <div class="menu">
-    <div class="logout w-100">
-      <router-link :to="{ name: 'login' }">
+    <div class="home w-100">
+      <router-link :to="{ name: 'home' }">
         <button class="content">
-          <div id="login" style="margin: 0 auto;" @mouseover="icon5 = logout_icon_blue"
-            @mouseleave="icon5 = logout_icon">
+          <div
+            style="margin: 0 auto"
+            @mouseover="icon5 = home_hover"
+            @mouseleave="icon5 = home"
+          >
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="login_icon" :src="icon5" alt="" style="display: block; width: 40px; height: 40px;">
+                <img
+                  :src="icon5"
+                  alt=""
+                  style="display: block; width: 50px; height: 50px"
+                />
               </template>
-              登出
+              主頁
             </n-tooltip>
           </div>
         </button>
@@ -17,14 +24,29 @@
     </div>
 
     <div class="w-100" style="margin: 0 0 20vh 0">
-      <router-link :to="{ name: 'switchregion' }">
-        <button class="content" @click="this.$store.commit('switchVenue');">
-          <div v-if="this.$store.state.step == 'switch'" class="decoration"></div>
-          <div id="switchRegion" style="margin: 0 auto;" @mouseover="icon4 = switchRegion_icon_blue"
-            @mouseleave="icon4 = switchRegion_icon">
+      <router-link
+        :to="{ name: 'switchregion' }"
+        v-if="this.$store.state.QRcodeFlag"
+      >
+        <button class="content" @click="checkOpenQRcode()">
+          <div
+            v-if="this.$store.state.step == 'switch'"
+            class="decoration"
+          ></div>
+          <div
+            id="switchRegion"
+            style="margin: 0 auto"
+            @mouseover="icon4 = switchRegion_icon_blue"
+            @mouseleave="icon4 = switchRegion_icon"
+          >
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="switchRegion_icon" :src="icon4" alt="" style="display: block; width: 45px; height: 45px;">
+                <img
+                  id="switchRegion_icon"
+                  :src="icon4"
+                  alt=""
+                  style="display: block; width: 45px; height: 45px"
+                />
               </template>
               切換場館
             </n-tooltip>
@@ -32,14 +54,26 @@
         </button>
       </router-link>
 
-      <router-link :to="{ name: 'viewdevice' }" v-show="this.$store.state.currvenue">
-        <button class="content" @click="this.$store.commit('viewDevice');">
+      <router-link
+        :to="{ name: 'viewdevice' }"
+        v-show="this.$store.state.currvenue"
+      >
+        <button class="content" @click="this.$store.commit('viewDevice')">
           <div v-if="this.$store.state.step == 'view'" class="decoration"></div>
-          <div id="viewDevice" style="margin: 0 auto;" @mouseover="icon3 = viewDevice_icon_blue"
-            @mouseleave="icon3 = viewDevice_icon">
+          <div
+            id="viewDevice"
+            style="margin: 0 auto"
+            @mouseover="icon3 = viewDevice_icon_blue"
+            @mouseleave="icon3 = viewDevice_icon"
+          >
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="viewDevice_icon" :src="icon3" alt="" style="display: block; width: 45px; height: 45px">
+                <img
+                  id="viewDevice_icon"
+                  :src="icon3"
+                  alt=""
+                  style="display: block; width: 45px; height: 45px"
+                />
               </template>
               查看區域
             </n-tooltip>
@@ -50,13 +84,23 @@
 
     <div class="info w-100">
       <router-link :to="{ name: 'FAQ' }">
-        <button class="content" @click="this.$store.commit('FAQ');">
+        <button class="content" @click="this.$store.commit('FAQ')">
           <div v-if="this.$store.state.step == 'faq'" class="decoration"></div>
-          <div id="FAQ" class="option" style="margin: 0 auto;" @mouseover="icon6 = FAQ_icon_blue"
-            @mouseleave="icon6 = FAQ_icon">
+          <div
+            id="FAQ"
+            class="option"
+            style="margin: 0 auto"
+            @mouseover="icon6 = FAQ_icon_blue"
+            @mouseleave="icon6 = FAQ_icon"
+          >
             <n-tooltip placement="right" trigger="hover">
               <template #trigger>
-                <img id="FAQ_icon" :src="icon6" alt="" style="width: 45px; height: 45px">
+                <img
+                  id="FAQ_icon"
+                  :src="icon6"
+                  alt=""
+                  style="width: 45px; height: 45px"
+                />
               </template>
               FAQ
             </n-tooltip>
@@ -67,37 +111,55 @@
   </div>
 </template>
 
-
 <script>
-import viewDevice_icon from '../assets/pic/viewDevice_icon.png'
-import switchRegion_icon from '../assets/pic/switchRegion_icon.png'
-import FAQ_icon from '../assets/pic/FAQ_icon.png'
-import logout_icon from '../assets/pic/logout_icon.png'
-import viewDevice_icon_blue from '../assets/pic/viewDevice_icon_blue.png'
-import switchRegion_icon_blue from '../assets/pic/switchRegion_icon_blue.png'
-import FAQ_icon_blue from '../assets/pic/FAQ_icon_blue.png'
-import logout_icon_blue from '../assets/pic/logout_icon_blue.png'
+import viewDevice_icon from "../assets/pic/viewDevice_icon.png";
+import switchRegion_icon from "../assets/pic/switchRegion_icon.png";
+import FAQ_icon from "../assets/pic/FAQ_icon.png";
+import home from "../assets/pic/home.png";
+import viewDevice_icon_blue from "../assets/pic/viewDevice_icon_blue.png";
+import switchRegion_icon_blue from "../assets/pic/switchRegion_icon_blue.png";
+import FAQ_icon_blue from "../assets/pic/FAQ_icon_blue.png";
+import home_hover from "../assets/pic/home_hover.png";
+import { defineComponent } from "vue";
+import { useMessage } from "naive-ui";
 
-
-export default {
+export default defineComponent({
   name: "MenuBar",
+  setup() {
+    const message = useMessage();
+    const mistake = () => {
+      message.error("請先選擇當前之網路模式"), { duration: 500 };
+    };
+    return {
+      mistake,
+    };
+  },
   data() {
     return {
       icon3: viewDevice_icon,
       icon4: switchRegion_icon,
-      icon5: logout_icon,
+      icon5: home,
       icon6: FAQ_icon,
       viewDevice_icon: viewDevice_icon,
       switchRegion_icon: switchRegion_icon,
-      logout_icon: logout_icon,
+      home: home,
       FAQ_icon: FAQ_icon,
       viewDevice_icon_blue: viewDevice_icon_blue,
       switchRegion_icon_blue: switchRegion_icon_blue,
-      logout_icon_blue: logout_icon_blue,
+      home_hover: home_hover,
       FAQ_icon_blue: FAQ_icon_blue,
-    }
+    };
   },
-}
+  methods: {
+    checkOpenQRcode() {
+      if (!this.$store.state.QRcodeFlag) {
+        this.mistake();
+      } else {
+        this.$store.commit("switchVenue");
+      }
+    },
+  },
+});
 </script>
 
 <style scoped>
@@ -107,7 +169,12 @@ a {
 
 .menu {
   transition: 250ms all ease;
-  background: linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255, 255, 255, 0.40) 0%, rgba(0, 0, 0, 0.25) 200%);
+  background: linear-gradient(to bottom, #323232 0%, #3f3f3f 40%, #1c1c1c 150%),
+    linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(0, 0, 0, 0.25) 200%
+    );
   background-blend-mode: multiply;
   min-height: 100vh;
   width: 100px;
@@ -117,8 +184,6 @@ a {
   align-items: center;
   padding: 25px 0;
 }
-
-
 
 .content {
   display: flex;

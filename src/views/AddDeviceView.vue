@@ -1,66 +1,146 @@
 <template>
   <div class="d-flex">
     <MenuBar></MenuBar>
-    <div class="d-flex flex-column align-items-center p-5" style="width: 100%; position: relative;"
-      :class="(locating && no_cursor) ? notlocateCursor : ''">
-      <div style="font-weight: bold; font-size: 18px;color: rgba(0, 0, 0, 30%); align-self: flex-start;">
-        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
-        {{
-            $store.state.currentvenue
-        }}
-        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
+    <div
+      class="d-flex flex-column align-items-center p-5"
+      style="width: 100%; position: relative"
+      :class="locating && no_cursor ? notlocateCursor : ''"
+    >
+      <div
+        style="
+          font-weight: bold;
+          font-size: 18px;
+          color: rgba(0, 0, 0, 30%);
+          align-self: flex-start;
+        "
+      >
+        <img
+          :src="crumb"
+          alt=""
+          style="width: 30px; height: 30px; padding-bottom: 5px"
+        />
+        {{ $store.state.currentvenue }}
+        <img
+          :src="crumb"
+          alt=""
+          style="width: 30px; height: 30px; padding-bottom: 5px"
+        />
         {{ $store.state.regionAddName }}
-        <img :src="crumb" alt="" style="width:30px; height: 30px; padding-bottom: 5px;">
+        <img
+          :src="crumb"
+          alt=""
+          style="width: 30px; height: 30px; padding-bottom: 5px"
+        />
         新增裝置
       </div>
       <div class="d-flex justify-content-center align-items-center w-100 mt-2">
-        <div style="margin-right:auto">
+        <div style="margin-right: auto">
           <n-tooltip placement="right" trigger="hover">
             <template #trigger>
               <router-link :to="{ name: 'viewdevice' }">
-                <img :src="icon1" @mouseover="icon1 = arrowback_hover" @mouseleave="icon1 = arrowback">
+                <img
+                  :src="icon1"
+                  @mouseover="icon1 = arrowback_hover"
+                  @mouseleave="icon1 = arrowback"
+                />
               </router-link>
             </template>
             回上一頁
           </n-tooltip>
         </div>
-        <div style="font-weight: bold; font-size: 24px;color: rgba(0, 0, 0, 50%);">您目前所在區域為 </div>
-        <div style="font-weight: 800; font-size: 26px; color: rgba(0, 0, 0, 90%); margin-left: 10px;margin-right:auto">
-          {{
-              $store.state.regionAddName
-          }}
+        <div
+          style="font-weight: bold; font-size: 24px; color: rgba(0, 0, 0, 50%)"
+        >
+          您目前所在區域為
+        </div>
+        <div
+          style="
+            font-weight: 800;
+            font-size: 26px;
+            color: rgba(0, 0, 0, 90%);
+            margin-left: 10px;
+            margin-right: auto;
+          "
+        >
+          {{ $store.state.regionAddName }}
         </div>
       </div>
-      <button v-if="$store.state.currvenue" class="locateBtn my-2 " @click="clickBtn()" :style="clickBtnFlag()">
+      <button
+        v-if="$store.state.currvenue"
+        class="locateBtn my-2"
+        @click="clickBtn()"
+        :style="clickBtnFlag()"
+      >
         <n-tooltip placement="right" trigger="hover">
           <template #trigger>
-            <img :src="icon" @mouseover="icon = locatePic" @mouseleave="icon = locatePic_change">
+            <img
+              :src="icon"
+              @mouseover="icon = locatePic"
+              @mouseleave="icon = locatePic_change"
+            />
           </template>
           選擇裝置設置之位置
         </n-tooltip>
       </button>
 
-      <div v-if="$store.state.currvenue" id="Canvas" class="frame"
-        :class="[locating ? notlocateCursor : normalCursor][frame_status ? '' : normalCursor]"
-        @click="add_device = true; no_cursor = false; ">
-        <img v-if="areapic != ''" :src="'../../images/' + this.$store.state.currentvenue + '/' + areapic + '.jpg'"
-          :class="(locating && no_cursor) ? canlocateCursor : normalCursor" alt="尚未選取區域"
-          @mousedown="getCursorValue($event)" ref="Canvas">
+      <div
+        v-if="$store.state.currvenue"
+        id="Canvas"
+        class="frame"
+        :class="
+          [locating ? notlocateCursor : normalCursor][
+            frame_status ? '' : normalCursor
+          ]
+        "
+        @click="
+          add_device = true;
+          no_cursor = false;
+        "
+      >
+        <img
+          v-if="areapic != ''"
+          :src="
+            '../../images/' +
+            this.$store.state.currentvenue +
+            '/' +
+            areapic +
+            '.jpg'
+          "
+          :class="locating && no_cursor ? canlocateCursor : normalCursor"
+          alt="尚未選取區域"
+          @mousedown="getCursorValue($event)"
+          ref="Canvas"
+        />
         <div v-for="item in currentdevice" :key="item">
           <n-tooltip trigger="hover">
             <template #trigger>
-              <img :src="already_locate" :style="styleobj" v-on="setPosition(item.x, item.y)">
+              <img
+                :src="already_locate"
+                :style="styleobj"
+                v-on="setPosition(item.x, item.y)"
+              />
             </template>
             標題 : {{ item.title }}
-            <br>
+            <br />
             電量 : {{ item.battery }}
           </n-tooltip>
         </div>
       </div>
       <div id="draggable">
-        <AddDeviceInfo @AddSuccess="AddSuccessFunc" :info="propdata" style="cursor: default;"
+        <AddDeviceInfo
+          @AddSuccess="AddSuccessFunc"
+          :info="propdata"
+          style="cursor: default"
           v-if="frame_status && add_device"
-          @close="frame_status = false; add_device = false; locating = false; no_cursor = true; this.propdata = []; this.clickBtnStatus = false">
+          @close="
+            frame_status = false;
+            add_device = false;
+            locating = false;
+            no_cursor = true;
+            this.propdata = [];
+            this.clickBtnStatus = false;
+          "
+        >
         </AddDeviceInfo>
       </div>
     </div>
@@ -68,41 +148,41 @@
 </template>
 
 <script>
-import $ from 'jquery'
-import 'jquery-ui-dist/jquery-ui.js'
-import 'jquery-ui-dist/jquery-ui.css'
-import axios from 'axios'
-import { defineComponent, ref, reactive } from 'vue'
-import MenuBar from '@/components/MenuBar.vue';
-import AddDeviceInfo from '@/components/AddDeviceInfo.vue';
+import $ from "jquery";
+import "jquery-ui-dist/jquery-ui.js";
+import "jquery-ui-dist/jquery-ui.css";
+import axios from "axios";
+import { defineComponent, ref, reactive } from "vue";
+import MenuBar from "@/components/MenuBar.vue";
+import AddDeviceInfo from "@/components/AddDeviceInfo.vue";
 
-import locatePic from '../assets/pic/location.png'
-import locatePic_change from '../assets/pic/location_change.png'
-import already_locate from '../assets/pic/already_locate.png'
-import arrowback from '../assets/pic/arrowback.jpg'
-import arrowback_hover from '../assets/pic/arrowback_hover.jpg'
-import crumb from '../assets/pic/crumb.png'
+import locatePic from "../assets/pic/location.png";
+import locatePic_change from "../assets/pic/location_change.png";
+import already_locate from "../assets/pic/already_locate.png";
+import arrowback from "../assets/pic/arrowback.jpg";
+import arrowback_hover from "../assets/pic/arrowback_hover.jpg";
+import crumb from "../assets/pic/crumb.png";
 
 export default defineComponent({
   setup() {
     let styleobj = reactive({
-      width: '20px',
-      height: '20px',
-      position: 'absolute',
-      top: '',
-      left: ''
+      width: "20px",
+      height: "20px",
+      position: "absolute",
+      top: "",
+      left: "",
     });
     const setPosition = (x, y) => {
-      styleobj.top = y + 'px'
-      styleobj.left = x + 'px'
-    }
+      styleobj.top = y + "px";
+      styleobj.left = x + "px";
+    };
     return {
       setPosition,
       styleobj,
       show: ref(false),
       options: [],
       propdata: [],
-    }
+    };
   },
   components: {
     MenuBar,
@@ -118,10 +198,10 @@ export default defineComponent({
       frame_status: false,
       add_device: false,
       locating: false,
-      canlocateCursor: 'locateCursor',
-      notlocateCursor: 'notlocateCursor',
-      normalCursor: 'normalCursor',
-      blechosen: 'blechosen',
+      canlocateCursor: "locateCursor",
+      notlocateCursor: "notlocateCursor",
+      normalCursor: "normalCursor",
+      blechosen: "blechosen",
       icon1: arrowback,
       arrowback: arrowback,
       arrowback_hover: arrowback_hover,
@@ -129,14 +209,14 @@ export default defineComponent({
 
       no_cursor: true,
       mouse: {
-        'x': 0,
-        'y': 0,
+        x: 0,
+        y: 0,
       },
       frameBoundary: {
-        'x': 0,
-        'y': 0,
+        x: 0,
+        y: 0,
       },
-      areapic: '',
+      areapic: "",
       currentdevice: [],
     };
   },
@@ -147,24 +227,28 @@ export default defineComponent({
       this.locating = false;
       this.no_cursor = true;
       this.propdata = [];
-      this.clickBtnStatus = false
-      this.areavalue = value
-      this.areapic = this.$store.state.currentvenue + "_" + this.$store.state.regionAddName
-      this.fetchPicInfo()
+      this.clickBtnStatus = false;
+      this.areavalue = value;
+      this.areapic =
+        this.$store.state.currentvenue + "_" + this.$store.state.regionAddName;
+      this.fetchPicInfo();
     },
     getCursorValue(event) {
       if (this.frame_status == true && this.locating == true) {
-        let temp = this.$refs.Canvas
+        let temp = this.$refs.Canvas;
 
-        this.frameBoundary.x = temp.getBoundingClientRect().x
-        this.frameBoundary.y = temp.getBoundingClientRect().y
+        this.frameBoundary.x = temp.getBoundingClientRect().x;
+        this.frameBoundary.y = temp.getBoundingClientRect().y;
 
-        this.mouse.x = event.clientX
-        this.mouse.y = event.clientY
+        this.mouse.x = event.clientX;
+        this.mouse.y = event.clientY;
 
         this.propdata.push({
-          'Xaxis': this.mouse.x - this.frameBoundary.x, 'Yaxis': this.mouse.y - this.frameBoundary.y, 'Area': this.$store.state.regionAddName, 'Venue': this.$store.state.currentvenue
-        })
+          Xaxis: this.mouse.x - this.frameBoundary.x,
+          Yaxis: this.mouse.y - this.frameBoundary.y,
+          Area: this.$store.state.regionAddName,
+          Venue: this.$store.state.currentvenue,
+        });
         // console.log(this.propdata)
       }
     },
@@ -172,50 +256,56 @@ export default defineComponent({
       if (this.clickBtnStatus) {
         this.frame_status = false;
         this.locating = false;
-        this.clickBtnStatus = false
-      }
-      else {
+        this.clickBtnStatus = false;
+      } else {
         this.frame_status = true;
         this.locating = true;
-        this.clickBtnStatus = true
+        this.clickBtnStatus = true;
       }
     },
     clickBtnFlag: function () {
       var style = {};
       if (this.clickBtnStatus) {
-        style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-      }
-      else {
-        style.backgroundColor = 'transparent';
+        style.backgroundColor = "rgba(0, 0, 0, 0.2)";
+      } else {
+        style.backgroundColor = "transparent";
       }
       return style;
     },
     async fetchPicInfo() {
-      let devices
+      let devices;
       await axios({
-        method: 'get',
-        baseURL: this.$store.state.api + '/deviceInfo',
-        'Content-Type': 'application/json',
+        method: "get",
+        baseURL: this.$store.state.api + "/deviceInfo",
+        "Content-Type": "application/json",
       })
-        .then((response) => devices = response.data)
-        .catch((err) => { console.error(err) })
-
+        .then((response) => (devices = response.data))
+        .catch((err) => {
+          console.error(err);
+        });
 
       for (let i = 0; i < Object.values(devices).length; i++) {
         if (devices[i].Area === this.$store.state.regionAddName) {
-          this.currentdevice.push({ 'x': devices[i].Xaxis, 'y': devices[i].Yaxis, 'battery': devices[i].Battery, 'title': devices[i].Title })
+          devices[i].Battery = 20 * devices[i].Battery
+          this.currentdevice.push({
+            x: devices[i].Xaxis,
+            y: devices[i].Yaxis,
+            battery: devices[i].Battery,
+            title: devices[i].Title,
+          });
         }
       }
     },
   },
   mounted() {
-    this.areapic = this.$store.state.currentvenue + "_" + this.$store.state.regionAddName
-    this.fetchPicInfo()
+    this.areapic =
+      this.$store.state.currentvenue + "_" + this.$store.state.regionAddName;
+    this.fetchPicInfo();
     if (this.$store.state.currvenue == false) {
-      this.$router.push('/')
+      this.$router.push("/");
     }
-    $('#draggable').draggable();
-  }
+    $("#draggable").draggable();
+  },
 });
 </script>
 
@@ -242,7 +332,6 @@ export default defineComponent({
   align-items: center;
 }
 
-
 .frame {
   width: 650px;
   height: 650px;
@@ -253,7 +342,6 @@ export default defineComponent({
   border-radius: 5px;
   position: relative;
 }
-
 
 .frame img {
   margin: 20px;
@@ -267,11 +355,11 @@ export default defineComponent({
 }
 
 .locateCursor {
-  cursor: url('../assets/pic/locate_green2.png'), pointer;
+  cursor: url("../assets/pic/locate_green2.png"), pointer;
 }
 
 .notlocateCursor {
-  cursor: url('../assets/pic/no_locate.png'), pointer;
+  cursor: url("../assets/pic/no_locate.png"), pointer;
 }
 
 .normalCursor {

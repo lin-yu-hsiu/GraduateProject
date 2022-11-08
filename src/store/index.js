@@ -1,58 +1,50 @@
-import {
-  createStore
-} from 'vuex'
+import { createStore } from "vuex";
 
 export default createStore({
   state: {
-    step: '',
+    step: "",
     currvenue: false,
-    currentvenue: '(需先切換場館)',
-    api: 'http://192.168.206.104:5000/',
-    currentUser: '',
+    currentvenue: "(需先切換場館)",
+    api: "http://10.101.0.89:5000",
+    currentUser: "",
     venueEditMode: false,
     allvenues: [],
     deviceEditMode: false,
-    regionAddName: '',
+    regionAddName: "",
     openMapFlag: false,
-    openMapName: '',
+    openMapNum: 0,
+    openMapName: "",
     openPicFlag: false,
-    openPicName: '',
-    openPicRegionName: '',
+    openPicName: "",
+    openPicRegionName: "",
     QRcodeNetFlag: false, //內跟外
     QRcodeFlag: false, //開跟關
-    QRcodeURL: ''
+    QRcodeURL: "",
   },
   getters: {},
   mutations: {
     switchRegion(state, curr) {
-
-      state.currentvenue = curr;
-      state.currvenue = true
-
+      if (state.QRcodeFlag) {
+        state.currentvenue = curr;
+        state.currvenue = true;
+      }
     },
     switchVenue(state) {
-
-      state.step = 'switch'
-      state.venueEditMode = false
-      state.deviceEditMode = false
-
+      state.step = "switch";
+      state.venueEditMode = false;
+      state.deviceEditMode = false;
     },
     viewDevice(state) {
-
-      state.step = 'view'
-      state.venueEditMode = false
-      state.deviceEditMode = false
-
-
+      state.step = "view";
+      state.venueEditMode = false;
+      state.deviceEditMode = false;
     },
     FAQ(state) {
-
-      state.step = 'faq'
-      state.venueEditMode = false
-      state.deviceEditMode = false
-
+      state.step = "faq";
+      state.venueEditMode = false;
+      state.deviceEditMode = false;
     },
   },
   actions: {},
-  modules: {}
-})
+  modules: {},
+});
