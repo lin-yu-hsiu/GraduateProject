@@ -110,43 +110,42 @@ export default {
         }
       }
       for (let i = 0; i < temp1.length; i++) {
-        devices[i].Battery = 20 * devices[i].Battery;
+        temp1[i].Battery = 20 * temp1[i].Battery;
         if (i == 0) {
           this.currentdevice.push({
-            x: devices[i].Xaxis,
-            y: devices[i].Yaxis,
-            battery: devices[i].Battery,
-            title: devices[i].Title,
-            visitor: devices[i].Visitor,
+            x: temp1[i].Xaxis,
+            y: temp1[i].Yaxis,
+            battery: temp1[i].Battery,
+            title: temp1[i].Title,
+            visitor: temp1[i].Visitor,
             picsrc: already_locate_green,
             maxtag: 0,
             mintag: 1,
           });
         } else if (i == temp1.length - 1) {
           this.currentdevice.push({
-            x: devices[i].Xaxis,
-            y: devices[i].Yaxis,
-            battery: devices[i].Battery,
-            title: devices[i].Title,
-            visitor: devices[i].Visitor,
+            x: temp1[i].Xaxis,
+            y: temp1[i].Yaxis,
+            battery: temp1[i].Battery,
+            title: temp1[i].Title,
+            visitor: temp1[i].Visitor,
             picsrc: already_locate_red,
             maxtag: 1,
             mintag: 0,
           });
         } else {
           this.currentdevice.push({
-            x: devices[i].Xaxis,
-            y: devices[i].Yaxis,
-            battery: devices[i].Battery,
-            title: devices[i].Title,
-            visitor: devices[i].Visitor,
+            x: temp1[i].Xaxis,
+            y: temp1[i].Yaxis,
+            battery: temp1[i].Battery,
+            title: temp1[i].Title,
+            visitor: temp1[i].Visitor,
             maxtag: 0,
             mintag: 0,
             picsrc: already_locate,
           });
         }
       }
-      // console.log(this.currentdevice);
     },
   },
   mounted() {
