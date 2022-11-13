@@ -255,9 +255,7 @@ def newDevice():
         data = str(request.data,encoding="UTF-8")
         temp = json.loads(data)
         data = { "UUID": temp['UUID'],'Tx':temp['tx'],'Rx':temp['rx'],'Nus':temp['nus'] }
-        print(data)        
         result = DB.insert_data("BLE", data)
-        print(result)
         #content = {"UUID": id,'tx':tx,'rx':rx,'nus':nus}
         if(result['success']):
             return jsonify(result)
