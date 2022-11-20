@@ -513,9 +513,7 @@ export default defineComponent({
             },
           })
         ).data;
-        if (res.success != 0 || res.success != 1) {
-          this.uploadFail();
-        }
+       
         if (res.success == 1) {
           let res1 = (
             await axios({
@@ -525,9 +523,6 @@ export default defineComponent({
               data: json_innet,
             })
           ).data;
-          if (res1.success != 0 || res1.success != 1) {
-            this.uploadFail();
-          }
           if (res1.success == 1) {
             this.uploadProgress += 5;
             setTimeout(() => {}, "500");
