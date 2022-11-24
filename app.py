@@ -17,6 +17,7 @@ def Home():
 @app.route("/table/BLE/<uuid>")
 def search(uuid):
     content = DB.show_data('BLE')
+    data = {}
     for i in content:
         if(content[i]['UUID'] == str(uuid)):
             data = content[i]       
@@ -300,7 +301,6 @@ def insertBLE():
         # 新增temp['Pic Download']
     else:
         del temp['Pic']
-    
     
     del temp['Venue']
     del temp['Area']

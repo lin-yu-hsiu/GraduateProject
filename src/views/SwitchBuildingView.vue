@@ -219,11 +219,12 @@ export default defineComponent({
           headers: { "Content-Type": "application/json" },
           data: json,
         })
-          .then((response) => (response = response.data))
+          .then((response) => {response = response.data;
+            console.log(response)})
           .catch((err) => {
             console.error(err);
           });
-
+        
         this.venuedata.name = ""; //清空輸入格
         this.fetchAllVenues();
         this.success();
