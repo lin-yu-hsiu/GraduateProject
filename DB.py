@@ -195,6 +195,8 @@ def show_device_info(number):
             temp['Audio'] = records[row][9]
             temp['Href'] = records[row][10]
             temp['Pic'] = records[row][14]
+            temp['Visitor'] = records[row][18]
+            temp['RSSI'] = records[row][19]
             temp['Route'] = records[row][len(records[row])-3]
             temp['Venue'] = records[row][len(records[row])-2]
             temp['Area'] = records[row][len(records[row])-1]

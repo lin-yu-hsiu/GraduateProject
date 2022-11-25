@@ -57,8 +57,27 @@
       class="d-flex justify-content-between mx-auto mb-2"
       style="width: 300px; font-weight: 600"
     >
+      <div class="subTitle">裝置參數</div>
+      <input
+        v-model="rssivalue"
+        class="edit"
+        type="text"
+        placeholder="請輸入數字"
+        style="font-weight: bold; font-size: 14px"
+      />
+    </div>
+    <div
+      class="d-flex justify-content-between mx-auto mb-2"
+      style="width: 300px; font-weight: 600"
+    >
       <div class="subTitle">標題</div>
-      <input v-model="titlevalue" class="edit" type="text" />
+      <input
+        v-model="titlevalue"
+        class="edit"
+        type="text"
+        placeholder="請輸入文字"
+        style="font-weight: bold; font-size: 14px"
+      />
     </div>
     <div
       class="d-flex justify-content-between mx-auto align-items-center"
@@ -305,6 +324,7 @@ export default defineComponent({
       titlevalue: "",
       BLEMessage: "",
       BLEHref: "",
+      rssivalue: "",
       messageLinkStatus: false,
       messageTextStatus: false,
       messageAudioStatus: false,
@@ -480,6 +500,7 @@ export default defineComponent({
           Href: this.BLEHref,
           Audio: this.audioFlag,
           Pic: this.imageFlag,
+          RSSI: this.rssivalue,
         };
         let body_outNet = {
           type: "A",
@@ -488,6 +509,7 @@ export default defineComponent({
           href: this.BLEHref,
           photoRef: this.uploadImageLink,
           audioRef: this.uploadAudioLink,
+          rssi: this.rssivalue,
         };
         let temp = Object.assign({}, body_innet, this.device[0]);
         let temp1 = Object.assign({}, body_outNet, this.server_info);
@@ -513,7 +535,7 @@ export default defineComponent({
             },
           })
         ).data;
-       
+
         if (res.success == 1) {
           let res1 = (
             await axios({

@@ -81,7 +81,7 @@
     >
       {{ deviceInfo.Title }}
     </div>
-
+    <!-- Battery -->
     <div
       class="d-flex justify-content-center"
       :class="[isRemoving ? removeHidden : '']"
@@ -99,7 +99,7 @@
         style="width: 60px"
       />
     </div>
-
+    <!-- Message -->
     <div
       class="scroll"
       v-if="isRemoving == false"
@@ -242,7 +242,28 @@
         ></textarea>
       </div>
     </div>
+    <!-- RSSI -->
+    <textarea
+      v-if="isEditing"
+      class="scroll edit scroll_white"
+      :class="[isRemoving ? removeHidden : '']"
+      cols="5"
+      rows="2"
+      style="width: 80px"
+      v-model="deviceInfo.RSSI"
+    ></textarea>
+    <textarea
+      v-else
+      disabled
+      id="psContent"
+      class="scroll"
+      :class="[isRemoving ? removeHidden : '']"
+      cols="5"
+      style="width: 80px; background-color: rgba(255, 255, 255, 65%)"
+      v-model="deviceInfo.RSSI"
+    ></textarea>
 
+    <!-- Status -->
     <n-switch
       size="large"
       v-if="isEditing"
@@ -260,7 +281,7 @@
       style="width: 80px"
     >
     </n-switch>
-
+    <!-- Picture -->
     <button
       v-if="!isRemoving"
       style="width: 80px; border: none; background-color: transparent"
@@ -295,7 +316,7 @@
       "
     >
     </ViewPic>
-
+    <!-- PS -->
     <textarea
       v-if="isEditing"
       name=""
@@ -355,13 +376,16 @@ export default defineComponent({
     ViewPic,
   },
   setup() {
-    // const reload = inject('reload')
     const message = useMessage();
     const update = () => {
       message.success("修改成功"), { duration: 500 };
     };
+    const deletefile = () => {
+      message.warning("刪除成功"), { duration: 500 };
+    };
     return {
       update,
+      deletefile,
     };
   },
   props: {
@@ -449,6 +473,7 @@ export default defineComponent({
         href: this.deviceInfo.Href,
         photoRef: uploadImageLink,
         audioRef: uploadAudioLink,
+        rssi: this.deviceInfo.RSSI,
       };
       let temp1 = Object.assign({}, body_outNet, server_info);
       const json_outNet = JSON.stringify(temp1);
@@ -468,6 +493,7 @@ export default defineComponent({
         Message: this.deviceInfo.Message,
         Note: this.deviceInfo.Note,
         Href: this.deviceInfo.Href,
+        RSSI: this.deviceInfo.RSSI,
       };
       const json = JSON.stringify(body);
       let res = [];
@@ -487,34 +513,45 @@ export default defineComponent({
       this.isEditing = false;
     },
     async removeChange() {
+      let device = (
+        await axios({
+          method: "get",
+          baseURL: this.$store.state.api + "/table/BLE/" + this.deviceInfo.UUID,
+          "Content-Type": "application/json",
+        })
+      ).data;
       // 外網刪除裝置
+      if (device["PicLink"] != null) {
+        let storageImage = dbRef(
+          storage,
+          "devices/" + this.deviceInfo.UUID + "/" + "photo.jpg"
+        );
+        await deleteObject(storageImage)
+          .then(() => {
+            console.log("success");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      if (device["AudLink"] != null) {
+        let storageAudio = dbRef(
+          storage,
+          "devices/" + this.deviceInfo.UUID + "/" + "audio.mp3"
+        );
+        await deleteObject(storageAudio)
+          .then(() => {
+            console.log("success");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
       let storageJson = dbRef(
         storage,
         "devices/" + this.deviceInfo.UUID + "/" + "config.json"
       );
       await deleteObject(storageJson)
-        .then(() => {
-          console.log("success");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      let storageImage = dbRef(
-        storage,
-        "devices/" + this.deviceInfo.UUID + "/" + "photo.jpg"
-      );
-      await deleteObject(storageImage)
-        .then(() => {
-          console.log("success");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      let storageAudio = dbRef(
-        storage,
-        "devices/" + this.deviceInfo.UUID + "/" + "audio.mp3"
-      );
-      await deleteObject(storageAudio)
         .then(() => {
           console.log("success");
         })
@@ -540,7 +577,7 @@ export default defineComponent({
         .then((response) => (res = response.data))
         .catch((error) => console.log(error));
       if (res.success == 1) {
-        this.update();
+        this.deletefile();
       }
 
       this.isRemoving = false;

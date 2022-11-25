@@ -134,7 +134,7 @@ export default defineComponent({
       message.success("新增成功");
     };
     const mistake = () => {
-      message.error("區域名稱不得超過五個字");
+      message.error("區域名稱不得空白或超過五個字");
     };
     return {
       update,
@@ -219,12 +219,14 @@ export default defineComponent({
           headers: { "Content-Type": "application/json" },
           data: json,
         })
-          .then((response) => {response = response.data;
-            console.log(response)})
+          .then((response) => {
+            response = response.data;
+            console.log(response);
+          })
           .catch((err) => {
             console.error(err);
           });
-        
+
         this.venuedata.name = ""; //清空輸入格
         this.fetchAllVenues();
         this.success();
