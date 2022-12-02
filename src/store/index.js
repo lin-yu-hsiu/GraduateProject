@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 
 export default createStore({
   state: {
-    step: "",
+    step: "home",
     currvenue: false,
     currentvenue: "(需先切換場館)",
     api: "http://192.168.50.236:5000",
@@ -28,6 +28,11 @@ export default createStore({
         state.currentvenue = curr;
         state.currvenue = true;
       }
+    },
+    home(state) {
+      state.step = "home";
+      state.venueEditMode = false;
+      state.deviceEditMode = false;
     },
     switchVenue(state) {
       state.step = "switch";

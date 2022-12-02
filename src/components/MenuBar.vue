@@ -2,7 +2,8 @@
   <div class="menu">
     <div class="home w-100">
       <router-link :to="{ name: 'home' }">
-        <button class="content">
+        <button class="content" @click="this.$store.commit('home')">
+          <div v-if="this.$store.state.step == 'home'" class="decoration"></div>
           <div
             style="margin: 0 auto"
             @mouseover="icon5 = home_hover"
@@ -83,7 +84,7 @@
     </div>
 
     <div class="info w-100">
-      <router-link :to="{ name: 'FAQ' }">
+      <!-- <router-link :to="{ name: 'FAQ' }">
         <button class="content" @click="this.$store.commit('FAQ')">
           <div v-if="this.$store.state.step == 'faq'" class="decoration"></div>
           <div
@@ -106,7 +107,7 @@
             </n-tooltip>
           </div>
         </button>
-      </router-link>
+      </router-link> -->
     </div>
   </div>
 </template>
