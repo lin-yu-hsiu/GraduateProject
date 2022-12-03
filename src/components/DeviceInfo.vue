@@ -456,16 +456,23 @@ export default defineComponent({
           server_info[index] = "";
         }
       }
-      let storageImage = dbRef(
-        storage,
-        "devices/" + this.deviceInfo.UUID + "/" + "photo.jpg"
-      );
-      let uploadImageLink = await getDownloadURL(storageImage);
-      let storageAudio = dbRef(
-        storage,
-        "devices/" + this.deviceInfo.UUID + "/" + "audio.mp3"
-      );
-      let uploadAudioLink = await getDownloadURL(storageAudio);
+      let uploadImageLink;
+      let uploadAudioLink;
+      if (device["PicLink"] != null) {
+        let storageImage = dbRef(
+          storage,
+          "devices/" + this.deviceInfo.UUID + "/" + "photo.jpg"
+        );
+        uploadImageLink = await getDownloadURL(storageImage);
+      }
+      if (device["AudLink"] != null) {
+        let storageAudio = dbRef(
+          storage,
+          "devices/" + this.deviceInfo.UUID + "/" + "audio.mp3"
+        );
+        uploadAudioLink = await getDownloadURL(storageAudio);
+      }
+
       let body_outNet = {
         type: "A",
         title: device["Title"],
