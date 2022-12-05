@@ -11,6 +11,7 @@ export default createStore({
     allvenues: [],
     deviceEditMode: false,
     regionAddName: "",
+    mapAddNum: 0,
     openMapFlag: false,
     openMapNum: 0,
     openMapName: "",

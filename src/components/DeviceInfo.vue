@@ -298,24 +298,7 @@
         "
       />
     </button>
-    <ViewPic
-      v-if="this.$store.state.openPicFlag"
-      @close="
-        this.$store.state.openPicFlag = false;
-        this.$store.state.openPicName = '';
-        this.$store.state.openPicRegionName = '';
-      "
-      style="
-        position: absolute;
-        top: 30vh;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-        z-index: 1;
-      "
-    >
-    </ViewPic>
+
     <!-- PS -->
     <textarea
       v-if="isEditing"
@@ -344,7 +327,7 @@
 
 <script>
 import axios from "axios";
-import ViewPic from "./ViewPic.vue";
+
 import { defineComponent } from "vue";
 import { useMessage } from "naive-ui";
 import edit from "../assets/pic/edit_green.png";
@@ -372,9 +355,6 @@ import {
 } from "firebase/storage";
 
 export default defineComponent({
-  components: {
-    ViewPic,
-  },
   setup() {
     const message = useMessage();
     const update = () => {
@@ -480,7 +460,7 @@ export default defineComponent({
         href: this.deviceInfo.Href,
         photoRef: uploadImageLink,
         audioRef: uploadAudioLink,
-        rssi: this.deviceInfo.RSSI,
+        rssi: Number(this.deviceInfo.RSSI),
       };
       let temp1 = Object.assign({}, body_outNet, server_info);
       const json_outNet = JSON.stringify(temp1);
@@ -500,7 +480,7 @@ export default defineComponent({
         Message: this.deviceInfo.Message,
         Note: this.deviceInfo.Note,
         Href: this.deviceInfo.Href,
-        RSSI: this.deviceInfo.RSSI,
+        RSSI: Number(this.deviceInfo.RSSI),
       };
       const json = JSON.stringify(body);
       let res = [];

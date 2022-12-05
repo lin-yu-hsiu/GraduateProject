@@ -285,8 +285,11 @@ export default defineComponent({
         });
 
       for (let i = 0; i < Object.values(devices).length; i++) {
-        if (devices[i].Area === this.$store.state.regionAddName) {
-          devices[i].Battery = 20 * devices[i].Battery
+        if (
+          devices[i].Area === this.$store.state.regionAddName &&
+          devices[i].MapNum == this.$store.state.mapAddNum
+        ) {
+          devices[i].Battery = 20 * devices[i].Battery;
           this.currentdevice.push({
             x: devices[i].Xaxis,
             y: devices[i].Yaxis,

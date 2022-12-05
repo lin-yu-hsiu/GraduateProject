@@ -89,7 +89,10 @@
       <button
         v-if="this.$store.state.deviceEditMode"
         class="AddDevice mb-1"
-        @click="this.$store.state.regionAddName = region.Area"
+        @click="
+          this.$store.state.regionAddName = region.Area;
+          this.$store.state.mapAddNum = region.Number;
+        "
         @mouseover="icon2 = addDevice_icon_blue"
         @mouseleave="icon2 = addDevice_icon"
       >
