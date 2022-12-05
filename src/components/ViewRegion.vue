@@ -150,6 +150,9 @@ import remove_hover from "../assets/pic/trash_hover.png";
 import addDevice_icon from "../assets/pic/addDevice_icon.png";
 import addDevice_icon_blue from "../assets/pic/addDevice_icon_blue.png";
 
+import { storage } from "@/firebase";
+import { ref as dbRef, deleteObject } from "firebase/storage";
+
 export default {
   setup() {
     const reload = inject("reload");
@@ -258,6 +261,71 @@ export default {
       this.$emit("ifEmpty");
     },
     async sendToRemoveRegion() {
+      // 外網刪除
+      let temp = [];
+      await axios({
+        method: "get",
+        url:
+          this.$store.state.api +
+          "/deviceInfo/" +
+          this.regions.Number.toString(),
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => (temp = response.data))
+        .catch((err) => {
+          console.error(err);
+        });
+      let allUUID = [];
+      for (let i = 0; i < temp.length; i++) {
+        allUUID[i] = temp[i].UUID;
+      }
+      for (let i = 0; i < allUUID.length; i++) {
+        let device = (
+          await axios({
+            method: "get",
+            baseURL: this.$store.state.api + "/table/BLE/" + allUUID[i],
+            "Content-Type": "application/json",
+          })
+        ).data;
+        if (device["PicLink"] != null) {
+          let storageImage = dbRef(
+            storage,
+            "devices/" + allUUID[i] + "/" + "photo.jpg"
+          );
+          await deleteObject(storageImage)
+            .then(() => {
+              console.log("success");
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        if (device["AudLink"] != null) {
+          let storageAudio = dbRef(
+            storage,
+            "devices/" + allUUID[i] + "/" + "audio.mp3"
+          );
+          await deleteObject(storageAudio)
+            .then(() => {
+              console.log("success");
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        let storageJson = dbRef(
+          storage,
+          "devices/" + allUUID[i] + "/" + "config.json"
+        );
+        await deleteObject(storageJson)
+          .then(() => {
+            console.log("success");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      // 內網刪除
       let body = {
         MapNum: this.regions.Number,
       };
@@ -276,9 +344,13 @@ export default {
       console.log(res);
       this.$emit("_reDisplay");
     },
+    // async test() {
+
+    // },
   },
   mounted() {
     this.viewRegion(this.regions.Number);
+    // this.test();
   },
 };
 </script>

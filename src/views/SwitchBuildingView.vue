@@ -136,10 +136,14 @@ export default defineComponent({
     const mistake = () => {
       message.error("區域名稱不得空白或超過五個字");
     };
+    const mistake1 = () => {
+      message.error("區域名稱不得重複");
+    };
     return {
       update,
       mistake,
       success,
+      mistake1,
     };
   },
   components: {
@@ -195,6 +199,7 @@ export default defineComponent({
       SetToArray.sort();
       this.venues = SetToArray;
       this.$store.state.allvenues = this.venues;
+      console.log(this.$store.state.allvenues);
     },
     reDisplay(toRemoveVenue, flag) {
       this.removingflag = flag;
@@ -208,30 +213,39 @@ export default defineComponent({
       this.update();
     },
     async sendToAddVenue() {
-      if (this.venuedata.name != "" && this.venuedata.name.length < 6) {
-        let body = {
-          Venue: this.venuedata.name,
-        };
-        const json = JSON.stringify(body);
-        await axios({
-          method: "post",
-          url: this.$store.state.api + "/createVenue",
-          headers: { "Content-Type": "application/json" },
-          data: json,
-        })
-          .then((response) => {
-            response = response.data;
-            console.log(response);
+      let flag = 1;
+      for (let i = 0; i < this.$store.state.allvenues.length; i++) {
+        if (this.venuedata.name == this.$store.state.allvenues[i].name) {
+          this.mistake1();
+          flag = 0;
+        }
+      }
+      if (flag == 1) {
+        if (this.venuedata.name != "" && this.venuedata.name.length < 6) {
+          let body = {
+            Venue: this.venuedata.name,
+          };
+          const json = JSON.stringify(body);
+          await axios({
+            method: "post",
+            url: this.$store.state.api + "/createVenue",
+            headers: { "Content-Type": "application/json" },
+            data: json,
           })
-          .catch((err) => {
-            console.error(err);
-          });
+            .then((response) => {
+              response = response.data;
+              console.log(response);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
 
-        this.venuedata.name = ""; //清空輸入格
-        this.fetchAllVenues();
-        this.success();
-      } else {
-        this.mistake();
+          this.venuedata.name = ""; //清空輸入格
+          this.fetchAllVenues();
+          this.success();
+        } else {
+          this.mistake();
+        }
       }
     },
   },
